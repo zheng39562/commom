@@ -61,11 +61,13 @@ PROJECT_PATH=out
 PROJECT_OBJECTS= \
 	./$(PROJECT_PATH)/./src/exception/common_exception.o \
 	./$(PROJECT_PATH)/./src/sql/sql_operator.o \
-	./$(PROJECT_PATH)/./src/network/msg_cache.o \
+	./$(PROJECT_PATH)/./src/network/net_server.o \
+	./$(PROJECT_PATH)/./src/network/net_client.o \
 	./$(PROJECT_PATH)/./src/network/net_collection.o \
 	./$(PROJECT_PATH)/./src/network/net_msg_struct.o \
 	./$(PROJECT_PATH)/./src/network/net_packer.o \
 	./$(PROJECT_PATH)/./src/network/net_protocol_convert.o \
+	./$(PROJECT_PATH)/./src/network/net_protocol_struct.o \
 	./$(PROJECT_PATH)/./src/network/net_struct.o \
 	./$(PROJECT_PATH)/./src/network/net_transfer.o \
 	./$(PROJECT_PATH)/./src/network/socket_simple.o \
@@ -81,7 +83,6 @@ PROJECT_OBJECTS= \
 	./$(PROJECT_PATH)/./src/tool/xls_struct.o \
 	./$(PROJECT_PATH)/./src/tool/xls_writer.o \
 	./$(PROJECT_PATH)/./src/${MAIN_NAME}.o
-
 
 ./${PROJECT_PATH}/%.o : %.cpp
 	-mkdir -p ./${PROJECT_PATH}/$(dir $<)

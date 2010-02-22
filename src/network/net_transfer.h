@@ -16,6 +16,8 @@
 #include "event2/event.h"
 #include "boost/shared_ptr.hpp"
 #include "network/net_packer.h"
+#include "network/net_struct.h"
+#include "network/net_msg_struct.h"
 
 namespace Network{
 	extern const int READ_BUFFER_SIZE;
@@ -34,24 +36,52 @@ namespace Network{
 	};
 	//! \brief	网络传输类。
 	//! \note	基于TCP libevent socket 结构完成。不排除未来支持UDP
-	//! \note	套接字，通过自定义的数据包，进行接收和写入。
+	//! 
+	//! \note	功能：
+	//! \note	1	监听端口，维护TCP连接，连接关闭通知。
+	//! \note	2	读写功能：通过自定义的数据包，进行接收和写入。拥有读通道和写通道。
+	//! \note		* 读通道通过读取msg信息，输出packer包
+	//! \note		* 写通道通过读取packer包，输出msg信息
+	//!
 	//! \todo	可以再扩展IO/文件等传输类。可能需要对类名进行一定修正。
 	//! \todo	PS：可以用过在外连接好socket的方式来当作客户端使用。后期会在此类基础上做一个简易的客户端版本。
-	class NetMsgTransfer : public Transfer {
+	class NetTransfer : public Transfer {
 		public:
-			NetMsgTransfer();
-			virtual ~NetMsgTransfer();
+			NetTransfer();
+			virtual ~NetTransfer();
 		public:
+			virtual void run(const std::string &ip, const long &port)=0;
+			//! \brief	注销连接。
+			//! \brief	写通道
+			bool emptyW(ConnectKey connectKey);
+			void pushPacker(const PackerPtr &pPacker);
+			MsgPtr popMsg(ConnectKey connectKey);
+
+			//! \brief	读通道
+			bool emptyR();
+			void pushMsg(const MsgPtr &pMsg);
+			PackerPtr popPacker();
+		protected:
 			int addSocket(const int &socket, eSocketRWOpt socketRWOpt = socketRWOpt_RW);
-			int removeSocket(const int &socket);
-			void run();
 		private:
-			static void writeBack(bufferevent* bev, void *ctx);
-			static void readBack(bufferevent* bev, void *ctx);
-			static void errorBack(bufferevent* bev, short events, void *ctx);
+			//! \brief	写 回调函数。
+			static void writeBack(ConnectKey connectKey, void *ctx);
+			//! \brief	读 回调函数。
+			static void readBack(ConnectKey connectKey, void *ctx);
+			//! \brief	报错 回调函数。
+			static void errorBack(ConnectKey connectKey, short events, void *ctx);
+
+			//! \brief	注册连接。
+			void registerConnect(const ConnectKey &connectKey);
+			void unregisterConnect(const ConnectKey &connectKey);
 		public:
+			static char* m_s_ReadBuf;
+
 			event_base* m_EventBase;
-			//MsgCache m_MsgCache;
+
+			MsgCache m_MsgCache;				//! 缓存类需要自身带锁。
+			PackerCache m_PackerCache;			//! 缓存类需要自身带锁。
+			std::map<ConnectKey, std::string> m_IncompleteMsg;
 	};
 }
 

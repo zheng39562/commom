@@ -25,8 +25,8 @@
 //!	\note	理论上可以传输任意尺寸的数据，但数据暂时全部写入内存中，故过大的文件可能导致内存不足。
 namespace Network{
 	//! \brief	扩展标志位
-	extern const char PROTOCOL_EXPAND_DATA_VERIFY;
-	extern const char PROTOCOL_EXPAND_;
+	const char PROTOCOL_EXPAND_DATA_VERIFY = 0x1;
+	const char PROTOCOL_EXPAND_ = 0x0;
 
 	//! \brief	数据结构类型。
 	enum eProtocolDataFormat{
@@ -42,13 +42,15 @@ namespace Network{
 	class ProtocolMsg;
 	typedef boost::shared_ptr<ProtocolMsg> ProtocolMsgPtr;
 	typedef size_t ProtocolSize;
-	extern const int PROTOCOL_MSG_SIZE_BYTE;
-	extern const int PROTOCOL_HEAD_SIZE;
 
-	extern const int PROTOCOL_INDEX_DATA_SIZE;
-	extern const int PROTOCOL_INDEX_FLAG;
-	extern const int PROTOCOL_INDEX_DATA_FORMAT;
-	extern const int PROTOCOL_INDEX_MSG;
+
+	const int PROTOCOL_MSG_SIZE_BYTE = 4;
+	const int PROTOCOL_HEAD_SIZE = 6;
+
+	const int PROTOCOL_INDEX_DATA_SIZE = 0;
+	const int PROTOCOL_INDEX_FLAG = PROTOCOL_MSG_SIZE_BYTE;
+	const int PROTOCOL_INDEX_DATA_FORMAT = PROTOCOL_INDEX_FLAG + 1;
+	const int PROTOCOL_INDEX_MSG = PROTOCOL_INDEX_DATA_FORMAT + 1;
 }
 
 #endif 

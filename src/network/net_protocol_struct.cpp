@@ -11,15 +11,5 @@
 #include "net_protocol_struct.h"
 
 namespace Network{
-	const char PROTOCOL_EXPAND_DATA_VERIFY = 0x1;
-	const char PROTOCOL_EXPAND_ = 0x0;
-
-	const int PROTOCOL_MSG_SIZE_BYTE = 4;
-	const int PROTOCOL_HEAD_SIZE = 6;
-
-	const int PROTOCOL_INDEX_DATA_SIZE = 0;
-	const int PROTOCOL_INDEX_FLAG = PROTOCOL_MSG_SIZE_BYTE;
-	const int PROTOCOL_INDEX_DATA_FORMAT = PROTOCOL_INDEX_FLAG + 1;
-	const int PROTOCOL_INDEX_MSG = PROTOCOL_INDEX_DATA_FORMAT + 1;
 }
 

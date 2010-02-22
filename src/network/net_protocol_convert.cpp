@@ -14,7 +14,6 @@
 #include "network/net_transfer.h"
 
 namespace Network{
-
 	ProtocolMsgPtr ProtocolMsg::getProtocolMsg(string &msg){
 		ProtocolMsgPtr pProtocolMsg;
 

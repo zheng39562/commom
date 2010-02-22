@@ -1,22 +1,23 @@
 任务安排：
 	*	network文件名称和类名统一修改。
-	4	完成server 和 cline 端的接口。
-	5	编译，排错，测试。
+	*	完成server 和 cline 端的接口。
+	*	编译，排错，测试。
 		1	测试网络的连通性。
+	*	log类：完成后补全network相关报错提示。
 
+	
 	*	调整vim的功能应用:可直接应用于源码环境。
 		1	自动补全
 		2	查找功能
 		3	tab功能
 		4	查找上一个打开的文件（而不是缓存顺序）
-	
+	*	git submodule : commonlibrary.
+	*	数据库服务器：维持连接，暂不缓存。
+	*	makefile优化：具体设计未出。
+		*	参考公司tags
+	*	vim F4 UpdateTags 增加报错提醒。
 	*	(不紧急)tmux
 		1	配置保存（关机后）
 		2	专门的top页
 		3	window命名设置。
-
-	*	git submodule : commonlibrary.
-	*	数据库服务器：维持连接，暂不缓存。
-	*	chosse设计。
-	*	makefile优化：具体设计未出。
 		

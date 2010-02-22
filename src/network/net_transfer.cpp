@@ -17,7 +17,7 @@
 #include "tool/single_mode.hpp"
 #include "common_define.h"
 #include "network/net_msg_struct.h"
-#include "network/msg_cache.h"
+#include "network/net_protocol_convert.h"
 
 using namespace std;
 
@@ -25,54 +25,116 @@ namespace Network{
 	const int READ_BUFFER_SIZE = 4000;
 	const int WRITE_BUFFER_SIZE = 4000;
 
-	NetMsgTransfer::NetMsgTransfer()
+	char* NetTransfer::m_s_ReadBuf = new char[READ_BUFFER_SIZE];
+
+	NetTransfer::NetTransfer()
 		:m_EventBase(NULL)
 	{
 		m_EventBase = event_base_new();
+
+		event_base_dispatch(m_EventBase);
 	}
-	NetMsgTransfer::~NetMsgTransfer(){
-		;
+	NetTransfer::~NetTransfer(){
+		if(m_EventBase != NULL){
+			event_base_free(m_EventBase);
+		}
 	}
 
-	int NetMsgTransfer::addSocket(const int &socket, eSocketRWOpt socketRWOpt){
-		bufferevent *bev = bufferevent_socket_new(m_EventBase, socket, BEV_OPT_CLOSE_ON_FREE | BEV_OPT_THREADSAFE);
-		if(bev == NULL){
+	bool NetTransfer::emptyW(ConnectKey connectKey){
+		if(m_MsgCache.find(connectKey) != m_MsgCache.end()){
+			return m_MsgCache.find(connectKey)->second.empty();
+		}
+		return false;
+	}
+
+	void NetTransfer::pushPacker(const PackerPtr &pPacker){
+		ConnectKey connectKey = pPacker->getConnectKey();
+		if(m_MsgCache.find(connectKey) != m_MsgCache.end()){
+			convertPackerToMsg(pPacker, m_MsgCache.find(connectKey)->second);
+		}
+		else{
+			DEBUG_D("未注册该连接：连接查找不到。");
+		}
+	}
+
+	MsgPtr NetTransfer::popMsg(ConnectKey connectKey){
+		MsgPtr pMsg;
+		if(m_MsgCache.find(connectKey) != m_MsgCache.end()){
+			if(!m_MsgCache.find(connectKey)->second.empty()){
+				pMsg = m_MsgCache.find(connectKey)->second.pop();
+			}
+		}
+		return pMsg;
+	}
+
+	bool NetTransfer::emptyR(){ return m_PackerCache.empty(); }
+
+	void NetTransfer::pushMsg(const MsgPtr &pMsg){
+		ConnectKey connectKey = pMsg->m_ConnectKey;
+		if(m_IncompleteMsg.find(connectKey) == m_IncompleteMsg.end()){
+			m_IncompleteMsg.insert(pair<ConnectKey, std::string>(connectKey, std::string()));
+		}
+		m_IncompleteMsg.find(connectKey)->second += pMsg->m_Msg;
+
+		convertMsgToPacker(connectKey, m_IncompleteMsg.find(connectKey)->second, m_PackerCache);
+	}
+
+	PackerPtr NetTransfer::popPacker(){
+		PackerPtr pPacker;
+		if(!emptyR()){
+			pPacker = m_PackerCache.pop();
+		}
+		return pPacker;
+	}
+
+	int NetTransfer::addSocket(const int &socket, eSocketRWOpt socketRWOpt){
+		ConnectKey connectKey = bufferevent_socket_new(m_EventBase, socket, BEV_OPT_CLOSE_ON_FREE | BEV_OPT_THREADSAFE);
+		if(connectKey == NULL){
 			DEBUG_D("new bufferevent failed.");
 		}
 
-		bufferevent_setcb(bev, NetMsgTransfer::readBack, NetMsgTransfer::writeBack, NetMsgTransfer::errorBack, NULL);
-		bufferevent_enable(bev, EV_READ|EV_WRITE);
+		bufferevent_setcb(connectKey, NetTransfer::readBack, NetTransfer::writeBack, NetTransfer::errorBack, this);
+		bufferevent_enable(connectKey, EV_READ|EV_WRITE);
 
+		registerConnect(connectKey);
 	}
 
-	int NetMsgTransfer::removeSocket(const int &socket){
-		return 0;
-	}
-
-	void NetMsgTransfer::writeBack(bufferevent* bev, void *ctx){
+	void NetTransfer::writeBack(ConnectKey connectKey, void *ctx){
+		NetTransfer* pTransfer = static_cast<NetTransfer*>(ctx);
 		DEBUG_D(" write ");
-		MsgPtr pMsg = SingleMsgServer::getInstance()->popMsg(bev);
+		MsgPtr pMsg = pTransfer->popMsg(connectKey);
 		DEBUG_D(" write " << pMsg->m_Msg);
-		bufferevent_write(bev, pMsg->m_Msg.c_str(), pMsg->m_Msg.size());
+		bufferevent_write(connectKey, pMsg->m_Msg.c_str(), pMsg->m_Msg.size());
 	}
-	void NetMsgTransfer::readBack(bufferevent* bev, void *ctx){
+	void NetTransfer::readBack(ConnectKey connectKey, void *ctx){
+		NetTransfer* pTransfer = static_cast<NetTransfer*>(ctx);
 		DEBUG_D(" readBack ");
-		evbuffer* output = bufferevent_get_input(bev);
-		char* retLine = new char[READ_BUFFER_SIZE];
-		memset(retLine, '\0', sizeof(char)*READ_BUFFER_SIZE);
-		if( bufferevent_read(bev, retLine, READ_BUFFER_SIZE) > 0 ){
-			SingleMsgServer::getInstance()->pushMsg(MsgPtr(new Msg(bev, retLine)));
+		evbuffer* output = bufferevent_get_input(connectKey);
+		memset(m_s_ReadBuf, '\0', sizeof(char)*READ_BUFFER_SIZE);
+		if( bufferevent_read(connectKey, m_s_ReadBuf, READ_BUFFER_SIZE) > 0 ){
+			pTransfer->pushMsg(MsgPtr(new Msg(connectKey, m_s_ReadBuf)));
 		}
-		delete retLine;
 	}
-	void NetMsgTransfer::errorBack(bufferevent* bev, short events, void *ctx){
+	void NetTransfer::errorBack(ConnectKey connectKey, short events, void *ctx){
+		NetTransfer* pTransfer = static_cast<NetTransfer*>(ctx);
 		DEBUG_D(" error back ");
-		bufferevent_free(bev);
-		DEBUG_D(" bev addr : " << bev);
+		bufferevent_free(connectKey);
+		pTransfer->unregisterConnect(connectKey);
+		DEBUG_D(" connectKey addr : " << connectKey);
 	}
 
-	void NetMsgTransfer::run(){
-		event_base_dispatch(m_EventBase);
+
+	void NetTransfer::registerConnect(const ConnectKey &connectKey){
+		if(m_MsgCache.find(connectKey) == m_MsgCache.end()){
+			m_MsgCache.insert(MsgCache::value_type(connectKey, MMsgPtrQueue()));
+		}
 	}
+
+	void NetTransfer::unregisterConnect(const ConnectKey &connectKey){
+		if(m_MsgCache.find(connectKey) != m_MsgCache.end()){
+			m_MsgCache.erase(m_MsgCache.find(connectKey));
+		}
+	}
+
 }
 
