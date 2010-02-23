@@ -28,7 +28,7 @@ namespace Network{
 			//! \brief	运行服务：连接服务器，并创建对应连接。
 			//! \note	集合 和 accpet 的功能
 			//! \note	建议单独开辟线程运行。
-			virtual void run(const std::string &ip, const long &port);
+			virtual bool run(const std::string &ip, const long &port);
 
 			void stop();
 		private:

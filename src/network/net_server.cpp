@@ -33,34 +33,14 @@ namespace Network{
 		m_IsRunning = false;
 	}
 
-	void NetServer::run(const string &ip, const long &port){
-		m_IsRunning = true;
-
-		struct sockaddr_in address;
-		bzero(&address, sizeof(address));
-		address.sin_family = AF_INET;
-		inet_pton(AF_INET, ip.c_str(), &address.sin_addr);
-		address.sin_port = htons(port);
-
-		int sock = socket(PF_INET, SOCK_STREAM, 0);
-		assert(sock >= 0);
-
-		int on(0);
-		setsockopt(sock,SOL_SOCKET,SO_REUSEADDR,&on,sizeof(on));
-
-		int ret = bind(sock, (struct sockaddr*) &address,  sizeof(address));
-		if(ret == -1){ cout << "errno " << errno << endl; }
-		assert(ret != -1); 
-		ret = listen(sock, 5);
-		if(ret == -1){ cout << "errno " << errno << endl; }
-		assert(ret != -1); 
-
+	void NetServer::execute(){
 		struct sockaddr_in client;
 		socklen_t client_addrlength = sizeof(client);
 		int connfd(-1);
 		char remote[ INET_ADDRSTRLEN ];
 		while(m_IsRunning){
-			connfd = accept(sock, (struct sockaddr *) &client, &client_addrlength);
+			// 印象里accept是阻塞的。需要确认下。
+			connfd = accept(m_ListenSocket, (struct sockaddr *) &client, &client_addrlength);
 
 			printf("connected with ip : %s and port : %d\n", 
 					inet_ntop(AF_INET, &client.sin_addr, remote, INET_ADDRSTRLEN), 
@@ -74,6 +54,32 @@ namespace Network{
 			}
 		}
 
-		close(sock);
+		close(m_ListenSocket);
+		m_ListenSocket = -1;
+	}
+
+	bool NetServer::run(const string &ip, const long &port){
+		m_IsRunning = true;
+
+		struct sockaddr_in address;
+		bzero(&address, sizeof(address));
+		address.sin_family = AF_INET;
+		inet_pton(AF_INET, ip.c_str(), &address.sin_addr);
+		address.sin_port = htons(port);
+
+		m_ListenSocket = socket(PF_INET, SOCK_STREAM, 0);
+		assert(m_ListenSocket >= 0);
+
+		int on(0);
+		setsockopt(m_ListenSocket,SOL_SOCKET,SO_REUSEADDR,&on,sizeof(on));
+
+		int ret = bind(m_ListenSocket, (struct sockaddr*) &address,  sizeof(address));
+		if(ret == -1){ cout << "errno " << errno << endl; }
+		assert(ret != -1); 
+		ret = listen(m_ListenSocket, 5);
+		if(ret == -1){ cout << "errno " << errno << endl; }
+		assert(ret != -1); 
+
+		return start();
 	}
 }

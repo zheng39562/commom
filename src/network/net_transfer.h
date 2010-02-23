@@ -50,7 +50,7 @@ namespace Network{
 			NetTransfer();
 			virtual ~NetTransfer();
 		public:
-			virtual void run(const std::string &ip, const long &port)=0;
+			virtual bool run(const std::string &ip, const long &port)=0;
 			//! \brief	注销连接。
 			//! \brief	写通道
 			bool emptyW(ConnectKey connectKey);

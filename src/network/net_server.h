@@ -15,22 +15,25 @@
 #include <string>
 #include "tool/single_mode.hpp"
 #include "network/net_transfer.h"
+#include "tool/common_thread.h"
 
 namespace Network{
 	//! \brief	net端口监听和消息转发类：server版。
 	//! 
 	//! \attetion	注意不建议直接使用该类。使用下面typedef的Single类更加合适。
-	class NetServer : public NetTransfer{
+	class NetServer : public NetTransfer, Universal::PThread{
 		public:
 			NetServer();
 			virtual ~NetServer();
 		public:
+			virtual void execute();
 			//! \brief	运行服务：监听端口，并创建对应连接。
 			//! \note	集合listen 和 accpet 的功能
 			//! \note	该函数使用轮询的方式反复找到链接，建议单独开辟线程运行。
-			virtual void run(const std::string &ip, const long &port);
+			virtual bool run(const std::string &ip, const long &port);
 		private:
 			bool m_IsRunning;
+			int m_ListenSocket;
 	};
 	typedef DesignMode::SingleMode<NetServer> SingleNetServer;
 }

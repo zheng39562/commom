@@ -61,6 +61,7 @@ PROJECT_PATH=out
 PROJECT_OBJECTS= \
 	./$(PROJECT_PATH)/./src/exception/common_exception.o \
 	./$(PROJECT_PATH)/./src/sql/sql_operator.o \
+	./$(PROJECT_PATH)/./src/network/net_interface.o \
 	./$(PROJECT_PATH)/./src/network/net_server.o \
 	./$(PROJECT_PATH)/./src/network/net_client.o \
 	./$(PROJECT_PATH)/./src/network/net_collection.o \
@@ -71,6 +72,7 @@ PROJECT_OBJECTS= \
 	./$(PROJECT_PATH)/./src/network/net_struct.o \
 	./$(PROJECT_PATH)/./src/network/net_transfer.o \
 	./$(PROJECT_PATH)/./src/network/socket_simple.o \
+	./$(PROJECT_PATH)/./src/network/net_test.o \
 	./$(PROJECT_PATH)/./src/tool/common_file.o \
 	./$(PROJECT_PATH)/./src/tool/common_ini.o \
 	./$(PROJECT_PATH)/./src/tool/common_log.o \

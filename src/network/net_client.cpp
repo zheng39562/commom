@@ -33,7 +33,7 @@ namespace Network{
 		stop();
 	}
 
-	void NetClient::run(const string &ip, const long &port){
+	bool NetClient::run(const string &ip, const long &port){
 		if(m_ConnectSocket >= 0){
 			cout << "already connect socket is [" << m_ConnectSocket << "]" << endl;
 		}
@@ -54,6 +54,7 @@ namespace Network{
 			cout << "connect failed" << endl;
 		}
 
+		return true;
 	}
 	void NetClient::stop(){ 
 		cout << "socket client is closing." << endl;

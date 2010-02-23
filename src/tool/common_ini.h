@@ -24,11 +24,13 @@ namespace Universal{
 			IniCfg();
 			~IniCfg();
 		public:
-			void InitFile(const string &filePath);
+			bool InitFile(const string &filePath);
 
 			string getString(const string &section, const string &key, string defaultValue = "");
 			int getInt(const string &section, const string &key, int defaultValue = 0);
 			double getDouble(const string &section, const string &key, double defaultValue = 0.0);
+		private:
+			bool isNewSection(const string &section);
 		private:
 			map<string, map<string, string> > m_IniInfo;
 	};

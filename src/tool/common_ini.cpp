@@ -11,8 +11,12 @@
 #include "common_ini.h"
 
 #include "tool/common_tool.h"
+#include "tool/common_file.h"
+#include "tool/string_util.h"
 
 namespace Universal{
+	using namespace std;
+
 	IniCfg::IniCfg()
 		:m_IniInfo()
 	{
@@ -21,8 +25,36 @@ namespace Universal{
 
 	IniCfg::~IniCfg(){ ; }
 
-	void IniCfg::InitFile(const string &filePath){
-		;
+	bool IniCfg::InitFile(const string &filePath){
+		vector<string> lines;
+		if(splitString(readFile(filePath), "\n", lines)){
+			map<string, string>* pKeyValueMap(NULL);
+			for(vector<string>::const_iterator citerLine = lines.begin(); citerLine != lines.end(); ++citerLine){
+				if(isNewSection(*citerLine)){
+					pKeyValueMap = NULL;
+					string section = citerLine->substr(1, citerLine->size()-2);
+					m_IniInfo.insert(pair<string, map<string, string> >(section, map<string, string>()));
+					pKeyValueMap = &(m_IniInfo.find(section)->second);
+				}
+				else{
+					 size_t pos = citerLine->find('=');
+					 if(pKeyValueMap == NULL || pos == string::npos || pos == 0){
+						 DEBUG_E("ini文件格式错误。");
+						 return false;
+					 }
+					 pKeyValueMap->insert(pair<string, string>(
+								 citerLine->substr(0, pos), 
+								 citerLine->substr(pos+1, citerLine->size() - pos - 1)
+								 ));
+				}
+			}
+		}
+		else{
+			DEBUG_E("文件不存在，或格式错误。（注：使用\\n分隔行，而非\\r\\n）");
+			return false;
+		}
+
+		return true;
 	}
 
 	string IniCfg::getString(const string &section, const string &key, string defaultValue){
@@ -49,6 +81,13 @@ namespace Universal{
 			return strToDouble(value);
 		}
 		return defaultValue;
+	}
+
+	bool IniCfg::isNewSection(const string &section){
+		if(section.size() <= 2 || section[0] != '[' || section[section.size()-1] != ']'){
+			return false;
+		}
+		return true;
 	}
 
 }
