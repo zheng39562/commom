@@ -16,18 +16,18 @@
 namespace Universal{
 	class RemoteAddrInfo {
 		public:
-			RemoteAddrInfo( const string &_ip, const string &_port, const string &_user, const string &_pwd );
+			RemoteAddrInfo( const std::string &_ip, const std::string &_port, const std::string &_user, const std::string &_pwd );
 			~RemoteAddrInfo();
 		private:
-			string ip;
-			string port;
-			string user;
-			string pwd;
+			std::string ip;
+			std::string port;
+			std::string user;
+			std::string pwd;
 		public:
-			string getIp()const{ return ip; }
-			string getPort()const{ return port; }
-			string getUser()const{ return user; }
-			string getPwd()const{ return pwd; }
+			std::string getIp()const{ return ip; }
+			std::string getPort()const{ return port; }
+			std::string getUser()const{ return user; }
+			std::string getPwd()const{ return pwd; }
 	};
 	//! \brief	文件传输者（基类）
 	//! \note	Responsibility:
@@ -37,42 +37,42 @@ namespace Universal{
 	//! \todo	需要构建一个基本的可用子类。目标为：实现一个C++的基本下载/上传功能。
 	class FileTransmission {
 		public:
-			FileTransmission( const string &_localPath, const string &_remotePath, const RemoteAddrInfo &_remoteAddrInfo );
-			FileTransmission( const string &_downloadPath, const string &_uploadPath, const string &_remoteDown, const string &_remoteUp, 
+			FileTransmission( const std::string &_localPath, const std::string &_remotePath, const RemoteAddrInfo &_remoteAddrInfo );
+			FileTransmission( const std::string &_downloadPath, const std::string &_uploadPath, const std::string &_remoteDown, const std::string &_remoteUp, 
 					const RemoteAddrInfo &_remoteAddrInfo );
 			virtual ~FileTransmission();
 		protected:
-			string										m_DownloadPath;
-			string										m_RemoteDownloadPath;
-			string										m_UploadPath;
-			string										m_RemoteUploadPath;
+			std::string										m_DownloadPath;
+			std::string										m_RemoteDownloadPath;
+			std::string										m_UploadPath;
+			std::string										m_RemoteUploadPath;
 			RemoteAddrInfo							m_RemoteAddrInfo;
 		public:
 			//! \brief	下载文件。
 			//! \param[in] pattern 除文件名外支持正则表达式：（注意上传也支持相同的方式）.但不支持子目录的获取。
 			//!				* 所有文件。
 			//!				*.sh 所有.sh结尾的文件。
-			virtual bool download( const string &pattern )=0;
+			virtual bool download( const std::string &pattern )=0;
 			//! \brief	上传文件。
-			virtual bool upload( const string &pattern )=0;
+			virtual bool upload( const std::string &pattern )=0;
 
 			//! \brief  获取本地的下载路径。
-			string getDownloadPath();
+			std::string getDownloadPath();
 			//! \brief  获取本地的上传路径。
-			string getUploadPath();
+			std::string getUploadPath();
 	};
 	//! \brief	socket版本的文件传输类。
 	class SocketFileTransfer : public FileTransmission {
 		public:
-			SocketFileTransfer( const string &_localPath, const string &_remotePath, const RemoteAddrInfo &_remoteAddrInfo );
-			SocketFileTransfer( const string &_downloadPath, const string &_uploadPath, const string &_remoteDown, const string &_remoteUp,
+			SocketFileTransfer( const std::string &_localPath, const std::string &_remotePath, const RemoteAddrInfo &_remoteAddrInfo );
+			SocketFileTransfer( const std::string &_downloadPath, const std::string &_uploadPath, const std::string &_remoteDown, const std::string &_remoteUp,
 					const RemoteAddrInfo &_remoteAddrInfo );
 			virtual ~SocketFileTransfer();
 		public:
 			//! \brief	下载文件。
-			virtual bool download( const string &pattern );
+			virtual bool download( const std::string &pattern );
 			//! \brief	上传文件。
-			virtual bool upload( const string &pattern );
+			virtual bool upload( const std::string &pattern );
 	};
 } // namespace Universal{
 #endif 

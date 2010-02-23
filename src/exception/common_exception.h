@@ -20,11 +20,11 @@ using namespace std;
  */
 namespace Universal{
 	enum ExceptionLevel{ 
-		exceptionLv_critical = LOG_LVL_CRITICAL,
-		exceptionLv_error = LOG_LVL_ERROR,
-		exceptionLv_warning = LOG_LVL_WARN, 
-		exceptionLv_info = LOG_LVL_INFO, 
-		exceptionLv_debug = LOG_LVL_DBG
+		exceptionLv_debug,
+		exceptionLv_info, 
+		exceptionLv_warning, 
+		exceptionLv_error,
+		exceptionLv_critical
 	};
 	class Exception : public exception {
 		public:

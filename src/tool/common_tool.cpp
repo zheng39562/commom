@@ -69,9 +69,6 @@ namespace Universal{
 
 
 	bool execShellCmd( const string &cmd ){
-#ifdef COMMON_DEBUG
-		DEBUG_D( "Exec shell command : [%s]", cmd.c_str() );
-#endif
 		FILE* fp = NULL;
 		if( (fp=popen(cmd.c_str(), "r" ) ) != NULL ){
 			pclose( fp);  fp = NULL;

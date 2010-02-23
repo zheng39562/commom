@@ -24,27 +24,31 @@ namespace Universal{
 	//! \note	支持分割符：非数字的单字节任意分隔符(除字母以外) 或 无分隔符.
 	//! \todo	1	两位数年份支持。
 	//! \todo	2	时分秒的支持。
-	string parseDateFormat( const string &date );
+	string parseDateFormat(const string &date);
 	//! \brief	strptime() 进行转换。
 	//! \note	常用指令： %D 月/天/年 %F 年-月-日 %R ：hh:mm %T ：hh:mm:ss
 	//!			%Y [年] %m [月] %d [日] %H [时] %M [分] %S [秒]   
 	//!			%I 12小时制的小时 %a/A 星期几的简写/全称 %b/B 月分的简写/全称 %j 十进制表示的每年的第几天 %z，%Z 时区名称，如果不能得到时区名称则返回空字符。
-	time_t dateToTime( const string date, string dateFormat = "%Y/%m/%d" );
+	time_t dateToTime(const string date, string dateFormat = "%Y/%m/%d");
 	//! \brief	strftime() 使用进行格式转换。
 	//! \note	常用指令： %D 月/天/年 %F 年-月-日 %R ：hh:mm %T ：hh:mm:ss
 	//!			%Y [年] %m [月] %d [日] %H [时] %M [分] %S [秒]   
 	//!			%I 12小时制的小时 %a/A 星期几的简写/全称 %b/B 月分的简写/全称 %j 十进制表示的每年的第几天 %z，%Z 时区名称，如果不能得到时区名称则返回空字符。
-	string formatDateTime( const time_t &second, string dateFormat = "%Y/%m/%d" );
-	string getDateStr( const time_t &second, const string &dateFormat );
+	string formatDateTime(const time_t &second, string dateFormat = "%Y/%m/%d");
+	string getDateStr(const time_t &second, const string &dateFormat);
 	//! \brief	返回从1970.1.1:00:00到当前的秒数。
 	time_t getLocalTime();
+	time_t getLocalTimeU();
     //! \param[in] dateFormat 要处理的格式.
-	string getLocalTime( const string &dateFormat );
+	string getLocalTime(const string &dateFormat);
+	//! \brief	在格式后增加纳秒数，使用[]包含，暂不支持更多格式。
+	//! \note	建议格式中包含到秒。
+	string getLocalTimeU(const string &dateFormat);
 	//! \brief	补全剩余的时间。默认使用 0 补充。可以选择最高数补全
 	//! \note	仅支持  y-m-d h:m:s  格式。
 	//! \param[in]	strtime	表示时间的字符串。可以省略部分尾部时间。
 	//! \param[in]	useMaxNum	尾部时间的补全方式：true表示使用最大值补全。false使用最小值补全。
-	time_t supplementTime( const string &strtime, bool useMaxNum = false );
+	time_t supplementTime(const string &strtime, bool useMaxNum = false);
 }  // namespace : Universal
 
 
@@ -54,7 +58,7 @@ namespace Universal{
 	class TimeCounter{
 		public:
 			TimeCounter();
-			TimeCounter( const string &_logFolder );
+			TimeCounter(const string &_logFolder);
 			~TimeCounter();
 		private:
 			timeval			m_TvStart;
@@ -75,7 +79,7 @@ namespace Universal{
 			//! \brief
 			void setLogPath();
 			//! \brief	
-			void writeToLog( string preStr = "", string addStr = "");
+			void writeToLog(string preStr = "", string addStr = "");
 	};
 }  // namespace : Universal
 

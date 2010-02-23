@@ -68,9 +68,7 @@ namespace Universal{
 			m_p_Statement = shared_ptr<sql::Statement>( m_p_Connection->createStatement() );
 		}
 		catch( sql::SQLException &e ){
-			DEBUG_E( "Sql Connection failure : Error code is " + intToStr( e.getErrorCode() ) + ". State is " + e.getSQLState() + ". Other info : " +
-					string( e.what() )
-					);
+			DEBUG_E("Sql Connection failure : Error code is " << intToStr( e.getErrorCode() ) << ". State is " << e.getSQLState() << ". Other info : " << string( e.what() ));
 			return false;
 		}
 

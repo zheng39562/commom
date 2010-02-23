@@ -94,10 +94,6 @@ namespace Universal{
 		m_MaxRows = xlsSheet.rows.lastrow + 1;
 
 		m_MaxColumns = xlsSheet.rows.lastcol;
-#ifdef COMMON_DEBUG
-		DEBUG_D( "%s: rows [%d], columns [%d] ", _FUNCPOS_XLS_SHEET, m_MaxRows, m_MaxColumns );
-#endif
-
 		XlsRowStruct tmpRow;
 		tmpRow.reserve( m_MaxColumns );
 		struct st_row::st_row_data *p_Row;
@@ -112,11 +108,6 @@ namespace Universal{
 						xlsValue = xlsValue.substr( 0, xlsValue.find(".") );
 					}
 					tmpRow.push_back( xlsValue );
-
-#ifdef DETAIL_DEBUG
-					DEBUG_D( "%s: orignal content [%s]", _FUNCPOS_XLS_SHEET, p_Row->cells.cell[indexOfColumn].str );
-					DEBUG_D( "%s: convert content [%s]", _FUNCPOS_XLS_SHEET, xlsValue.c_str() );
-#endif
 				}
 				else{
 					tmpRow.push_back("");
@@ -124,16 +115,7 @@ namespace Universal{
 			}
 			m_XlsContent.push_back( tmpRow );
 		}
-#ifdef DETAIL_DEBUG
-		for( XlsSheetStruct::const_iterator citerRow = m_XlsContent.begin(); citerRow != m_XlsContent.end(); ++citerRow ){
-			string line;
-			for( XlsRowStruct::const_iterator citerColumn = citerRow->begin(); citerColumn != citerRow->end(); ++citerColumn ){
-				line += "  [" + *citerColumn + "]  ";
-			}
-			DEBUG_D( "%s: one line === %s ===", _FUNCPOS_XLS_SHEET, line.c_str() );
-		}
-#endif
-		DEBUG_D( "%s: end sheet parse", _FUNCPOS_XLS_SHEET );
+		DEBUG_D("end sheet parse");
 	}
 } // namespace Universal
 

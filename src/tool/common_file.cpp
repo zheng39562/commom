@@ -24,7 +24,7 @@ namespace Universal{
 			return strTmp;
 		}
 		else{
-			DEBUG_I( "%s: open aciton is failed.Please check arg of path: %s.", _RUN_FUNC_, path.c_str() );
+			DEBUG_I(_RUN_FUNC_ << ": open aciton is failed.Please check arg of path:" << path << ".");
 			return _STRINGFALSE;
 		}
 	}
@@ -36,7 +36,7 @@ namespace Universal{
 			return true;
 		}
 		else{
-			DEBUG_I( "%s: Can't open file.Please check arg of path: %s.", _RUN_FUNC_, path.c_str() );
+			DEBUG_I(_RUN_FUNC_ << ": open aciton is failed.Please check arg of path:" << path << ".");
 		}
 		return false;
 	}
@@ -48,7 +48,7 @@ namespace Universal{
 			return true;
 		}
 		else{
-			DEBUG_I( "%s: Can't open file.Please check arg of path: %s.", _RUN_FUNC_, path.c_str() );
+			DEBUG_I(_RUN_FUNC_ << ": open aciton is failed.Please check arg of path:" << path << ".");
 			return false;
 		}
 	}
@@ -64,7 +64,7 @@ namespace Universal{
 			curFolder = path.substr( 0, index+1 );
 			if( access(curFolder.c_str(), F_OK ) != 0 ){
 				if( mkdir( curFolder.c_str(), mode ) != 0){
-					DEBUG_I( "%s: Can't create this folder.full path is %s,current index is %d. folder name is %s", _RUN_FUNC_, path.c_str(), index, curFolder.c_str() );
+					DEBUG_I(_RUN_FUNC_ << ": Can't create this folder.full path is " << path << ",current index is " << index << ". folder name is " << curFolder);
 					return false;
 				}
 			}
@@ -100,7 +100,7 @@ namespace Universal{
 				fileNames.push_back( dirent_p->d_name );
 			}
 		}
-		else DEBUG_I( "%s: Can't find direction. Dir path is %s.", _RUN_FUNC_, path.c_str() );
+		else DEBUG_I(_RUN_FUNC_ << ": open aciton is failed.Please check arg of path:" << path << ".");
 		closedir( pDir);  pDir = NULL;
 		return true;
 	}

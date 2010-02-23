@@ -72,6 +72,8 @@ PROJECT_OBJECTS= \
 	./$(PROJECT_PATH)/./src/network/net_transfer.o \
 	./$(PROJECT_PATH)/./src/network/socket_simple.o \
 	./$(PROJECT_PATH)/./src/tool/common_file.o \
+	./$(PROJECT_PATH)/./src/tool/common_ini.o \
+	./$(PROJECT_PATH)/./src/tool/common_log.o \
 	./$(PROJECT_PATH)/./src/tool/common_mutex.o \
 	./$(PROJECT_PATH)/./src/tool/common_thread.o \
 	./$(PROJECT_PATH)/./src/tool/common_timer.o \

@@ -18,7 +18,6 @@ using namespace xls;
 // XlsReader
 //
 namespace Universal{
-	#define _FUNCPOS_XLS_READER							_COMMON_FUNC_( "XlsReader")
 	XlsReader::XlsReader()throw(LogException){ ; }
 	XlsReader::XlsReader( const string &_filePath)throw(LogException ){
 		parseXls( _filePath );
@@ -34,7 +33,7 @@ namespace Universal{
 
 		p_Wb = xls_open( filePath.c_str(), "UTF-8" );
 		if(  p_Wb == NULL ){
-			DEBUG_I( "%s: parse failed [%s] ", _FUNCPOS_XLS_READER, filePath.c_str() );
+			DEBUG_I("parse failed [ " << filePath << "] ");
 			throw LogException( "parse failed : " + filePath );
 		}
 
@@ -53,9 +52,9 @@ namespace Universal{
 
 	XlsSheet& XlsReader::getSheet( const long &indexOfSheet )throw(LogException ) {
 		if(  m_SheetArray.empty() )
-			throw LogException( string("this xls is empty.") + _FUNCPOS_XLS_READER, exceptionLv_info );
+			throw LogException( string("this xls is empty."), exceptionLv_info );
 		if(  indexOfSheet >= m_SheetArray.size() )
-			throw LogException( string("Array bounds (check indexOfSheet).") + _FUNCPOS_XLS_READER, exceptionLv_error );
+			throw LogException( string("Array bounds (check indexOfSheet)."), exceptionLv_error );
 
 		return m_SheetArray[indexOfSheet ];
 	}

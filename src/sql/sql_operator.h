@@ -11,6 +11,9 @@
 #ifndef _SqlOperator_H
 #define _SqlOperator_H
 
+#include <vector>
+#include <map>
+#include <string>
 #include "mysql_driver.h"
 #include "mysql_connection.h"
 #include "boost/shared_ptr.hpp"

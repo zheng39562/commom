@@ -33,9 +33,6 @@ namespace Universal{
 			virtual ~PThread();
 		public:
 			static void* threadProxy(void* args);
-			//! \brief	
-			//! \note	
-			virtual void execute()=0;
 
 			//! \brief	线程启动
 			bool start();
@@ -46,6 +43,10 @@ namespace Universal{
 
 			inline const THREAD& getThreadID(){ return m_Thread; }
 			inline eThreadStatus getStatus(){ return m_ThreadStatus; }
+		protected:
+			//! \brief	
+			//! \note	
+			virtual void execute()=0;
 		private:
 			THREAD m_Thread; //! 线程ID
 			eThreadStatus m_ThreadStatus; //! 线程是否在运行

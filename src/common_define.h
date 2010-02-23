@@ -9,13 +9,8 @@
 #ifndef _Define_H
 #define _Define_H
 
-#include <string>
-#include <map>
-#include <vector>
-#include <list>
-#include <time.h>
-
-using namespace std;
+#include <sstream>
+#include "common_log.h"
 
 /*
  * Debug information and operator.
@@ -27,48 +22,27 @@ using namespace std;
 	#define _RUN_FUNC_
 #endif
 
-#define DEBUG_D(msg, ...) 							cout << msg << endl;
-#define DEBUG_I(msg, ...) 							cout << msg << endl;
-#define DEBUG_W(msg, ...) 							cout << msg << endl;
-#define DEBUG_E(msg, ...) 							cout << msg << endl;
-#define DEBUG_C(msg, ...) 							cout << msg << endl;
-#define	LOG_LVL_DBG									0
-#define LOG_LVL_INFO								1
-#define LOG_LVL_WARN								2
-#define LOG_LVL_ERROR								3
-#define LOG_LVL_CRITICAL							4
-
-#ifdef IMPORTFILE_TEST
-														//StartCount();
-	#define	_START_FUNC(func)							LOG_D_CF();  \
-														DEBUG_D( "%s: Start...", func );
-	#define	_STOP_FUNC(func)							DEBUG_D( "%s: End...",  func );
-														//stopCount(func);
-#else
-	#define	_START_FUNC(func)							LOG_D_CF();
-	#define	_STOP_FUNC(func)
-#endif
+#define DEBUG_D(msg) 							os31415926_tmp << msg; Log_D(os31415926_tmp.str());
+#define DEBUG_I(msg) 							os31415926_tmp << msg; Log_I(os31415926_tmp.str());
+#define DEBUG_W(msg) 							os31415926_tmp << msg; Log_W(os31415926_tmp.str());
+#define DEBUG_E(msg) 							os31415926_tmp << msg; Log_E(os31415926_tmp.str());
+#define DEBUG_C(msg) 							os31415926_tmp << msg; Log_C(os31415926_tmp.str());
 
 /// *******************************************************************************************************
 
 /*
  * default and temporary value
  */
-// temporary 
-#define _TMP_INT									-100
-#define _TMP_DOUBLE								-100.0
 // type default error.
 #define _STRINGFALSE								"string_false"
 #define _INTFALSE									-1
-#define _BOOLFALSE								false
+#define _BOOLFALSE									false
 #define _DOUBLEFALSE								-1.0
 /// *******************************************************************************************************
 
 /*
  * About time : format, default value.
  */
-// datetime formate
-#define _TIMEFORMAT_DEFAULT						string("Y-m-d H:i:s")
 // sec to ms
 #define _TIMEUNIT_BASENUM							1000
 #define _TIMEUNIT_SECTOMS							_TIMEUNIT_BASENUM

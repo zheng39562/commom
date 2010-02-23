@@ -13,6 +13,8 @@
 #include "common_tool.h"
 
 namespace Universal{
+	using namespace std;
+
 	RemoteAddrInfo::RemoteAddrInfo( const string &_ip, const string &_port, const string &_user, const string &_pwd )
 		:ip( _ip ),
 		 port( _port ),

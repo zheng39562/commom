@@ -55,7 +55,7 @@ namespace Universal{
 			error += " key --> " + *iterKey + " ||";
 			jsFoundValue_p = findJsValueByKey( *jsFoundValue_p, *iterKey );
 			if(  jsFoundValue_p == NULL ){
-				//DEBUG_D( "%s: found a empty json value.key path is %s.already go [%s]", _JSONTOOL_FUNC_, path.c_str(), error.c_str() );
+				DEBUG_D("found a empty json value.key path is " << path << ".already go [" << error << "]");
 				return NULL;
 			}
 		}  //for
@@ -104,11 +104,11 @@ namespace Universal{
 		if(  jsValue.isArray() ){
 			mapResult.clear( );
 			mapResult.insert( pair<string,string>("array", getJsString(jsValue)) );
-			DEBUG_D( "%s: Json is a array.", _JSONTOOL_FUNC_ );
+			DEBUG_D( "Json is a array.");
 			return false;
 		}
 		if(  jsValue.isNull() ){
-			DEBUG_D( "%s: Json data has empty.", _JSONTOOL_FUNC_ );
+			DEBUG_D( "Json data has empty.");
 			return false;
 		}
 		
@@ -139,7 +139,7 @@ namespace Universal{
 			}
 		}
 		else{
-			DEBUG_D( "%s: Json value is not a array.", _JSONTOOL_FUNC_ );
+			DEBUG_D( "Json value is not a array." );
 			return false;
 		}
 		return true;
@@ -154,7 +154,7 @@ namespace Universal{
 			}
 		}
 		else{
-			DEBUG_D( "%s: Json value is not a array.", _JSONTOOL_FUNC_ );
+			DEBUG_D( "Json value is not a array." );
 			return false;
 		}
 		return true;
@@ -220,7 +220,7 @@ namespace Universal{
 	}
 	bool JsonTool::parseKeyList( const string &keyList, vector<string> &keys ){
 		if(  !Universal::splitString(keyList, indexOfSplittingKey, keys ) ){
-			DEBUG_D( "%s: key list format is wrong.key list is [ %s ]", _JSONTOOL_FUNC_, keyList.c_str() );
+			DEBUG_D( "key list format is wrong.key list is [ " << keyList << " ]");
 			return false;
 		}
 		return true;
@@ -231,7 +231,7 @@ namespace Universal{
 			return NULL;
 		if(  jsValue_p->isArray() ){
 			if( !checkNumber(key) ){
-				DEBUG_D( "%s: Key is not a number. Key name is %s.", _JSONTOOL_FUNC_, key.c_str() );
+				DEBUG_D( "Key is not a number. Key name is " << key);
 				return NULL;
 			}
 			int index = strToInt( key);
