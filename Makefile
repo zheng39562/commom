@@ -3,9 +3,9 @@ MAIN_NAME=main
 SOFTWARE_NAME=Main_64
 
 # third part path
-THIRDPART_PATH=./thirdpart
+THIRDPART_PATH=../commonlibrary
 # mysql ( mysql connection )
-MYSQL_INCLUDE=
+MYSQL_INCLUDE=-I${THIRDPART_PATH}/include/mysqlcppconn
 # xlslib ( xls writer )
 XLSLIB_INCLUDE=-I${THIRDPART_PATH}/include/xlslib
 # libxls ( xls reader )
@@ -15,11 +15,12 @@ JSON_INCLUDE=-I${THIRDPART_PATH}/include/
 # boost
 BOOST_INC=-I${THIRDPART_PATH}/include/boost
 # thirdpart include 
-THIRDPART_INC=-I${THIRDPART_PATH}/include $(MYSQL_INCLUDE) ${XLSLIB_INCLUDE} ${LIBXLS_INCLUDE} ${JSON_INCLUDE} ${BOOST_INC}
+THIRDPART_INC=-I${THIRDPART_PATH}/include ${MYSQL_INCLUDE} ${XLSLIB_INCLUDE} ${LIBXLS_INCLUDE} ${JSON_INCLUDE} ${BOOST_INC}
 # project child path
 PROJECT_INC=-I./src \
 		    -I./src/tool \
-		    -I./src/exception
+		    -I./src/exception \
+		    -I./src/sql
 # all include path
 LIB_INC=-I. ${PROJECT_INC} ${THIRDPART_INC} 
 
@@ -33,7 +34,8 @@ XLS_READER_LIB=-lxlsreader
 # event
 EVENT_LIB=-levent
 # mysql connector ++ lib
-MYSQL_LIB=-lmysqlcppconn-static -lmysqlclient
+MYSQL_LIB=-lmysqlcppconn-static 
+#-lmysqlclient
 # boost regex
 BOOST_LIB=-lboost_regex
 THIRDPART_LIB=${JSON_LIB} ${XLS_WRITER_LIB} ${XLS_READER_LIB} ${EVENT_LIB} ${MYSQL_LIB} ${BOOST_LIB}
@@ -55,17 +57,18 @@ LINK_NONEEDED=-Wl,--no-as-needed
 	#./$(PROJECT_PATH)/./src/sql/CSSqlOperator.o
 PROJECT_PATH=out
 PROJECT_OBJECTS= \
-	./$(PROJECT_PATH)/./src/exception/CSException.o \
-	./$(PROJECT_PATH)/./src/tool/CSCommonTool.o \
-	./$(PROJECT_PATH)/./src/tool/CSFile.o \
-	./$(PROJECT_PATH)/./src/tool/CSFileTransmission.o \
-	./$(PROJECT_PATH)/./src/tool/CSJsonTool.o \
-	./$(PROJECT_PATH)/./src/tool/CSPMutex.o \
-	./$(PROJECT_PATH)/./src/tool/CSStrUtil.o \
-	./$(PROJECT_PATH)/./src/tool/CSTimer.o \
-	./$(PROJECT_PATH)/./src/tool/CSXlsReader.o \
-	./$(PROJECT_PATH)/./src/tool/CSXlsStruct.o \
-	./$(PROJECT_PATH)/./src/tool/CSXlsWriter.o \
+	./$(PROJECT_PATH)/./src/exception/common_exception.o \
+	./$(PROJECT_PATH)/./src/sql/sql_operator.o \
+	./$(PROJECT_PATH)/./src/tool/common_tool.o \
+	./$(PROJECT_PATH)/./src/tool/common_file.o \
+	./$(PROJECT_PATH)/./src/tool/file_transmission.o \
+	./$(PROJECT_PATH)/./src/tool/json_tool.o \
+	./$(PROJECT_PATH)/./src/tool/common_mutex.o \
+	./$(PROJECT_PATH)/./src/tool/string_util.o \
+	./$(PROJECT_PATH)/./src/tool/common_timer.o \
+	./$(PROJECT_PATH)/./src/tool/xls_reader.o \
+	./$(PROJECT_PATH)/./src/tool/xls_struct.o \
+	./$(PROJECT_PATH)/./src/tool/xls_writer.o \
 	./$(PROJECT_PATH)/./src/${MAIN_NAME}.o \
 
 
