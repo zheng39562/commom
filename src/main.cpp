@@ -8,36 +8,33 @@
  * \version 
  * \author zheng39562@163.com
 **********************************************************/
-#include "CSDefine.h"
+#include "common_define.h"
 
 #include <iostream>
-#include "CSTemplateFunc.hpp"
+#include "template_function.hpp"
+#include "sql_operator.h"
+#include "boost/scoped_ptr.hpp"
 
 using namespace std;
 using namespace Universal;
 
 int main( int agrc, char **argv ){
+	/*
+	boost::scoped_ptr<SqlOperator> pSqlOperator( new SqlOperator( "192.168.1.235", 3306, "igr_all", "igrow123", "svr_log", 50 ) );
 
-	map< string, string > mapVar;
-	mapVar.insert( pair<string, string>("1", "2") );
-	string value;
-	if( mapFind( mapVar, string("1"), value ) ){
-		cout << value << endl;
+	TableDatas datas;
+
+	if( pSqlOperator->execQuery( "select servname as servname, substring( time, 1, 10 ) as time, sum(usetime) as usetimecount, count(1) as usetimes, sum(usetime) / count(1) as averagetime from log_analyzeinfo where 1=1 and unix_timestamp(time) >= 1455638400 and unix_timestamp(time) <= 1455811199 group by substring( time, 1, 10 ), servname limit 0,20", datas ) ){
+		cout << "success" << endl;
 	}
 	else{
-		cout << " not found " << endl;
+		cout << "failure" << endl;
 	}
+	*/
 
-
-	vector<long> vecVar;
-	vecVar.push_back(1);
-	vecVar.push_back(2);
-	vecVar.push_back(3);
-	cout << vectorAt( vecVar, 0 ) << endl;
-	cout << vectorAt( vecVar, 10 ) << endl;
-	
-
-
+	boost::shared_ptr<int> ptr( new int(4) );
+	cout << ptr << endl;
+	cout << *ptr << endl;
 
 	return 0;
 }
