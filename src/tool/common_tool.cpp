@@ -52,37 +52,6 @@ namespace Universal{
  * other function
  */
 namespace Universal{
-	//! \brief 计算当前对象占用的内存。用于计算保存string的类型。
-	long calmemoryOfObject( const vector<string> &object ){
-		string str( "1");
-		long size = 0;
-		for( vector<string>::const_iterator citer = object.begin(); citer != object.end(); ++citer ){
-			size += sizeof( str[0]) * citer->size();
-		}
-		return size;
-	}
-	long calmemoryOfObject( const map<string, string> &object ){
-		string str( "1");
-		long size = 0;
-		for( map<string, string>::const_iterator citer = object.begin(); citer != object.end(); ++citer ){
-			size += sizeof( str[0]) * ( citer->first.size() + citer->second.size() );
-		}
-		return size;
-	}
-	long calmemoryOfObject( const vector<vector<string> > &object ){
-		long size = 0;
-		for( vector<vector<string> >::const_iterator citer = object.begin(); citer != object.end(); ++citer ){
-			size += calmemoryOfObject( *citer );
-		}
-		return size;
-	}
-	long calmemoryOfObject( const vector<map<string, string> > &object ){
-		long size = 0;
-		for( vector<map<string, string> >::const_iterator citer = object.begin(); citer != object.end(); ++citer ){
-			size += calmemoryOfObject( *citer );
-		}
-		return size;
-	}
 	void filterDuplicateValue( vector<string> &duplicateArray ){
 		vector<string> newArray;
 		bool isNewValue;
@@ -135,29 +104,6 @@ namespace Universal{
 		}
 		else{
 			return _PTHONETYPE_QT;
-		}
-		return _STRINGFALSE;
-	}
-
-
-	string getSmsRoute( const string &mobile ){
-		string head3 = mobile.substr( 0, 3 );
-		string head4 = mobile.substr( 0, 4 );
-		if( mobile.size() == 12 ){
-			if( head3 == "057" || head4 == "1700" || head4 == "0580" )
-				return _SMSROUTE_TEL;
-		}
-		if( head3 == "134" || head3 == "135" || head3 == "136" || head3 == "137" || head3 == "138" || head3 == "139" || head3 == "147" || 
-			head3 == "150" || head3 == "151" || head3 == "152" || head3 == "157" || head3 == "158" || head3 == "159" || 
-			head3 == "182" || head3 == "183" || head3 == "184" || head3 == "187" || head3 == "188" || head3 == "178" || 
-			head4 == "1705" ){
-			return _SMSROUTE_MO;
-		}
-		else if( head3 == "130" || head3 == "131" || head3 == "132" || head3 == "133" || head3 == "153" || head3 == "155" || head3 == "156" || 
-				 head3 == "169" || head3 == "177" || head3 == "180" || head3 == "181" || head3 == "185" || head3 == "186" || head3 == "189" || 
-				 head3 == "183" || head3 == "184" || head3 == "187" || head3 == "188" || head3 == "178" || 
-				 head3 == "1709" ){ 
-			return _SMSROUTE_UNTMP;
 		}
 		return _STRINGFALSE;
 	}

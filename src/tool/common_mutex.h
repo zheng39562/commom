@@ -15,6 +15,8 @@
 #include <pthread.h>
 
 namespace Universal{
+	//! \brief
+	//! \todo	需要按照pthread结构扩充类属性，按照pthead的属性先建立基本结构。
 	class PMutex{
 		public: 
 			PMutex();	
@@ -24,9 +26,9 @@ namespace Universal{
 		public:
 			//! \brief 返回值表示错误。
 			//! \return 0 is success.Other number is failed.
-			int lock( );
-			int tryLock( );
-			int unlock( );
+			int lock();
+			int tryLock();
+			int unlock();
 	};
 }
 

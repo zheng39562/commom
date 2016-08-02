@@ -53,15 +53,6 @@ namespace Universal{
 #define _PTHONETYPE_UNICOM					"LT"
 #define _PTHONETYPE_CDMA						"DX"
 #define _PTHONETYPE_QT						"QT"
-#define _SMSROUTE_TEL							"JX_TEL"
-#define _SMSROUTE_MO							"JX_MO"
-#define _SMSROUTE_UNTMP						"JX_UNTMP"
-	//! \brief 计算当前对象占用的内存。用于计算保存string的类型。
-	//! \param[in]	object	需要计算存储大小的对象。
-	long calmemoryOfObject( const vector<string> &object );
-	long calmemoryOfObject( const map<string, string> &object );
-	long calmemoryOfObject( const vector<vector<string> > &object );
-	long calmemoryOfObject( const vector<map<string, string> > &object );
 
 	//! \brief	消除重复的值。
 	//! \todo	扩展为模板类。
@@ -71,8 +62,6 @@ namespace Universal{
 	bool execShellCmd( const string &cmd );
 	//! \brief	获取手机的运营商。
 	string getMobileType( const string &mobile );
-	//! \brief	或者手机号码的短信网关类型。（和公司标准设置相关）
-	string getSmsRoute( const string &mobile );
 
 	//! \brief	从map中查询key对应的数据。如果查询不到则返回 宏[_STRINGFALSE] 定义的字符串。
 	string findDataFromMap( const map<string, string> &mapData, const string &key );
