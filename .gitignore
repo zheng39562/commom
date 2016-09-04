@@ -1,1 +1,5 @@
 _64
+cscope\..*
+*\.log
+*\.vim
+wget-log

@@ -11,6 +11,12 @@
 #ifndef _server_start_H
 #define _server_start_H
 
+/*
+ * 1 server 和 client 完成 : 基于libevent 要求多线程。
+ * 2 pack和unpack包的基本类
+ * 3 测试。
+ */
+
 namespace ServiceSpace{
 	enum eServerMode{
 		serverMode_FirstInvalid = -1,
