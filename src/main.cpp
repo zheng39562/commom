@@ -14,28 +14,31 @@
 #include "template_function.hpp"
 #include "sql_operator.h"
 #include "boost/scoped_ptr.hpp"
+#include "network/socket_simple.h"
+#include "tool/string_util.h"
 
 using namespace std;
 using namespace Universal;
+using namespace MyTest;
 
 int main( int agrc, char **argv ){
-	/*
-	boost::scoped_ptr<SqlOperator> pSqlOperator( new SqlOperator( "192.168.1.235", 3306, "igr_all", "igrow123", "svr_log", 50 ) );
+	if( agrc >= 2 ){
+		string option( argv[1] );
+		string ip( "127.0.0.1" );
+		string port( "6000" );
 
-	TableDatas datas;
-
-	if( pSqlOperator->execQuery( "select servname as servname, substring( time, 1, 10 ) as time, sum(usetime) as usetimecount, count(1) as usetimes, sum(usetime) / count(1) as averagetime from log_analyzeinfo where 1=1 and unix_timestamp(time) >= 1455638400 and unix_timestamp(time) <= 1455811199 group by substring( time, 1, 10 ), servname limit 0,20", datas ) ){
-		cout << "success" << endl;
+		if( option == "c" || option == "client" || option == "-c" ){
+			cout << " run socket client. " << endl;
+			socket_client( ip, Inside::strToInt(port) );
+		}
+		else{
+			cout << " run socket server. " << endl;
+			socket_server( ip, Inside::strToInt(port) );
+		}
 	}
 	else{
-		cout << "failure" << endl;
+		cout << " param size is wrong. size [" << agrc << "]" << endl;
 	}
-	*/
-
-	boost::shared_ptr<int> ptr( new int(4) );
-	cout << ptr << endl;
-	cout << *ptr << endl;
-
 	return 0;
 }
 
