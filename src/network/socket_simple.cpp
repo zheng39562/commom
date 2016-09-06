@@ -68,13 +68,7 @@ namespace MyTest{
 		assert( sock >= 0 );
 
 		int on(0);
-		if( setsockopt(sock,SOL_SOCKET,SO_REUSEADDR,&on,sizeof(on) ) < 0 ){
-			cout << " set error " << endl;
-			return;
-		}
-		else{
-			cout << " set success " << endl;
-		}
+		setsockopt(sock,SOL_SOCKET,SO_REUSEADDR,&on,sizeof(on) );
 
 		int ret = bind( sock, ( struct sockaddr* ) &address,  sizeof( address ) );
 		if( ret == -1 ){ cout << "errno " << errno << endl; }

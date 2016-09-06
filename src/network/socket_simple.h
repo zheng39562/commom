@@ -11,7 +11,16 @@
 #ifndef _socket_simple_H
 #define _socket_simple_H
 
-#include <string>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <iostream>
+#include <stdio.h>
+#include <arpa/inet.h>
+#include <string.h>
+#include <assert.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <errno.h>
 
 //! \brief	仅用于学习测试，以及长时间不接触的备忘。
 //! \note	如需要使用对应功能，建议使用其他封装完整的类。
@@ -23,6 +32,8 @@ namespace MyTest{
 	//! \note	每接收一个消息，会将消息内容自动返回。
 	//! \note	当链接的客户端被关闭时 服务会自动关闭。
 	void socket_server( const std::string &ip, const int &port );
+
+	bool setAddress( const std::string &ip, const int &port, sockaddr_in &address );
 }
 
 #endif 
