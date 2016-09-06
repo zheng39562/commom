@@ -34,8 +34,8 @@ namespace Network{
 			cout << "new bufferevent failed." << endl;
 		}
 
-		//bufferevent_setcb(bev, NetMsgTransfer::readBack, NetMsgTransfer::writeBack, NULL, NULL);
-		bufferevent_setcb(bev, NULL, NULL, NULL, NULL);
+		bufferevent_setcb(bev, NetMsgTransfer::readBack, NetMsgTransfer::writeBack, NULL, NULL);
+		//bufferevent_setcb(bev, NULL, NULL, NULL, NULL);
 		bufferevent_enable(bev, EV_READ|EV_WRITE);
 	}
 
@@ -68,8 +68,8 @@ namespace Network{
 	void NetMsgTransfer::readBack(bufferevent* bev, void *ctx){
 		cout << " readBack " << endl;
 		evbuffer* output = bufferevent_get_input(bev);
-		unsigned long len(0);
-		char* retLine = evbuffer_readln(output, &len, EVBUFFER_EOL_CRLF);
+		char retLine[100];
+		size_t len = bufferevent_read(bev, retLine, 100);
 
 		if(retLine == NULL){
 			cout << "retLine is null " << endl;
@@ -77,7 +77,6 @@ namespace Network{
 		}
 
 		cout << " readBack : " << retLine << endl;
-
 
 		NetMsgPtr pMsg(new NetMsg());
 		pMsg->m_BufferEvent = bev;
