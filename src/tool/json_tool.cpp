@@ -185,7 +185,6 @@ namespace Universal{
 		if(  mapList.size() == 0 )  return "";
 
 		string defaultJsStr;
-		defaultJsStr.reserve(  mapList.size() * calmemoryOfObject( *(mapList.begin()) ) * 2 );  // 空间换时间。
 		defaultJsStr += "[\n";
 		for( vector<map<string,string> >::const_iterator citerJsBlock = mapList.begin(); citerJsBlock != mapList.end(); ){
 			defaultJsStr += JsonTool::convertMapToJsStr( *citerJsBlock );
@@ -203,7 +202,6 @@ namespace Universal{
 		if(  mapList.size() == 0 )  return "";
 
 		string defaultJsStr;
-		defaultJsStr.reserve(  mapList.size() * calmemoryOfObject( *(mapList.begin()) ) * 2 );  // 空间换时间。
 		defaultJsStr += "[\n";
 		for( list<map<string,string> >::const_iterator citerJsBlock = mapList.begin(); citerJsBlock != mapList.end(); ){
 			defaultJsStr += JsonTool::convertMapToJsStr( *citerJsBlock );

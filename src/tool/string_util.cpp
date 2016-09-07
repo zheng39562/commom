@@ -280,7 +280,6 @@ namespace Universal{
 	}
 	string mergeString( const vector<string> &strings, const string &mergerKey ){
 		string strTmp;
-		strTmp.reserve( calmemoryOfObject(strings ) );
 		for( vector<string>::const_iterator citer = strings.begin(); citer != strings.end();){
 			strTmp += *citer;
 			if( ++citer != strings.end() )
