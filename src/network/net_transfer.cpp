@@ -11,16 +11,18 @@
 #include "net_transfer.h"
 
 #include <iostream>
+#include <string.h>
 #include "event2/buffer.h"
 #include "event2/bufferevent.h"
 #include "tool/single_mode.hpp"
+#include "common_define.h"
 
 using namespace std;
 
 namespace Network{
+	const int READ_BUFFER_SIZE=4000;
 	NetMsgTransfer::NetMsgTransfer()
-		:m_EventBase(NULL),
-		 m_MsgList()
+		:m_EventBase(NULL)
 	{
 		m_EventBase = event_base_new();
 	}
@@ -29,59 +31,38 @@ namespace Network{
 	}
 
 	int NetMsgTransfer::addSocket(const int &socket, eSocketRWOpt socketRWOpt){
-		bufferevent *bev = bufferevent_socket_new(m_EventBase, socket, BEV_OPT_CLOSE_ON_FREE);
+		bufferevent *bev = bufferevent_socket_new(m_EventBase, socket, BEV_OPT_CLOSE_ON_FREE | BEV_OPT_THREADSAFE);
 		if(bev == NULL){
-			cout << "new bufferevent failed." << endl;
+			DEBUG_D("new bufferevent failed.");
 		}
 
-		bufferevent_setcb(bev, NetMsgTransfer::readBack, NetMsgTransfer::writeBack, NULL, NULL);
-		//bufferevent_setcb(bev, NULL, NULL, NULL, NULL);
+		bufferevent_setcb(bev, NetMsgTransfer::readBack, NetMsgTransfer::writeBack, NetMsgTransfer::errorBack, NULL);
 		bufferevent_enable(bev, EV_READ|EV_WRITE);
+
 	}
 
 	int NetMsgTransfer::removeSocket(const int &socket){
 		return 0;
 	}
 
-	int NetMsgTransfer::pushMsg(const NetMsg &msg){
-		bufferevent_write(msg.m_BufferEvent, msg.m_Data.c_str(), msg.m_Data.size() );
-		return 0;
-	}
-
-	NetMsgPtr NetMsgTransfer::popMsg(){
-		return NetMsgPtr();
-	}
-
 	void NetMsgTransfer::writeBack(bufferevent* bev, void *ctx){
-		cout << " writeBack " << endl;
-		evbuffer* output = bufferevent_get_output(bev);
-		unsigned long len(0);
-		char* retLine = evbuffer_readln(output, &len, EVBUFFER_EOL_CRLF);
-
-		if(retLine == NULL){
-			cout << "retLine is null " << endl;
-			return;
-		}
-
-		cout << " writeBack : " << retLine << endl;
+		DEBUG_D(" writeBack ");
+		//m_MsgCache.activeWrite(bev);
 	}
 	void NetMsgTransfer::readBack(bufferevent* bev, void *ctx){
-		cout << " readBack " << endl;
+		DEBUG_D(" readBack ");
 		evbuffer* output = bufferevent_get_input(bev);
-		char retLine[100];
-		size_t len = bufferevent_read(bev, retLine, 100);
-
-		if(retLine == NULL){
-			cout << "retLine is null " << endl;
-			return;
+		char retLine[READ_BUFFER_SIZE];
+		memset(retLine, '\0', sizeof(char)*READ_BUFFER_SIZE);
+		if( bufferevent_read(bev, retLine, READ_BUFFER_SIZE) > 0 ){
+			//m_MsgCache.pushMsg(bev, retLine);
 		}
+	}
+	void NetMsgTransfer::errorBack(bufferevent* bev, short events, void *ctx){
+		DEBUG_D(" error back ");
+		bufferevent_free(bev);
 
-		cout << " readBack : " << retLine << endl;
-
-		NetMsgPtr pMsg(new NetMsg());
-		pMsg->m_BufferEvent = bev;
-		pMsg->m_Data = string(retLine);
-		DesignMode::SingleMode<NetMsgTransfer>::getInstance()->m_MsgList.push_back(pMsg);
+		DEBUG_D(" bev addr : " << bev);
 	}
 
 	void NetMsgTransfer::run(){

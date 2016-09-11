@@ -27,32 +27,16 @@ using namespace std;
 	#define _RUN_FUNC_
 #endif
 
-// DEBUG
-#ifndef __COMMON
-	#include "DebugLog.h"
-	#define DEBUG_D(msg, ...) 							LOG_D(msg, ##__VA_ARGS__)
-	#define DEBUG_I(msg, ...) 							LOG_I(msg, ##__VA_ARGS__)
-	#define DEBUG_W(msg, ...) 							LOG_W(msg, ##__VA_ARGS__)
-	#define DEBUG_E(msg, ...) 							LOG_E(msg, ##__VA_ARGS__)
-	#define DEBUG_C(msg, ...) 							LOG_C(msg, ##__VA_ARGS__)
-#else
-    // 日志部分。
-	#define _DEBUG(msg, ...) 							
-
-	#define DEBUG_D(msg, ...) 							cout << msg << endl;
-	#define DEBUG_I(msg, ...) 							cout << msg << endl;
-	#define DEBUG_W(msg, ...) 							cout << msg << endl;
-	#define DEBUG_E(msg, ...) 							cout << msg << endl;
-	#define DEBUG_C(msg, ...) 							cout << msg << endl;
-	#define	LOG_LVL_DBG								0
-	#define LOG_LVL_INFO								1
-	#define LOG_LVL_WARN								2
-	#define LOG_LVL_ERROR								3
-	#define LOG_LVL_CRITICAL							4
-#endif
-#ifdef DEBUG
-	#define PRIINFO(msg, ...)							LOG_D(msg, ##__VA_ARGS__)
-#endif
+#define DEBUG_D(msg, ...) 							cout << msg << endl;
+#define DEBUG_I(msg, ...) 							cout << msg << endl;
+#define DEBUG_W(msg, ...) 							cout << msg << endl;
+#define DEBUG_E(msg, ...) 							cout << msg << endl;
+#define DEBUG_C(msg, ...) 							cout << msg << endl;
+#define	LOG_LVL_DBG									0
+#define LOG_LVL_INFO								1
+#define LOG_LVL_WARN								2
+#define LOG_LVL_ERROR								3
+#define LOG_LVL_CRITICAL							4
 
 #ifdef IMPORTFILE_TEST
 														//StartCount();

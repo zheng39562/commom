@@ -14,6 +14,7 @@
 #include "template_function.hpp"
 #include "sql_operator.h"
 #include "boost/scoped_ptr.hpp"
+#include "boost/shared_ptr.hpp"
 #include "network/socket_simple.h"
 #include "network/net_transfer.h"
 #include "tool/string_util.h"
@@ -36,6 +37,7 @@ using namespace MyTest;
 using namespace Network;
 
 int main( int agrc, char **argv ){
+	/*
 	if( agrc >= 2 ){
 		string option( argv[1] );
 		string ip( "127.0.0.1" );
@@ -84,6 +86,15 @@ int main( int agrc, char **argv ){
 	else{
 		cout << " param size is wrong. size [" << agrc << "]" << endl;
 	}
+	*/
+	boost::shared_ptr<int> p1(new int(2));
+	boost::shared_ptr<const int> p2;
+	p2 = p1;
+
+	cout << *p1 << endl;
+
+	cout << *p2 << endl;
+	cout << *p2 << endl;
 	return 0;
 }
 

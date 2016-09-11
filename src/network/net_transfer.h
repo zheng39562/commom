@@ -11,11 +11,10 @@
 #ifndef _net_transfer_H
 #define _net_transfer_H
 
-#include "event2/event.h"
 #include <string>
-#include "boost/shared_ptr.hpp"
 #include <list>
-
+#include "event2/event.h"
+#include "boost/shared_ptr.hpp"
 #include "network/net_packer.h"
 
 namespace Network{
@@ -33,13 +32,8 @@ namespace Network{
 	//! \brief	网络传输类。
 	//! \note	基于TCP libevent socket 结构完成。不排除未来支持UDP
 	//! \note	套接字，通过自定义的数据包，进行接收和写入。
-	//! \note	该方案基于消息包形式，未测试过效率和瓶颈问题。
-	//! \note	使用方法：
-	//			1	直接构造该类即可，但注意，不同对象的监听是分开的。
 	//! \todo	可以再扩展IO/文件等传输类。可能需要对类名进行一定修正。
 	//! \todo	PS：可以用过在外连接好socket的方式来当作客户端使用。后期会在此类基础上做一个简易的客户端版本。
-	typedef NetPacker NetMsg;
-	typedef boost::shared_ptr<NetMsg> NetMsgPtr;
 	class NetMsgTransfer : public Transfer {
 		public:
 			NetMsgTransfer();
@@ -47,20 +41,14 @@ namespace Network{
 		public:
 			int addSocket(const int &socket, eSocketRWOpt socketRWOpt = socketRWOpt_RW);
 			int removeSocket(const int &socket);
-			//! \todo	增加读写设置功能。
-			//int setSocketRWOpt(const int &socket, eSocketRWOpt socketRWOpt = socketRWOpt_RW);
-
-			int pushMsg(const NetMsg &Msg);
-			NetMsgPtr popMsg();
-
 			void run();
 		private:
 			static void writeBack(bufferevent* bev, void *ctx);
 			static void readBack(bufferevent* bev, void *ctx);
-		//private:
+			static void errorBack(bufferevent* bev, short events, void *ctx);
 		public:
 			event_base* m_EventBase;
-			std::list<NetMsgPtr> m_MsgList;
+			//MsgCache m_MsgCache;
 	};
 }
 

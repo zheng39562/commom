@@ -13,6 +13,7 @@
 
 #include <string>
 #include "event2/bufferevent.h"
+#include "boost/shared_ptr.hpp"
 
 namespace Network{
 	//! \brief	暂时不需要更多扩展。仅单纯作为基类。
@@ -21,6 +22,8 @@ namespace Network{
 			Packer(){;}
 			virtual ~Packer(){;}
 	};
+	typedef boost::shared_ptr<Packer> PackerPtr;
+	typedef boost::shared_ptr<const Packer> PackerConstPtr;
 
 	class NetPacker{
 		public:
