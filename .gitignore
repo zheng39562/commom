@@ -3,3 +3,4 @@ cscope\..*
 *\.log
 *\.vim
 wget-log
+*\.o

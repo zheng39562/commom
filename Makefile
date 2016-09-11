@@ -59,6 +59,9 @@ PROJECT_PATH=out
 PROJECT_OBJECTS= \
 	./$(PROJECT_PATH)/./src/exception/common_exception.o \
 	./$(PROJECT_PATH)/./src/sql/sql_operator.o \
+	./$(PROJECT_PATH)/./src/network/socket_simple.o \
+	./$(PROJECT_PATH)/./src/network/net_packer.o \
+	./$(PROJECT_PATH)/./src/network/net_transfer.o \
 	./$(PROJECT_PATH)/./src/tool/common_tool.o \
 	./$(PROJECT_PATH)/./src/tool/common_file.o \
 	./$(PROJECT_PATH)/./src/tool/file_transmission.o \
@@ -69,7 +72,7 @@ PROJECT_OBJECTS= \
 	./$(PROJECT_PATH)/./src/tool/xls_reader.o \
 	./$(PROJECT_PATH)/./src/tool/xls_struct.o \
 	./$(PROJECT_PATH)/./src/tool/xls_writer.o \
-	./$(PROJECT_PATH)/./src/${MAIN_NAME}.o \
+	./$(PROJECT_PATH)/./src/${MAIN_NAME}.o
 
 
 ./${PROJECT_PATH}/%.o : %.cpp
