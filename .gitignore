@@ -1,5 +1,5 @@
 _64
-cscope\..*
+cscope\.*
 *\.log
 *\.vim
 wget-log
