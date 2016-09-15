@@ -60,7 +60,8 @@ PROJECT_OBJECTS= \
 	./$(PROJECT_PATH)/./src/exception/common_exception.o \
 	./$(PROJECT_PATH)/./src/sql/sql_operator.o \
 	./$(PROJECT_PATH)/./src/network/socket_simple.o \
-	./$(PROJECT_PATH)/./src/network/net_packer.o \
+	./$(PROJECT_PATH)/./src/network/net_struct.o \
+	./$(PROJECT_PATH)/./src/network/net_protocol_convert.o \
 	./$(PROJECT_PATH)/./src/network/net_transfer.o \
 	./$(PROJECT_PATH)/./src/tool/common_tool.o \
 	./$(PROJECT_PATH)/./src/tool/common_file.o \
@@ -93,11 +94,16 @@ tar :
 
 # common 
 	
+.PHONY: clean cleanall tags
 cleanall :
 	rm -rf ./out/
 	rm -f ${SOFTWARE_NAME}
 clean :
 	rm -rf ./out/
 	rm -f ${SOFTWARE_NAME}
+tags:
+	rm -rf tags
+	touch tags
+	find ./src ../commonlibrary/include -iname '*.cpp' -or -iname '*.c' -or -iname '*.h'-or -iname '*.hpp' | xargs ctags --c++-kinds=+p --fields=+iaS --extra=+q --langmap=c++:+.inl -a tags
 
 

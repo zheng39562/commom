@@ -4,3 +4,4 @@ cscope\.*
 *\.vim
 wget-log
 *\.o
+tags

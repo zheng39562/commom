@@ -30,6 +30,7 @@ namespace Universal{
 			int tryLock();
 			int unlock();
 	};
+	class RWMutex;
 }
 
 #endif

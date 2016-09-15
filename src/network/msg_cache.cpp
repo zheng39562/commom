@@ -26,27 +26,60 @@ namespace Network{
 };
 
 namespace Network{
-	MsgCache::MsgCache()
-		:m_MsgQueue(),
-		 m_ReadCache(),
-		 m_WriteCache()
+	MsgServer::MsgServer()
+		:m_MsgCache(),
+		 m_MMsg(),
+		 m_PackerCache(),
+		 m_MPacker(),
+		 m_IncompletePacker()
 	{
 		;
 	}
-	MsgCache::~MsgCache(){
-		;
+	MsgServer::~MsgServer(){ ; }
+
+	bool MsgServer::emptyW(ConnectKey connectKey){
+		if(m_MsgCache.find(connectKey) != m_MsgCache.end()){
+			return m_MsgCache.find(connectKey).second.empty();
+		}
+		return false;
 	}
 
-	int MsgCache::sendPack(PackerConstPtr pPacker){
-		;
+	void MsgServer::sendPacker(const PackerPtr &pPacker){
+		ConnectKey connectKey = pPacker->getConnectKey();
+		if(m_MsgCache.find(connectKey) == m_MsgCache.end()){
+			m_MsgCache.insert(connectKey, MMsgQueue());
+		}
+		convertPackerToMsg(pPacker, m_MsgCache.find(connectKey)->second);
 	}
-	void MsgCache::recvMsg(MsgPtr msg){
-		;
+
+	MsgPtr MsgServer::recvMsg(ConnectKey connectKey){
+		MsgPtr pMsg;
+		if(m_MsgCache.find(connectKey) != m_MsgCache.end()){
+			if(!m_MsgCache.find(connectKey).second.empty()){
+				pMsg = m_MsgCache.find(connectKey).second.pop();
+			}
+		}
+		return pMsg;
 	}
-	void MsgCache::activeWrite(bufferevent *bev){
-		;
+
+	bool MsgServer::emptyR(){ return m_PackerCache.empty(); }
+
+	void MsgServer::sendMsg(const MsgPtr &pMsg){
+		ConnectKey connectKey = pMsg.m_ConnectKey;
+		if(m_IncompleteMsg.find(connectKey) == m_IncompleteMsg.end()){
+			m_IncompleteMsg.insert(pair<ConnectKey, std::string>(connectKey, std::string()));
+		}
+		m_IncompleteMsg.find(connectKey)->second += pMsg.m_Msg;
+
+		convertMsgToPacker(m_IncompleteMsg.find(connectKey)->second, m_PackerCache);
 	}
-	MsgPtr MsgCache::popPacker(){
-		;
+
+	PackerPtr MsgServer::recvPacker(){
+		PackerPtr pPacker;
+		if(!emptyR()){
+			pPacker = m_PackerCache.pop();
+		}
+		return pPacker;
 	}
-};
+}
+

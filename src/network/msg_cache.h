@@ -15,37 +15,41 @@
 #include "boost/shared_ptr.hpp"
 #include "event2/bufferevent.h"
 #include "tool/lock_queue.hpp"
+#include "tool/single_mode.hpp"
+#include "tool/common_mutex.h"
+#include "network/net_protocol_convert.h"
+#include "tool/single_mode.hpp"
 
 namespace Network{
-	//! \todo 复制构造函数，赋值构造函数等
-	class Msg{
+	class ConnectKey;
+	//! \brief	消息中间件，用于分隔应用层和传输层。
+	//! \note	类似tcp，拥有一条读通道一条写通道。
+	//! \note	读通道通过读取msg信息，输出packer包
+	//! \note	写通道通过读取packer包，输出msg信息
+	//! \attetion	注意不建议直接使用该类。使用下面typedef的Single类更加合适。
+	//! \todo	可以考虑对读写通道分离。
+	//! \todo	更高抽象：当前是从应用视角来理解该类，在传输和通信视角会感到困惑。
+	class MsgServer{
 		public:
-			Msg(bufferevent *_bev, const string &msg);
-			~Msg();
-		private:
-			bufferevent *m_Bev;
-			std::string m_Msg;
-	}
-	typedef boost::shared_ptr<Msg> MsgPtr;
+			MsgServer();
+			~MsgServer();
+		public:
+			//! 写通道
+			bool emptyW(ConnectKey connectKey);
+			void pushPacker(const PackerPtr &pPacker);
+			MsgPtr popMsg(ConnectKey connectKey);
 
-	//! \brief	信息缓存和处理类。
-	//! \note	读取：从缓存中读取数据，打包成msg结构。如已接收到完整的包，则打包，否则放入缓存。
-	//! \note	写入：将包分解成msg结构，等待写入事件激活。
-	class MsgCache{
-		public:
-			MsgCache();
-			~MsgCache();
-		public:
-			int sendPack(PackerConstPtr pPacker);
-			void recvMsg(MsgPtr msg);
-			void activeWrite(bufferevent *bev);
-			MsgPtr popPacker();
-		private:
-			LockQueue<PackerPtr> m_PackerQueue;
-			std::map<bufferevent*, std::string> m_ReadCache;
-			std::map<bufferevent*, LockQueue<MsgPtr>> m_WriteCache;
-			std::list<MsgPtr> m_WriteMsgList;
+			//! 读通道
+			bool emptyR();
+			void pushMsg(const MsgPtr &pMsg);
+			PackerPtr popPacker();
+		protected:
+			MsgCache m_MsgCache;				//! 缓存类需要自身带锁。
+
+			PackerCache m_PackerCache;			//! 缓存类需要自身带锁。
+			std::map<ConnectKey, std::string> m_IncompleteMsg;
 	};
+	typedef DesignMode::SingleMode<MsgServer> SingleMsgServer;
 }
 #endif 
 

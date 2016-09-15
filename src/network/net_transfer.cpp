@@ -46,22 +46,24 @@ namespace Network{
 	}
 
 	void NetMsgTransfer::writeBack(bufferevent* bev, void *ctx){
-		DEBUG_D(" writeBack ");
-		//m_MsgCache.activeWrite(bev);
+		DEBUG_D(" write ");
+		MsgPtr pMsg = SingleMsgServer::getInstance()->popMsg(bev);
+		DEBUG_D(" write " << pMsg->m_Msg);
+		bufferevent_write(bev, pMsg->m_Msg.c_str(), pMsg->m_Msg.c_str());
 	}
 	void NetMsgTransfer::readBack(bufferevent* bev, void *ctx){
 		DEBUG_D(" readBack ");
 		evbuffer* output = bufferevent_get_input(bev);
-		char retLine[READ_BUFFER_SIZE];
+		char* retLine = new char(READ_BUFFER_SIZE);
 		memset(retLine, '\0', sizeof(char)*READ_BUFFER_SIZE);
 		if( bufferevent_read(bev, retLine, READ_BUFFER_SIZE) > 0 ){
-			//m_MsgCache.pushMsg(bev, retLine);
+			SingleMsgServer::getInstance()->pushMsg(MsgPtr(new Msg(bev, retLine)));
 		}
+		delete retLine;
 	}
 	void NetMsgTransfer::errorBack(bufferevent* bev, short events, void *ctx){
 		DEBUG_D(" error back ");
 		bufferevent_free(bev);
-
 		DEBUG_D(" bev addr : " << bev);
 	}
 
