@@ -21,27 +21,49 @@ namespace Network{
 	enum eProtocolDataFormat;
 
 	typedef std::string PackerKey;
-	//! \brief	暂时不需要更多扩展。仅单纯作为基类。
+	typedef std::string ItemName;
+	typedef std::string CollectionName;
+	//! \brief	数据包。
+	//! \note	结构类似linux文件。path表示路径。collection类似目录，item类似文件。目录没有内容。具体内容保存在item中（即文件）
+	//! \todo	目标会接受xml 和 json。但目前看来json会优先（已有三方库可用）
+	//! \todo	考虑使用三方库需要先解析，然后再进行深复制。考虑对此进行优化。
+	//! \todo	暂时不对数组类型单独考虑（把数字0，1等当作一个key。）。在实际使用中，再后续考虑是否需要对数组单独做一些接口。
 	class Packer{
 		public:
 			Packer()
 				:m_ConnectKey(NET_CACHEKEY_DEFAULT)
 			{;}
-			virtual ~Packer(){;}
+			~Packer(){;}
 		public:
-			virtual bool parseMsg(const std::string &msg)=0; 
-			virtual string getPackerStr(const PackerKey &packerKey)=0;
-			virtual string getString(const PackerKey &packerKey)=0;
-			virtual string getInt(const PackerKey &packerKey)=0;
-			virtual string getDouble(const PackerKey &packerKey)=0;
-			virtual string getBoolean(const PackerKey &packerKey)=0;
-			virtual string getChar(const PackerKey &packerKey)=0;
-
-			virtual eProtocolDataFormat getDataFormat()=0;
-
 			ConnectKey getConnectKey();
+			eProtocolDataFormat getDataFormat()=0;
+
+			bool parseMsg(const std::string &msg)=0; 
+			
+			//! \brief	获取数据函数。
+			string getPackerStr(const PackerKey &packerKey)=0;
+			string getString(const PackerKey &packerKey)=0;
+			int getInt(const PackerKey &packerKey)=0;
+			double getDouble(const PackerKey &packerKey)=0;
+			bool getBoolean(const PackerKey &packerKey)=0;
+			char getChar(const PackerKey &packerKey)=0;
+			//! \brief	
+			bool addItem(const ItemName &name, const int &value);
+			bool addItem(const ItemName &name, const char &value);
+			bool addItem(const ItemName &name, const double &value);
+			bool addItem(const ItemName &name, const string &value);
+			bool addCollection(const CollectionName &name);
+
+			//! 索引功能。
+			bool setPath(const std::string path);
+			string getPath();
+			void getItemNames(vector<ItemName> &itemNames);
+
+			//
+			bool isCollection();
 		private:
 			ConnectKey m_ConnectKey;
+			eProtocolDataFormat m_DataFormat;
 	};
 	typedef boost::shared_ptr<Packer> PackerPtr;
 	typedef boost::shared_ptr<const Packer> ConstPackerPtr;

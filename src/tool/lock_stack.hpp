@@ -18,7 +18,7 @@
 namespace Universal{
 	//! \brief	自实现的栈操作。
 	//! \note	拥有自己的互斥锁。互斥锁仅对单对象做出限制：多个不同的对象没有影响。
-	template < typename T >
+	template<typename T>
 	class LockStack {
 		public:
 			LockStack();
@@ -38,20 +38,20 @@ namespace Universal{
 			//! \brief	
 			long size();
 	};
-	template < typename T > LockStack<T>::LockStack()
+	template<typename T> LockStack<T>::LockStack()
 		:m_Mutex(),
 		 m_Stack()
 	{ ; }
-	template < typename T > LockStack<T>::~LockStack(){ ; }
+	template<typename T> LockStack<T>::~LockStack(){ ; }
 
-	template < typename T > void LockStack<T>::push( const T &data ){
+	template<typename T> void LockStack<T>::push( const T &data ){
 		m_Mutex.lock();
 		m_Stack.push( data );
 		m_Mutex.unlock();
 	}
 
 
-	template < typename T > T LockStack<T>::pop(){
+	template<typename T> T LockStack<T>::pop(){
 		m_Mutex.lock();
 		T dataTmp = m_Stack.top();
 		m_Stack.pop();
@@ -61,7 +61,7 @@ namespace Universal{
 	}
 
 
-	template < typename T > T LockStack<T>::top(){
+	template<typename T> T LockStack<T>::top(){
 		m_Mutex.lock();
 		T dataTmp = m_Stack.top();
 		m_Mutex.unlock();
@@ -70,7 +70,7 @@ namespace Universal{
 	}
 
 
-	template < typename T > bool LockStack<T>::empty(){
+	template<typename T> bool LockStack<T>::empty(){
 		m_Mutex.lock();
 		bool empty = m_Stack.empty();
 		m_Mutex.unlock();
@@ -79,7 +79,7 @@ namespace Universal{
 	}
 
 
-	template < typename T > long LockStack<T>::size(){
+	template<typename T> long LockStack<T>::size(){
 		m_Mutex.lock();
 		long size = m_Stack.size();
 		m_Mutex.unlock();
