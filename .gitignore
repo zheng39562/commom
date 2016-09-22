@@ -3,5 +3,6 @@ cscope\.*
 *\.log
 *\.vim
 wget-log
-*\.o
+*.o
 tags
+Main_64
