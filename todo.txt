@@ -1,6 +1,5 @@
 任务安排：
 	2	完成msg_cache的类，在pack中增加打印的形式 测试msg_cache  和 transfer 类的正常运行。
-		1	协议函数未完成
 		2	packer的结构 : 
 			1	packer的路径规划：使用类似cd pwd ls 等功能方式。当前层只支持key:value形式。
 			2	需要增加一个内部数据存储类。该类需要使用递归形式。需要支持：key-value;array;object
@@ -18,3 +17,5 @@
 		1	配置保存（关机后）
 		2	专门的top页
 		3	window命名设置。
+
+	*	git submodule : commonlibrary.
