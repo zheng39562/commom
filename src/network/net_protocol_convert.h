@@ -39,11 +39,46 @@ namespace Network{
 		eProtocolDataFormat_LastInvalid = 255
 	};
 
+	class ProtocolMsg;
+	typedef ProtocolMsg ProtocolMsgPtr;
+	typedef size_t ProtocolSize;
+	extern const int PROTOCOL_SIZE_STR_LENGTH;
+
+	extern const int PROTOCOL_INDEX_DATA_SIZE;
+	extern const int PROTOCOL_INDEX_FLAG;
+	extern const int PROTOCOL_INDEX_DATA_FORMAT;
+	extern const int PROTOCOL_INDEX_MSG;
+	//! \brief	协议结构。
+	//! \todo	
+	class ProtocolMsg{
+		public:
+			ProtocolMsg()
+				:size(0),
+				 flags(0),
+				 dataFormat(eProtocolDataFormat_String),
+				 msg()
+			{;}
+			~ProtocolMsg(){;}
+		public:
+			static ProtocolMsgPtr getProtocolMsg(string &msg);
+			static string convertMsgToStr(const ProtocolMsgPtr pProtocolMsg);
+		private:
+			static ProtocolSize StrToSize(const string &msg);
+			static string SizeToStr(const ProtocolSize size);
+		public:
+			ProtocolSize size;
+			char flags;
+			eProtocolDataFormat dataFormat;
+			string msg;
+	}
 	//! \brief	将msg转换成packer
 	//! \param[in,out] msg 消息字符串，已完成的消息会被打包。剩余消息通过该参数返回。
-	void convertMsgToProtocolData(std::string &msg, MProtocolDataQueue &packerQueue);
+	//! \todo	MD5验证
+	void convertMsgToProtocolData(const ConnectKey &key, std::string &msg, MProtocolDataQueue &packerQueue);
 	//! \brief	将packer转换成msg
+	//! \todo	MD5验证
 	void convertProtocolDataToMsg(const ConstProtocolDataPtr &pProtocolData, MMsgQueue &msgQueue);
+
 }
 #endif 
 

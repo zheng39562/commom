@@ -30,23 +30,26 @@ namespace Network{
 	//! \todo	暂时不对数组类型单独考虑（把数字0，1等当作一个key。）。在实际使用中，再后续考虑是否需要对数组单独做一些接口。
 	class Packer{
 		public:
-			Packer()
-				:m_ConnectKey(NET_CACHEKEY_DEFAULT)
+			Packer(const ConnectKey &_key)
+				:m_ConnectKey(_key)
 			{;}
+			Packer(const Packer &ref);
+			Packer& operator=(const Packer &ref);
 			~Packer(){;}
 		public:
 			ConnectKey getConnectKey();
-			eProtocolDataFormat getDataFormat()=0;
+			eProtocolDataFormat getDataFormat();
 
-			bool parseMsg(const std::string &msg)=0; 
+			bool parseMsg(const std::string &msg, const eProtocolDataFormat &dataFormat); 
 			
 			//! \brief	获取数据函数。
-			string getPackerStr(const PackerKey &packerKey)=0;
-			string getString(const PackerKey &packerKey)=0;
-			int getInt(const PackerKey &packerKey)=0;
-			double getDouble(const PackerKey &packerKey)=0;
-			bool getBoolean(const PackerKey &packerKey)=0;
-			char getChar(const PackerKey &packerKey)=0;
+			string getPackerStr();
+
+			string getString(const PackerKey &packerKey);
+			int getInt(const PackerKey &packerKey);
+			double getDouble(const PackerKey &packerKey);
+			bool getBoolean(const PackerKey &packerKey);
+			char getChar(const PackerKey &packerKey);
 			//! \brief	
 			bool addItem(const ItemName &name, const int &value);
 			bool addItem(const ItemName &name, const char &value);
