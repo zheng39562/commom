@@ -24,7 +24,6 @@ namespace Network{
 	typedef std::string PackerKey;
 	typedef std::string ItemName;
 	typedef std::string ItemValue;
-	typedef KeyTree<ItemName, ItemValue> Collection;
 	//! \brief	数据包。
 	//! \note	结构类似linux文件。path表示路径。collection类似目录，item类似文件。目录没有内容。具体内容保存在item中（即文件）
 	//! \todo	目标会接受xml 和 json。但目前看来json会优先（已有三方库可用）
@@ -72,7 +71,7 @@ namespace Network{
 		private:
 			ConnectKey m_ConnectKey;
 			eProtocolDataFormat m_DataFormat;
-			Collection m_Coolection;
+			Collection* m_pCoolection;
 	};
 	typedef boost::shared_ptr<Packer> PackerPtr;
 	typedef boost::shared_ptr<const Packer> ConstPackerPtr;

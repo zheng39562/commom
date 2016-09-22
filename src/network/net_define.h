@@ -12,5 +12,11 @@
 #define _net_define_H
 
 #define NET_ERROR_NO -1
+
+
+typedef std::string Name;
+typedef std::string Path;
+
+
 #endif 
 
