@@ -21,25 +21,29 @@ namespace Universal{
 		class KeyTree{
 			public:
 				typedef KeyTree* iterator;
-				typedef KeyTree const * const_iterator;
+				typedef const KeyTree* const_iterator;
 				const iterator ITERATOR_END = NULL:
 			public:
 				KeyTree();
+				KeyTree(const TKey &_key);
+				KeyTree(const TKey &_key, const TValue &_value);
+				//! \brief	拷贝和赋值都不复制除节点以外的信息。
+				//! \note	节点关联性只能通过节点关联函数(setParent or oprtChild)来完成
 				KeyTree(const KeyTree &ref);
 				KeyTree& operator=(const KeyTree &ref);
 				~KeyTree();
 			public:
-				void setKey(const TKey &key);
-				inline void setValue(const TValue &value);
-				inline void setParent(iterator &iter);
-				inline TKey getKey();
-				inline TValue getValue();
-				inline iterator getParent();
-
 				void addChild(const TKey &key);
 				void addChild(const TKey &key, const TValue &value);
 				void addChild(const KeyTree &keyTree);
-				void delChild(const TKey);
+
+				void delChild(const TKey &key);
+
+				void changeParent(KeyTree &parent);
+				void changeChildKey(const TKey &origin, const TKey &dest);
+
+				void unlinkParent();
+				void unlinkChild(const KeyTree &child);
 
 				iterator find(const TKey &key);
 				iterator begin();
@@ -47,69 +51,128 @@ namespace Universal{
 				iterator end();
 				//const_iterator end()const;
 
+				//! \brief	不建议外间直接使用此函数获取子节点集。对此引用的操作会直接影响到树结构。
+				//! \todo	此函数是由于addChild 和 setParent 会相互引用造成循环的折中办法。希望可以得到更好的解决。
+				inline map<TKey, iterator>& child(){ return m_Child; }
+				inline TValue& value(){ return m_Value; }
+				inline const TValue& value()const{ return m_Value; }
+				inline const TKey& key(){ return m_Key; }
+				inline const TKey& key()const{ return m_Key; }
+				inline const_iterator parent(){ return m_IterParent; }
+				inline const_iterator parent()const{ return m_IterParent; }
 			private:
 				TKey m_Key;
 				TValue m_Value;
-				iterator m_Parent;
+				iterator m_IterParent;
 				map<TKey, iterator> m_Child;
 		};
-	template<TKey, TValue> KeyTree<TKey, TValue>::KeyTree(){
-		;
-	}
+	template<TKey, TValue> KeyTree<TKey, TValue>::KeyTree()
+		:m_Key(),
+		 m_Value(),
+		 m_IterParent(ITERATOR_END),
+		 m_Child()
+	{ ; }
+	template<TKey, TValue> KeyTree<TKey, TValue>::KeyTree(const TKey &_key)
+		:m_Key(_key),
+		 m_Value(),
+		 m_IterParent(ITERATOR_END),
+		 m_Child()
+	{ ; }
+	template<TKey, TValue> KeyTree<TKey, TValue>::KeyTree(const TKey &_key, const TValue &_value)
+		:m_Key(_key),
+		 m_Value(_value),
+		 m_IterParent(ITERATOR_END),
+		 m_Child()
+	{ ; }
 	template<TKey, TValue> KeyTree<TKey, TValue>::KeyTree(const KeyTree &ref){
-		;
+		this->m_Key = ref.getKey();
+		this->m_Value = ref.getValue();
+		this->m_IterParent = ITERATOR_END;
+		this->m_Child = map<TKey, iterator>;
 	}
 	template<TKey, TValue> KeyTree<TKey, TValue>::operator=(const KeyTree &ref){
-		;
+		this->m_Key = ref.getKey();
+		this->m_Value = ref.getValue();
+		this->m_IterParent = ITERATOR_END;
+		this->m_Child = map<TKey, iterator>;
 	}
 	template<TKey, TValue> KeyTree<TKey, TValue>::~KeyTree(){
-		;
-	}
-	template<TKey, TValue> void KeyTree<TKey, TValue>::setKey(const TKey &key){ 
-		if(m_Parent != ITERATOR_END){
-			assert(m_Parent->find(key) != m_Parent->end());
+		unlinkParent();
 
-			m_Parent->delChild(key);
+		for(map<string, iterator>::iterator iterChild = m_Child.begin(); iterChild = m_Child.begin(); ++iterChild){
+			delete iterChild->second; iterChild->second = ITERATOR_END;
 		}
-		m_Key = key; 
-		m_Parent->addChild(*this);
 	}
-	template<TKey, TValue> void KeyTree<TKey, TValue>::setValue(const TValue &value){ m_Value = value ; }
-	template<TKey, TValue> void KeyTree<TKey, TValue>::setParent(const KeyTree &parent){ m_Parent = &parent; }
-
-	template<TKey, TValue> Tkey KeyTree<TKey, TValue>::getKey(){ return m_Key; }
-	template<TKey, TValue> TValue KeyTree<TKey, TValue>::getValue(){ return m_Value; }
-	template<TKey, TValue> iterator KeyTree<TKey, TValue>::getParent(){ return m_Parent; }
 
 	template<TKey, TValue> void KeyTree<TKey, TValue>::addChild(const TKey &key){ 
-		iterator iter(new KeyTree()); 
-		iter->setKey(key);
-		m_Child.insert(pair<TKey, iterator>(key, iter));
+		iterator iter(new KeyTree(key)); 
+		addChlid(*iter);
 	}
 	template<TKey, TValue> void KeyTree<TKey, TValue>::addChild(const TKey &key, const TValue &value){ 
-		; 
+		iterator iter(new KeyTree(key, value)); 
+		addChlid(*iter);
 	}
-	template<TKey, TValue> void KeyTree<TKey, TValue>::addChild(const KeyTree &keyTree){ 
-		; 
+	template<TKey, TValue> void KeyTree<TKey, TValue>::addChild(KeyTree &keyTree){ 
+		keyTree.changeParent(*this);
 	}
 
-	template<TKey, TValue> iterator KeyTree<TKey, TValue>::parent(){ return m_Parent; }
+	template<TKey, TValue> void KeyTree<TKey, TValue>::delChild(const TKey &key){ 
+		map<string, iterator>::iterator iterChild = m_Child.find(origin);
+		if(iterChild != m_Child.end()){
+			delete iterChild->second; iterChild->second = ITERATOR_END;
+			m_Child.erase(iterChild);
+		}
+	}
+
+	template<TKey, TValue> void iterator KeyTree<TKey, TValue>::changeParent(KeyTree &parent){ 
+		unlinkParent();
+		m_IterParent = &parent;
+		m_IterParent->child().insert(pair<TKey, iterator>(m_Key, this));
+	}
+
+	template<TKey, TValue> void iterator KeyTree<TKey, TValue>::changeChildKey(const TKey &origin, const TKey &dest){ 
+		map<string, iterator>::iterator iterChild = m_Child.find(origin);
+		if(iterChild != m_Child.end()){
+			m_Child.insert(pair<string, iterator>(dest, iterChild->second));
+			m_Child.erase(iterChild);
+		}
+		else{
+			DEBUG_E("没有找到对应的key");
+		}
+	}
+
+	template<TKey, TValue> void iterator KeyTree<TKey, TValue>::unlinkParent(){ 
+		if(m_IterParent != ITERATOR_END ){
+			m_IterParent->unlinkChild(*this);
+			m_IterParent = ITERATOR_END;
+		}
+	}
+	template<TKey, TValue> void iterator KeyTree<TKey, TValue>::unlinkChild(const KeyTree &child){ 
+		map<string, iterator>::iterator iterChild = m_Child.find(origin);
+		if(iterChild != m_Child.end()){
+			m_Child.erase(iterChild);
+		}
+		else{
+			DEBUG_E("没有找到对应的key");
+		}
+	}
 
 	template<TKey, TValue> iterator KeyTree<TKey, TValue>::find(const TKey &key){
-		iterator iter(NULL);
+		iterator iter(ITERATOR_END);
 		if(m_Child.find(key) != m_Child.end()){
 			iter = m_Child.find(key)->second;
 		}
 		return iter;
 	}
 	template<TKey, TValue> iterator KeyTree<TKey, TValue>::begin(){
-		iterator iter(NULL);
+		iterator iter(ITERATOR_END);
 		if(!m_Child.empty()){
 			iter = m_Child.begin(key)->second;
 		}
 		return iter;
 	}
-	template<TKey, TValue> iterator KeyTree<TKey, TValue>::end(){ return NULL; }
+	template<TKey, TValue> iterator KeyTree<TKey, TValue>::end(){ return ITERATOR_END; }
+
 }
 #endif 
 
