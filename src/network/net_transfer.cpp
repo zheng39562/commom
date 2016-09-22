@@ -20,7 +20,9 @@
 using namespace std;
 
 namespace Network{
-	const int READ_BUFFER_SIZE=4000;
+	const int READ_BUFFER_SIZE = 4000;
+	const int WRITE_BUFFER_SIZE = 4000;
+
 	NetMsgTransfer::NetMsgTransfer()
 		:m_EventBase(NULL)
 	{

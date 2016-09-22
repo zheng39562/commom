@@ -18,6 +18,9 @@
 #include "network/net_packer.h"
 
 namespace Network{
+	extern const int READ_BUFFER_SIZE;
+	extern const int WRITE_BUFFER_SIZE;
+
 	enum eSocketRWOpt{
 		socketRWOpt_Read,
 		socketRWOpt_Write,
