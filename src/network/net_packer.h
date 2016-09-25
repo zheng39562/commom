@@ -16,13 +16,15 @@
 #include <map>
 #include "network/net_struct.h"
 #include "tool/single_mode.hpp"
+#include "tool/template_tree.hpp"
 
 namespace Network{
 	enum eProtocolDataFormat;
 
 	typedef std::string PackerKey;
 	typedef std::string ItemName;
-	typedef std::string CollectionName;
+	typedef std::string ItemValue;
+	typedef KeyTree<ItemName, ItemValue> Collection;
 	//! \brief	数据包。
 	//! \note	结构类似linux文件。path表示路径。collection类似目录，item类似文件。目录没有内容。具体内容保存在item中（即文件）
 	//! \todo	目标会接受xml 和 json。但目前看来json会优先（已有三方库可用）
@@ -30,43 +32,47 @@ namespace Network{
 	//! \todo	暂时不对数组类型单独考虑（把数字0，1等当作一个key。）。在实际使用中，再后续考虑是否需要对数组单独做一些接口。
 	class Packer{
 		public:
-			Packer(const ConnectKey &_key)
-				:m_ConnectKey(_key)
-			{;}
+			Packer(const ConnectKey &_key);
 			Packer(const Packer &ref);
 			Packer& operator=(const Packer &ref);
-			~Packer(){;}
+			~Packer();
 		public:
-			ConnectKey getConnectKey();
-			eProtocolDataFormat getDataFormat();
+			const ConnectKey& getConnectKey()const;
+			const eProtocolDataFormat& getDataFormat()const;
 
-			bool parseMsg(const std::string &msg, const eProtocolDataFormat &dataFormat); 
-			
+			//! \brief	解析函数。
+			bool parseMsg(const std::string &msg, const eProtocolDataFormat &dataFormat);
 			//! \brief	获取数据函数。
 			string getPackerStr();
 
-			string getString(const PackerKey &packerKey);
-			int getInt(const PackerKey &packerKey);
-			double getDouble(const PackerKey &packerKey);
-			bool getBoolean(const PackerKey &packerKey);
-			char getChar(const PackerKey &packerKey);
+			string getString(const PackerKey &packerKey)const;
+			int getInt(const PackerKey &packerKey)const;
+			double getDouble(const PackerKey &packerKey)const;
+			bool getBoolean(const PackerKey &packerKey)const;
+			char getChar(const PackerKey &packerKey)const;
 			//! \brief	
 			bool addItem(const ItemName &name, const int &value);
 			bool addItem(const ItemName &name, const char &value);
 			bool addItem(const ItemName &name, const double &value);
+			bool addItem(const ItemName &name, const char &value);
 			bool addItem(const ItemName &name, const string &value);
 			bool addCollection(const CollectionName &name);
 
-			//! 索引功能。
-			bool setPath(const std::string path);
-			string getPath();
-			void getItemNames(vector<ItemName> &itemNames);
+			//! \brief	设置当前路径。
+			//! \todo	修正函数名称，暂时没有更好的。
+			//! \note	可以是绝对路径，也可以是相对路径。路径规则与linux完全相同。
+			//!			例：/path1/path2 | ../path1 | ./path
+			bool toPath(const std::string &path);
+			//! \brief	获取当前路径
+			string curPath();
+			void getItems(vector<ItemName> &itemNames);
 
-			//
+			//! \brief	
 			bool isCollection();
 		private:
 			ConnectKey m_ConnectKey;
 			eProtocolDataFormat m_DataFormat;
+			Collection m_Coolection;
 	};
 	typedef boost::shared_ptr<Packer> PackerPtr;
 	typedef boost::shared_ptr<const Packer> ConstPackerPtr;
