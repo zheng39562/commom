@@ -14,18 +14,16 @@
 
 using namespace std;
 
-//! \brief	通用函数库的内部函数。如必要可提供给外部使用。
-namespace Inside{
-	//! \brief	给str增加单引号(主要用于SQL)
-	inline string quotedStr( const string &str ){ return "'" + str + "'"; }
-	
-	std::string intToStr( const long &number );
-	long strToInt( const string &number );
-} // namespace Invisible{
 //
 // 字符和其他格式之间的转换。
 //
 namespace Universal{
+	//! \brief	给str增加单引号(主要用于SQL)
+	inline string quotedStr( const string &str ){ return "'" + str + "'"; }
+	inline string doubleQuotedStr( const string &str ){ return "\"" + str + "\""; }
+	
+	std::string intToStr( const long &number );
+	long strToInt( const string &number );
 	//! \brief	字符和数字之间的相互转换。使用是stringstream形式。
 	std::string doubleToStr( const double &number );
 
@@ -38,6 +36,10 @@ namespace Universal{
 	string strToXmlStr( string content );
 	//! \brief	字符串中XML的实体转换为常规符号。
 	string xmlStrToStr( string content );
+	//! \brief	字符串中json的关键符号转换为实体。
+	string strToJsonStr( string content );
+	//! \brief	字符串中json的实体转换为常规符号。
+	string jsonStrToStr( string content );
 
 	//! \brief	编码格式设置。
 	enum eCharacterEncoding{

@@ -13,6 +13,7 @@
 
 #include <string>
 #include "network/net_define.h"
+#include "tool/json_tool.h"
 
 namespace Universal{
 	class Collection;
@@ -24,6 +25,11 @@ namespace Universal{
 	class Collection : public {
 		public:
 			Collection(const Name &_name);
+			Collection(const Name &_name, Collection* _pParent);
+			//! \note	复制子节点内容，父节点置空值。
+			Collection(const Collection &ref);
+			//! \note	复制子节点内容，父节点置空值。
+			Collection& operator=(const Collection &ref);
 			virtual ~Collection();
 		public:
 			inline const Name& getName()const{ return m_Name; }
@@ -43,7 +49,16 @@ namespace Universal{
 			//! \brief	
 			bool delItem(const Name &name);
 			bool delCollection(const Name &name);
+			//! \brief
+			bool moveChild(const Name &name, Collection *pNewParent);
 
+			inline bool isEmpty()const{ return m_Items.empty && m_Collection.empty(); }
+
+			//! \brief	父节点获取。
+			//! \note	不能在外界直接进行删除操作。
+			//! \note	任意修改都会直接影响到相关节点。修改时请慎重。
+			//! \note	如果想要修改节点的挂载，建议使用moveChild函数。该函数直接修改父节点会导致多重引用。
+			inline Collection* parent(){ return m_pParent; }
 			//! \brief	子节点获取。
 			//! \note	不能在外界直接进行删除操作。
 			//! \note	任意修改都会直接影响到相关节点。
@@ -63,11 +78,12 @@ namespace Universal{
 			//! \brief	将集合数据转化成xml字符串
 			string toXml();
 			//! \brief	解析json字符并保存成collection结构。需要注意，该函数会清空collection中的数据。
-			bool parseJson(const string &jsString);
+			bool parseJs(const string &jsString);
 			//! \brief	解析xml字符并保存成collection结构。需要注意，该函数会清空collection中的数据。
 			bool parseXml(const string &xmlString);
 		private:
 			string toJson(const Collection &collection);
+			bool parseJs(const Collection &collection, const Json::Value jsValue);
 		private:
 			Name m_Name;
 			Collection* m_pParent;

@@ -10,10 +10,11 @@
 **********************************************************/
 #include "net_collection.h"
 
-#include "tool/json_tool.h"
+#include <assert.h>
 #include "tool/string_util.h"
 
 namespace Universal{
+	#define CONVERT_JSON_QUOTED(content) doubleQuotedStr(strToJsonStr(content));
 
 	using namespace std;
 	using namespace Universal;
@@ -26,7 +27,45 @@ namespace Universal{
 	{
 		;
 	}
-	Collection::~Collection(){ ; }
+	Collection(const Name &_name, Collection* _pParent)
+		:m_Name(_name),
+		 m_pParent(_pParent),
+		 m_Items(),
+		 m_Collection()
+	{
+		;
+	}
+	Collection::Collection(const Collection &ref){
+		m_Name = ref.getName();
+		m_pParent = NULL;
+
+		vector<Name> names;
+		getItemNames(names);
+		for(vector<Name>::const_iterator citer = names.begin(); citer != names.end(); ++citer){
+			addItem(*iter, ref.getString(*iter));
+		}
+
+		getCollectionNames(names);
+		for(vector<Name>::const_iterator citer = names.begin(); citer != names.end(); ++citer){
+			Collection* child = ref.child();
+			if(child == NULL){
+				addCollection(*iter);
+			}
+			else{
+				addCollection(new Collection(*child)));
+			}
+		}
+	}
+	Collection& Collection::operator=(const Collection &ref){
+		this->Collection(ref);
+		return *this;
+	}
+	Collection::~Collection(){ 
+		for(map<Name, Collection*>::iterator iter = m_Collection.begin(); iter != m_Collection.end(); ++iter){
+			delete iter->second;
+			iter->second = NULL;
+		}
+	}
 
 
 	std::string Collection::getString(const Name &name)const{
@@ -49,7 +88,7 @@ namespace Universal{
 			return false;
 		}
 
-		m_Collection.insert(pair<Name, Collection*>(name, new Collection(name)));
+		m_Collection.insert(pair<Name, Collection*>(name, new Collection(name, this)));
 		return true;
 	}
 	bool Collection::addCollection(Collection *pCollection){
@@ -59,8 +98,14 @@ namespace Universal{
 		if(collectionExist(pCollection->getName())){
 			return false;
 		}
+		if(pCollection->parent() == NULL){
+			pCollection->parent() = this;
+			m_Collection.insert(pair<Name, Collection*>(pCollection->getName(), pCollection));
+		}
+		else{
+			pCollection->parent()->moveChild(pCollection->getName());
+		}
 		
-		m_Collection.insert(pair<Name, Collection*>(pCollection->getName(), pCollection));
 		return true;
 	}
 
@@ -104,6 +149,10 @@ namespace Universal{
 		m_Collection.erase(m_Collection.find(oldName));
 		return true;
 	}
+
+	bool Collection::updateParent(Collection* pParent){
+		m_pParent = pParent;
+	}
 	
 	bool Collection::delItem(const Name &name){
 		if(itemExist(name)){
@@ -119,6 +168,20 @@ namespace Universal{
 			iter->second = NULL;
 			m_Collection.erase(iter);
 		}
+		return true;
+	}
+
+	bool Collection::moveChild(const Name &name, Collection *pNewParent){
+		Collection* child = child(name);
+		if(child == NULL){
+			DBEUG_D("找不到对应的集合[" << name << "]。");
+			return false:
+		}
+
+		m_Collection.erase(m_Collection.find(name));
+
+		child->parent() = NULL;
+		pNewParent->addCollection(child);
 		return true;
 	}
 
@@ -171,11 +234,91 @@ namespace Universal{
 	}
 
 	string Collection::toJson(const Collection &collection){
-		;
+		string jsString;
+		if(collection.isEmpty()){
+			jsString += CONVERT_JSON_QUOTED(m_Name) + ":" + CONVERT_JSON_QUOTED("");
+		}
+		else if(collection,isArray()){
+			jsString += "[";
+
+			string jsCollection("");
+			for(int i=0; i<collection.collectionSize(); ++i){
+				if(!jsCollection.empty()){
+					jsCollection += ",";
+				}
+				jsCollection += toJson(*(collection.child(intToStr(i))));
+			}
+			jsString += jsCollection;
+
+			jsString += "]";
+		}
+		else{
+			jsString += "{";
+
+			string jsItem("");
+			for(map<Name, CollectionItem>::const_iterator citerItem = m_Items.begin(); citerItem != m_Items.end(); ++citerItem){
+				if(!jsItem.empty()){
+					jsItem += ",";
+				}
+				jsItem += CONVERT_JSON_QUOTED(citerItem->first) + ":" + CONVERT_JSON_QUOTED(citerItem->second);
+			}
+
+			string jsCollection("");
+			for(map<Name, Collection*>::const_iterator citerCollection = m_Collection.begin(); citerCollection != m_Collection.end(); ++citerCollection){
+				if(!jsCollection.empty()){
+					jsCollection += ",";
+				}
+				assert(citerCollection->second != NULL);
+				jsCollection += toJson(*(citerCollection->second));
+			}
+
+			jsString += jsItem;
+			jsString += jsItem.empty() ? jsCollection : "," + jsCollection;
+			jsString += "}";
+		}
+		return jsString;
 	}
 
-	bool Collection::parseJson(const string &jsString){
-		;
+	bool Collection::parseJs(const string &jsString){
+		Json::Value jsValue;
+		if(CSJsonTool::parseJs(jsString, jsValue)){
+			return parseJs(*this, jsValue);
+		}
+		else{
+			return false;
+		}
+		return true;
+	}
+
+	bool Collection::parseJs(const Collection &collection, const Json::Value jsValue){
+		if(jsValue.isArray()){
+			for(int i=0; i<jsValue.size(); ++i){
+				Name name(intToStr(i));
+				Collection* pCollection(new Collection(name));
+				parseJs(*pCollection, jsValue[i]);
+				addCollection(pCollection);
+			}
+		}
+		else if(jsValue.isObject()){
+			Json::Value::Members vKeys = jsValue.getMemberNames();
+			for(Json::Value::Members::const_iterator iter = vKeys.begin; iter != vKeys.end(); ++iter){
+				if(jsValue[*iter].isArray() || jsValue[*iter].isObject()){
+					Name name(*iter);
+					Collection* pCollection(new Collection(name));
+					parseJs(*pCollection, jsValue[i]);
+					addCollection(pCollection);
+				}
+				else{
+					addItem(*iter, getJsString(jsValue, *iter));
+				}
+			}
+		}
+		else{
+			DEBUG_E("结构错误。传入非对象/非数组类型的JSON。");
+			return false;
+		}
+
+		return true;
 	}
 
 	bool Collection::parseXml(const string &xmlString){

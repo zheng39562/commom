@@ -18,7 +18,10 @@ using namespace std;
 using namespace Inside;
 using namespace Universal;
 
-namespace Inside{
+//
+// 字符和其他格式之间的转换。
+//
+namespace Universal{
 
 	long strToInt( const string &number ){
 		stringstream strStream;
@@ -34,11 +37,6 @@ namespace Inside{
 		strStream << number;
 		return strStream.str();
 	}
-}
-//
-// 字符和其他格式之间的转换。
-//
-namespace Universal{
 
 	string doubleToStr( const double &number ){
 		stringstream strStream;
@@ -84,6 +82,16 @@ namespace Universal{
 		// " -> &quot;
 		strReplaceAll( content, "quot;", "\"" );
 
+		return content;
+	}
+	
+	string strToJsonStr( string content ){
+		strReplaceAll( content, "\"", "\\\"" );
+		return content;
+	}
+
+	string jsonStrToStr( string content ){
+		strReplaceAll( content, "\\\"", "\"" );
 		return content;
 	}
 
