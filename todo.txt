@@ -1,12 +1,4 @@
 任务安排：
-	2	完成msg_cache的类，在pack中增加打印的形式 测试msg_cache  和 transfer 类的正常运行。
-		1	增加集合树（或称之为目录树，暂未考虑好。）
-			1	目录树要有对应实例化，并且支持JSON转换。
-			2	JSON::VALUE的转换。
-		2	packer的结构 : 
-			1	packer的路径规划：使用类似cd pwd ls 等功能方式。当前层只支持key:value形式。
-			2	packer需要包含一些通信相关基础信息。不排除后期还需要增加其他信息。
-		3	packer的解析功能（暂时增加到字符串中。）
 	3	增加线程类
 	4	完成server 和 cline 端的接口。
 	5	编译，排错，测试。
