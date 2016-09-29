@@ -14,6 +14,11 @@
 #include <pthread.h>
 
 namespace Universal{
+	enum eThreadStatus{
+		eThreadStatus_New,
+		eThreadStatus_Run,
+		eThreadStatus_Exit
+	};
 	//! \brief	线程类。
 	//! \note	使用方法：实现execute函数即可。
 	//! \note	virtual void execute(){
@@ -32,11 +37,20 @@ namespace Universal{
 			//! \note	
 			virtual void execute()=0;
 
+			//! \brief	线程启动
 			void start();
+			//! \brief	线程关闭。
 			void stop();
+			//! \brief	等待线程退出。
+			void join();
+
+			inline const THREAD& getThreadID(){ return m_Thread; }
+			inline eThreadStatus getStatus(){ return m_ThreadStatus; }
 		private:
-			THREAD m_Thread;
+			THREAD m_Thread; //! 线程ID
+			eThreadStatus m_ThreadStatus; //! 线程是否在运行
 	};
 }
-#endif 
+  
+#endif  
 

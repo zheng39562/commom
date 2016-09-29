@@ -12,25 +12,47 @@
 
 namespace Universal{
 	PThread::PThread()
+		:m_Thread(-1),
+		 m_ThreadStatus(eThreadStatus_New)
 	{ ; }
 
-	virtual PThread::~PThread() { ; }
+	PThread::~PThread() { 
+		if(m_Thread != -1){
+			pthread_exit(NULL); 
+		}
+	}
 
 	void PThread::threadProxy(void* args){
 		PThread *pThread = static_cast<PThread*>(args);
 		pThread->execute();
-	}
 
-	virtual void PThread::execute()=0{
-		;
+		pthread_exit(NULL);
 	}
 
 	bool PThread::start(){
-		return pthread_create(&m_PThread, NULL, PThread::threadProxy, this) == 0;
+		int iRet = pthread_create(&m_PThread, NULL, PThread::threadProxy, this);
+		if(iRet == 0){
+			m_Thread = pthread_self;
+			m_ThreadStatus = eThreadStatus_Run;
+		}
+		else{
+			DEBUG_E("create thread failed. error no [" << iRet << "]");
+		}
+		return iRet == 0;
 	}
 
 	void PThread::stop(){
-		;
+		m_ThreadStatus = eThreadStatus_Exit;
+		m_Thread = -1;
+		pthread_exit(NULL);
+	}
+
+	void PThread::join(){
+		if (m_Thread > 0){  
+			pthread_join(m_Thread, NULL);  
+		}  
 	}
 
 }
+  
+  
