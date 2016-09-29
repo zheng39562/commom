@@ -13,9 +13,12 @@
 
 #define NET_ERROR_NO -1
 
+#include <string>
 
-typedef std::string Name;
-typedef std::string Path;
+namespace Network{
+	typedef std::string Name;
+	typedef std::string Path;
+}
 
 
 #endif 

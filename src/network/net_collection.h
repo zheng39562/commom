@@ -15,14 +15,12 @@
 #include "network/net_define.h"
 #include "tool/json_tool.h"
 
-namespace Universal{
-	class Collection;
-
+namespace Network{
 	typedef std::string CollectionItem;
 	//! \brief	集合类。
 	//! \note	类分为集合(collection)和项目(item).集合中能包含collection and item 
 	//! \note	该类保护行为较少，数据操作请谨慎。
-	class Collection : public {
+	class Collection {
 		public:
 			Collection(const Name &_name);
 			Collection(const Name &_name, Collection* _pParent);
@@ -52,7 +50,7 @@ namespace Universal{
 			//! \brief
 			bool moveChild(const Name &name, Collection *pNewParent);
 
-			inline bool isEmpty()const{ return m_Items.empty && m_Collection.empty(); }
+			inline bool isEmpty()const{ return m_Items.empty() && m_Collection.empty(); }
 
 			//! \brief	父节点获取。
 			//! \note	不能在外界直接进行删除操作。
@@ -67,8 +65,8 @@ namespace Universal{
 			void getItemNames(vector<Name> &names);
 			void getCollectionNames(vector<Name> &names);
 
-			inline const size_t& itemSize()const{ return m_Items.size(); }
-			inline const size_t& collectionSize()const{ return m_Collection.size(); }
+			inline size_t itemSize()const{ return m_Items.size(); }
+			inline size_t collectionSize()const{ return m_Collection.size(); }
 
 			//! \brief	是否是个数组i
 			//! \note	初衷用于转换格式使用，不推荐使用该函数来做循环获取。
@@ -89,7 +87,7 @@ namespace Universal{
 			Collection* m_pParent;
 			map<Name, CollectionItem> m_Items;
 			map<Name, Collection*> m_Collection;
-	}
+	};
 }
 
 #endif 

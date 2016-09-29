@@ -14,13 +14,6 @@
 #include "network/net_transfer.h"
 
 namespace Network{
-	const int PROTOCOL_MSG_SIZE_BYTE = 4;
-	const int PROTOCOL_HEAD_SIZE = 6;
-
-	const int PROTOCOL_INDEX_DATA_SIZE = 0;
-	const int PROTOCOL_INDEX_FLAG = PROTOCOL_MSG_SIZE_BYTE;
-	const int PROTOCOL_INDEX_DATA_FORMAT = PROTOCOL_INDEX_FLAG + 1;
-	const int PROTOCOL_INDEX_MSG = PROTOCOL_INDEX_DATA_FORMAT + 1;
 
 	ProtocolMsgPtr ProtocolMsg::getProtocolMsg(string &msg){
 		ProtocolMsgPtr pProtocolMsg(NULL);

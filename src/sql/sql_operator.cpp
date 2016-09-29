@@ -68,7 +68,7 @@ namespace Universal{
 			m_p_Statement = shared_ptr<sql::Statement>( m_p_Connection->createStatement() );
 		}
 		catch( sql::SQLException &e ){
-			DEBUG_E( "Sql Connection failure : Error code is " + Inside::intToStr( e.getErrorCode() ) + ". State is " + e.getSQLState() + ". Other info : " +
+			DEBUG_E( "Sql Connection failure : Error code is " + intToStr( e.getErrorCode() ) + ". State is " + e.getSQLState() + ". Other info : " +
 					string( e.what() )
 					);
 			return false;
@@ -81,7 +81,7 @@ namespace Universal{
 	SQLWhere SqlOperator::convertCond( const map<string, string> &sqlWhere ) throw(Exception) {
 		SQLWhere sqlWhereTmp;
 		for( map<string, string>::const_iterator citer = sqlWhere.begin(); citer != sqlWhere.end(); ++citer ){
-			sqlWhereTmp += " and " + citer->first + " = " + Inside::quotedStr( citer->second );
+			sqlWhereTmp += " and " + citer->first + " = " + quotedStr( citer->second );
 		}
 		return sqlWhereTmp;
 	}

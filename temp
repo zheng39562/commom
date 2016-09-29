@@ -1,0 +1,716 @@
+In file included from ./src/network/net_packer.h:18:0,
+                 from ./src/network/net_protocol_convert.h:14,
+                 from src/network/msg_cache.h:20,
+                 from src/network/msg_cache.cpp:11:
+./src/network/net_collection.h:25:28: 错误：expected class-name before ‘{’ token
+  class Collection : public {
+                            ^
+In file included from ./src/network/net_packer.h:18:0,
+                 from ./src/network/net_protocol_convert.h:14,
+                 from src/network/msg_cache.h:20,
+                 from src/network/msg_cache.cpp:11:
+./src/network/net_collection.h:92:2: 错误：类定义后需要‘;’
+  }
+  ^
+In file included from ./src/network/net_packer.h:18:0,
+                 from ./src/network/net_protocol_convert.h:14,
+                 from src/network/msg_cache.h:20,
+                 from src/network/msg_cache.cpp:11:
+./src/network/net_collection.h: 在成员函数‘bool Universal::Collection::isEmpty() const’中:
+./src/network/net_collection.h:55:75: 错误：invalid use of member function (did you forget the ‘()’ ?)
+    inline bool isEmpty()const{ return m_Items.empty && m_Collection.empty(); }
+                                                                           ^
+In file included from ./src/network/net_packer.h:18:0,
+                 from ./src/network/net_protocol_convert.h:14,
+                 from src/network/msg_cache.h:20,
+                 from src/network/msg_cache.cpp:11:
+./src/network/net_collection.h: 在成员函数‘const size_t& Universal::Collection::itemSize() const’中:
+./src/network/net_collection.h:70:62: 警告：返回临时变量的引用 [-Wreturn-local-addr]
+    inline const size_t& itemSize()const{ return m_Items.size(); }
+                                                              ^
+./src/network/net_collection.h: 在成员函数‘const size_t& Universal::Collection::collectionSize() const’中:
+./src/network/net_collection.h:71:73: 警告：返回临时变量的引用 [-Wreturn-local-addr]
+    inline const size_t& collectionSize()const{ return m_Collection.size(); }
+                                                                         ^
+In file included from ./src/network/net_packer.h:20:0,
+                 from ./src/network/net_protocol_convert.h:14,
+                 from src/network/msg_cache.h:20,
+                 from src/network/msg_cache.cpp:11:
+./src/tool/template_tree.hpp: 在全局域：
+./src/tool/template_tree.hpp:27:13: 警告：non-static data member initializers only available with -std=c++11 or -std=gnu++11 [默认启用]
+     KeyTree();
+             ^
+./src/tool/template_tree.hpp:25:39: 错误：expected ‘;’ before ‘:’ token
+     const iterator ITERATOR_END = NULL:
+                                       ^
+In file included from ./src/network/net_packer.h:20:0,
+                 from ./src/network/net_protocol_convert.h:14,
+                 from src/network/msg_cache.h:20,
+                 from src/network/msg_cache.cpp:11:
+./src/tool/template_tree.hpp:69:11: 错误：‘TKey’未声明
+  template<TKey, TValue> KeyTree<TKey, TValue>::KeyTree()
+           ^
+./src/tool/template_tree.hpp:69:17: 错误：‘TValue’未声明
+  template<TKey, TValue> KeyTree<TKey, TValue>::KeyTree()
+                 ^
+./src/tool/template_tree.hpp:69:33: 错误：‘TKey’在此作用域中尚未声明
+  template<TKey, TValue> KeyTree<TKey, TValue>::KeyTree()
+                                 ^
+./src/tool/template_tree.hpp:69:39: 错误：‘TValue’在此作用域中尚未声明
+  template<TKey, TValue> KeyTree<TKey, TValue>::KeyTree()
+                                       ^
+./src/tool/template_tree.hpp:69:45: 错误：模板第 1 个参数无效
+  template<TKey, TValue> KeyTree<TKey, TValue>::KeyTree()
+                                             ^
+./src/tool/template_tree.hpp:69:45: 错误：模板第 2 个参数无效
+./src/tool/template_tree.hpp:69:56: 错误：模板声明‘template<int <anonymous>, int <anonymous> > int Universal::KeyTree()’
+  template<TKey, TValue> KeyTree<TKey, TValue>::KeyTree()
+                                                        ^
+In file included from ./src/network/net_packer.h:20:0,
+                 from ./src/network/net_protocol_convert.h:14,
+                 from src/network/msg_cache.h:20,
+                 from src/network/msg_cache.cpp:11:
+./src/tool/template_tree.hpp:21:9: 错误：与先前的声明‘template<class TKey, class TValue> class Universal::KeyTree’冲突
+   class KeyTree{
+         ^
+In file included from ./src/network/net_packer.h:20:0,
+                 from ./src/network/net_protocol_convert.h:14,
+                 from src/network/msg_cache.h:20,
+                 from src/network/msg_cache.cpp:11:
+./src/tool/template_tree.hpp: 在函数‘int Universal::KeyTree()’中:
+./src/tool/template_tree.hpp:70:4: 错误：only constructors take member initializers
+   :m_Key(),
+    ^
+./src/tool/template_tree.hpp:72:17: 错误：‘ITERATOR_END’在此作用域中尚未声明
+    m_IterParent(ITERATOR_END),
+                 ^
+./src/tool/template_tree.hpp: 在全局域：
+./src/tool/template_tree.hpp:75:11: 错误：‘TKey’未声明
+  template<TKey, TValue> KeyTree<TKey, TValue>::KeyTree(const TKey &_key)
+           ^
+./src/tool/template_tree.hpp:75:17: 错误：‘TValue’未声明
+  template<TKey, TValue> KeyTree<TKey, TValue>::KeyTree(const TKey &_key)
+                 ^
+./src/tool/template_tree.hpp:75:33: 错误：‘TKey’在此作用域中尚未声明
+  template<TKey, TValue> KeyTree<TKey, TValue>::KeyTree(const TKey &_key)
+                                 ^
+./src/tool/template_tree.hpp:75:39: 错误：‘TValue’在此作用域中尚未声明
+  template<TKey, TValue> KeyTree<TKey, TValue>::KeyTree(const TKey &_key)
+                                       ^
+./src/tool/template_tree.hpp:75:45: 错误：模板第 1 个参数无效
+  template<TKey, TValue> KeyTree<TKey, TValue>::KeyTree(const TKey &_key)
+                                             ^
+./src/tool/template_tree.hpp:75:45: 错误：模板第 2 个参数无效
+./src/tool/template_tree.hpp:75:62: 错误：‘TKey’不是一个类型名
+  template<TKey, TValue> KeyTree<TKey, TValue>::KeyTree(const TKey &_key)
+                                                              ^
+./src/tool/template_tree.hpp:75:68: 错误：ISO C++ 不允许声明无类型的‘_key’ [-fpermissive]
+  template<TKey, TValue> KeyTree<TKey, TValue>::KeyTree(const TKey &_key)
+                                                                    ^
+./src/tool/template_tree.hpp:75:72: 错误：模板声明‘template<int <anonymous>, int <anonymous> > int Universal::KeyTree(const int&)’
+  template<TKey, TValue> KeyTree<TKey, TValue>::KeyTree(const TKey &_key)
+                                                                        ^
+In file included from ./src/network/net_packer.h:20:0,
+                 from ./src/network/net_protocol_convert.h:14,
+                 from src/network/msg_cache.h:20,
+                 from src/network/msg_cache.cpp:11:
+./src/tool/template_tree.hpp:21:9: 错误：与先前的声明‘template<class TKey, class TValue> class Universal::KeyTree’冲突
+   class KeyTree{
+         ^
+In file included from ./src/network/net_packer.h:20:0,
+                 from ./src/network/net_protocol_convert.h:14,
+                 from src/network/msg_cache.h:20,
+                 from src/network/msg_cache.cpp:11:
+./src/tool/template_tree.hpp: 在函数‘int Universal::KeyTree(const int&)’中:
+./src/tool/template_tree.hpp:76:4: 错误：only constructors take member initializers
+   :m_Key(_key),
+    ^
+./src/tool/template_tree.hpp:78:17: 错误：‘ITERATOR_END’在此作用域中尚未声明
+    m_IterParent(ITERATOR_END),
+                 ^
+./src/tool/template_tree.hpp: 在全局域：
+./src/tool/template_tree.hpp:81:11: 错误：‘TKey’未声明
+  template<TKey, TValue> KeyTree<TKey, TValue>::KeyTree(const TKey &_key, const TValue &_value)
+           ^
+./src/tool/template_tree.hpp:81:17: 错误：‘TValue’未声明
+  template<TKey, TValue> KeyTree<TKey, TValue>::KeyTree(const TKey &_key, const TValue &_value)
+                 ^
+./src/tool/template_tree.hpp:81:33: 错误：‘TKey’在此作用域中尚未声明
+  template<TKey, TValue> KeyTree<TKey, TValue>::KeyTree(const TKey &_key, const TValue &_value)
+                                 ^
+./src/tool/template_tree.hpp:81:39: 错误：‘TValue’在此作用域中尚未声明
+  template<TKey, TValue> KeyTree<TKey, TValue>::KeyTree(const TKey &_key, const TValue &_value)
+                                       ^
+./src/tool/template_tree.hpp:81:45: 错误：模板第 1 个参数无效
+  template<TKey, TValue> KeyTree<TKey, TValue>::KeyTree(const TKey &_key, const TValue &_value)
+                                             ^
+./src/tool/template_tree.hpp:81:45: 错误：模板第 2 个参数无效
+./src/tool/template_tree.hpp:81:62: 错误：‘TKey’不是一个类型名
+  template<TKey, TValue> KeyTree<TKey, TValue>::KeyTree(const TKey &_key, const TValue &_value)
+                                                              ^
+./src/tool/template_tree.hpp:81:68: 错误：ISO C++ 不允许声明无类型的‘_key’ [-fpermissive]
+  template<TKey, TValue> KeyTree<TKey, TValue>::KeyTree(const TKey &_key, const TValue &_value)
+                                                                    ^
+./src/tool/template_tree.hpp:81:80: 错误：‘TValue’不是一个类型名
+  template<TKey, TValue> KeyTree<TKey, TValue>::KeyTree(const TKey &_key, const TValue &_value)
+                                                                                ^
+./src/tool/template_tree.hpp:81:88: 错误：ISO C++ 不允许声明无类型的‘_value’ [-fpermissive]
+  template<TKey, TValue> KeyTree<TKey, TValue>::KeyTree(const TKey &_key, const TValue &_value)
+                                                                                        ^
+./src/tool/template_tree.hpp:81:94: 错误：模板声明‘template<int <anonymous>, int <anonymous> > int Universal::KeyTree(const int&, const int&)’
+  template<TKey, TValue> KeyTree<TKey, TValue>::KeyTree(const TKey &_key, const TValue &_value)
+                                                                                              ^
+In file included from ./src/network/net_packer.h:20:0,
+                 from ./src/network/net_protocol_convert.h:14,
+                 from src/network/msg_cache.h:20,
+                 from src/network/msg_cache.cpp:11:
+./src/tool/template_tree.hpp:21:9: 错误：与先前的声明‘template<class TKey, class TValue> class Universal::KeyTree’冲突
+   class KeyTree{
+         ^
+In file included from ./src/network/net_packer.h:20:0,
+                 from ./src/network/net_protocol_convert.h:14,
+                 from src/network/msg_cache.h:20,
+                 from src/network/msg_cache.cpp:11:
+./src/tool/template_tree.hpp: 在函数‘int Universal::KeyTree(const int&, const int&)’中:
+./src/tool/template_tree.hpp:82:4: 错误：only constructors take member initializers
+   :m_Key(_key),
+    ^
+./src/tool/template_tree.hpp:84:17: 错误：‘ITERATOR_END’在此作用域中尚未声明
+    m_IterParent(ITERATOR_END),
+                 ^
+./src/tool/template_tree.hpp: 在全局域：
+./src/tool/template_tree.hpp:87:11: 错误：‘TKey’未声明
+  template<TKey, TValue> KeyTree<TKey, TValue>::KeyTree(const KeyTree &ref){
+           ^
+./src/tool/template_tree.hpp:87:17: 错误：‘TValue’未声明
+  template<TKey, TValue> KeyTree<TKey, TValue>::KeyTree(const KeyTree &ref){
+                 ^
+./src/tool/template_tree.hpp:87:33: 错误：‘TKey’在此作用域中尚未声明
+  template<TKey, TValue> KeyTree<TKey, TValue>::KeyTree(const KeyTree &ref){
+                                 ^
+./src/tool/template_tree.hpp:87:39: 错误：‘TValue’在此作用域中尚未声明
+  template<TKey, TValue> KeyTree<TKey, TValue>::KeyTree(const KeyTree &ref){
+                                       ^
+./src/tool/template_tree.hpp:87:45: 错误：模板第 1 个参数无效
+  template<TKey, TValue> KeyTree<TKey, TValue>::KeyTree(const KeyTree &ref){
+                                             ^
+./src/tool/template_tree.hpp:87:45: 错误：模板第 2 个参数无效
+./src/tool/template_tree.hpp:87:62: 错误：使用模板名‘Universal::KeyTree’时不带实参表无效
+  template<TKey, TValue> KeyTree<TKey, TValue>::KeyTree(const KeyTree &ref){
+                                                              ^
+./src/tool/template_tree.hpp:87:71: 错误：ISO C++ 不允许声明无类型的‘ref’ [-fpermissive]
+  template<TKey, TValue> KeyTree<TKey, TValue>::KeyTree(const KeyTree &ref){
+                                                                       ^
+./src/tool/template_tree.hpp:87:74: 错误：模板声明‘template<int <anonymous>, int <anonymous> > int Universal::KeyTree(const int&)’
+  template<TKey, TValue> KeyTree<TKey, TValue>::KeyTree(const KeyTree &ref){
+                                                                          ^
+In file included from ./src/network/net_packer.h:20:0,
+                 from ./src/network/net_protocol_convert.h:14,
+                 from src/network/msg_cache.h:20,
+                 from src/network/msg_cache.cpp:11:
+./src/tool/template_tree.hpp:21:9: 错误：与先前的声明‘template<class TKey, class TValue> class Universal::KeyTree’冲突
+   class KeyTree{
+         ^
+In file included from ./src/network/net_packer.h:20:0,
+                 from ./src/network/net_protocol_convert.h:14,
+                 from src/network/msg_cache.h:20,
+                 from src/network/msg_cache.cpp:11:
+./src/tool/template_tree.hpp: 在函数‘int Universal::KeyTree(const int&)’中:
+./src/tool/template_tree.hpp:88:3: 错误：在非成员函数中使用‘this’无效
+   this->m_Key = ref.getKey();
+   ^
+./src/tool/template_tree.hpp:88:21: 错误：对成员‘getKey’的请求出现在‘ref’中，而后者具有非类类型‘const int’
+   this->m_Key = ref.getKey();
+                     ^
+./src/tool/template_tree.hpp:89:3: 错误：在非成员函数中使用‘this’无效
+   this->m_Value = ref.getValue();
+   ^
+./src/tool/template_tree.hpp:89:23: 错误：对成员‘getValue’的请求出现在‘ref’中，而后者具有非类类型‘const int’
+   this->m_Value = ref.getValue();
+                       ^
+./src/tool/template_tree.hpp:90:3: 错误：在非成员函数中使用‘this’无效
+   this->m_IterParent = ITERATOR_END;
+   ^
+./src/tool/template_tree.hpp:90:24: 错误：‘ITERATOR_END’在此作用域中尚未声明
+   this->m_IterParent = ITERATOR_END;
+                        ^
+./src/tool/template_tree.hpp:91:3: 错误：在非成员函数中使用‘this’无效
+   this->m_Child = map<TKey, iterator>;
+   ^
+./src/tool/template_tree.hpp:91:23: 错误：‘TKey’在此作用域中尚未声明
+   this->m_Child = map<TKey, iterator>;
+                       ^
+./src/tool/template_tree.hpp:91:37: 错误：模板第 1 个参数无效
+   this->m_Child = map<TKey, iterator>;
+                                     ^
+./src/tool/template_tree.hpp:91:37: 错误：实参 2 的类型/值不匹配，在‘template<class _Key, class _Tp, class _Compare, class _Alloc> class std::map’的模板参数列表中
+./src/tool/template_tree.hpp:91:37: 错误：需要一个类型，却给出了‘iterator’
+./src/tool/template_tree.hpp:91:37: 错误：模板第 3 个参数无效
+./src/tool/template_tree.hpp:91:37: 错误：模板第 4 个参数无效
+./src/tool/template_tree.hpp: 在全局域：
+./src/tool/template_tree.hpp:93:11: 错误：‘TKey’未声明
+  template<TKey, TValue> KeyTree<TKey, TValue>::operator=(const KeyTree &ref){
+           ^
+./src/tool/template_tree.hpp:93:17: 错误：‘TValue’未声明
+  template<TKey, TValue> KeyTree<TKey, TValue>::operator=(const KeyTree &ref){
+                 ^
+./src/tool/template_tree.hpp:93:33: 错误：‘TKey’在此作用域中尚未声明
+  template<TKey, TValue> KeyTree<TKey, TValue>::operator=(const KeyTree &ref){
+                                 ^
+./src/tool/template_tree.hpp:93:39: 错误：‘TValue’在此作用域中尚未声明
+  template<TKey, TValue> KeyTree<TKey, TValue>::operator=(const KeyTree &ref){
+                                       ^
+./src/tool/template_tree.hpp:93:45: 错误：模板第 1 个参数无效
+  template<TKey, TValue> KeyTree<TKey, TValue>::operator=(const KeyTree &ref){
+                                             ^
+./src/tool/template_tree.hpp:93:45: 错误：模板第 2 个参数无效
+./src/tool/template_tree.hpp:93:64: 错误：使用模板名‘Universal::KeyTree’时不带实参表无效
+  template<TKey, TValue> KeyTree<TKey, TValue>::operator=(const KeyTree &ref){
+                                                                ^
+./src/tool/template_tree.hpp:93:73: 错误：ISO C++ 不允许声明无类型的‘ref’ [-fpermissive]
+  template<TKey, TValue> KeyTree<TKey, TValue>::operator=(const KeyTree &ref){
+                                                                         ^
+./src/tool/template_tree.hpp:93:76: 错误：ISO C++ 不允许声明无类型的‘operator=’ [-fpermissive]
+  template<TKey, TValue> KeyTree<TKey, TValue>::operator=(const KeyTree &ref){
+                                                                            ^
+./src/tool/template_tree.hpp:93:76: 错误：‘int Universal::operator=(const int&)’必须是一个非静态的成员函数
+./src/tool/template_tree.hpp:99:11: 错误：‘TKey’未声明
+  template<TKey, TValue> KeyTree<TKey, TValue>::~KeyTree(){
+           ^
+./src/tool/template_tree.hpp:99:17: 错误：‘TValue’未声明
+  template<TKey, TValue> KeyTree<TKey, TValue>::~KeyTree(){
+                 ^
+./src/tool/template_tree.hpp:99:33: 错误：‘TKey’在此作用域中尚未声明
+  template<TKey, TValue> KeyTree<TKey, TValue>::~KeyTree(){
+                                 ^
+./src/tool/template_tree.hpp:99:39: 错误：‘TValue’在此作用域中尚未声明
+  template<TKey, TValue> KeyTree<TKey, TValue>::~KeyTree(){
+                                       ^
+./src/tool/template_tree.hpp:99:45: 错误：模板第 1 个参数无效
+  template<TKey, TValue> KeyTree<TKey, TValue>::~KeyTree(){
+                                             ^
+./src/tool/template_tree.hpp:99:45: 错误：模板第 2 个参数无效
+./src/tool/template_tree.hpp:107:11: 错误：‘TKey’未声明
+  template<TKey, TValue> void KeyTree<TKey, TValue>::addChild(const TKey &key){ 
+           ^
+./src/tool/template_tree.hpp:107:17: 错误：‘TValue’未声明
+  template<TKey, TValue> void KeyTree<TKey, TValue>::addChild(const TKey &key){ 
+                 ^
+./src/tool/template_tree.hpp:107:38: 错误：‘TKey’在此作用域中尚未声明
+  template<TKey, TValue> void KeyTree<TKey, TValue>::addChild(const TKey &key){ 
+                                      ^
+./src/tool/template_tree.hpp:107:44: 错误：‘TValue’在此作用域中尚未声明
+  template<TKey, TValue> void KeyTree<TKey, TValue>::addChild(const TKey &key){ 
+                                            ^
+./src/tool/template_tree.hpp:107:50: 错误：模板第 1 个参数无效
+  template<TKey, TValue> void KeyTree<TKey, TValue>::addChild(const TKey &key){ 
+                                                  ^
+./src/tool/template_tree.hpp:107:50: 错误：模板第 2 个参数无效
+./src/tool/template_tree.hpp:107:68: 错误：‘TKey’不是一个类型名
+  template<TKey, TValue> void KeyTree<TKey, TValue>::addChild(const TKey &key){ 
+                                                                    ^
+./src/tool/template_tree.hpp:107:74: 错误：ISO C++ 不允许声明无类型的‘key’ [-fpermissive]
+  template<TKey, TValue> void KeyTree<TKey, TValue>::addChild(const TKey &key){ 
+                                                                          ^
+./src/tool/template_tree.hpp: 在函数‘void Universal::addChild(const int&)’中:
+./src/tool/template_tree.hpp:108:12: 错误：missing template arguments before ‘iter’
+   iterator iter(new KeyTree(key)); 
+            ^
+./src/tool/template_tree.hpp:108:12: 错误：expected ‘;’ before ‘iter’
+./src/tool/template_tree.hpp:109:13: 错误：‘iter’在此作用域中尚未声明
+   addChlid(*iter);
+             ^
+./src/tool/template_tree.hpp:109:17: 错误：‘addChlid’的实参不依赖模板参数，所以‘addChlid’的声明必须可用 [-fpermissive]
+   addChlid(*iter);
+                 ^
+./src/tool/template_tree.hpp:109:17: 附注：(如果您使用‘-fpermissive’，G++ 会接受您的代码，但是允许使用未定义的名称是不建议使用的风格)
+./src/tool/template_tree.hpp: 在全局域：
+./src/tool/template_tree.hpp:111:11: 错误：‘TKey’未声明
+  template<TKey, TValue> void KeyTree<TKey, TValue>::addChild(const TKey &key, const TValue &value){ 
+           ^
+./src/tool/template_tree.hpp:111:17: 错误：‘TValue’未声明
+  template<TKey, TValue> void KeyTree<TKey, TValue>::addChild(const TKey &key, const TValue &value){ 
+                 ^
+./src/tool/template_tree.hpp:111:38: 错误：‘TKey’在此作用域中尚未声明
+  template<TKey, TValue> void KeyTree<TKey, TValue>::addChild(const TKey &key, const TValue &value){ 
+                                      ^
+./src/tool/template_tree.hpp:111:44: 错误：‘TValue’在此作用域中尚未声明
+  template<TKey, TValue> void KeyTree<TKey, TValue>::addChild(const TKey &key, const TValue &value){ 
+                                            ^
+./src/tool/template_tree.hpp:111:50: 错误：模板第 1 个参数无效
+  template<TKey, TValue> void KeyTree<TKey, TValue>::addChild(const TKey &key, const TValue &value){ 
+                                                  ^
+./src/tool/template_tree.hpp:111:50: 错误：模板第 2 个参数无效
+./src/tool/template_tree.hpp:111:68: 错误：‘TKey’不是一个类型名
+  template<TKey, TValue> void KeyTree<TKey, TValue>::addChild(const TKey &key, const TValue &value){ 
+                                                                    ^
+./src/tool/template_tree.hpp:111:74: 错误：ISO C++ 不允许声明无类型的‘key’ [-fpermissive]
+  template<TKey, TValue> void KeyTree<TKey, TValue>::addChild(const TKey &key, const TValue &value){ 
+                                                                          ^
+./src/tool/template_tree.hpp:111:85: 错误：‘TValue’不是一个类型名
+  template<TKey, TValue> void KeyTree<TKey, TValue>::addChild(const TKey &key, const TValue &value){ 
+                                                                                     ^
+./src/tool/template_tree.hpp:111:93: 错误：ISO C++ 不允许声明无类型的‘value’ [-fpermissive]
+  template<TKey, TValue> void KeyTree<TKey, TValue>::addChild(const TKey &key, const TValue &value){ 
+                                                                                             ^
+./src/tool/template_tree.hpp: 在函数‘void Universal::addChild(const int&, const int&)’中:
+./src/tool/template_tree.hpp:112:12: 错误：missing template arguments before ‘iter’
+   iterator iter(new KeyTree(key, value)); 
+            ^
+./src/tool/template_tree.hpp:112:12: 错误：expected ‘;’ before ‘iter’
+./src/tool/template_tree.hpp:113:13: 错误：‘iter’在此作用域中尚未声明
+   addChlid(*iter);
+             ^
+./src/tool/template_tree.hpp:113:17: 错误：‘addChlid’的实参不依赖模板参数，所以‘addChlid’的声明必须可用 [-fpermissive]
+   addChlid(*iter);
+                 ^
+./src/tool/template_tree.hpp: 在全局域：
+./src/tool/template_tree.hpp:115:11: 错误：‘TKey’未声明
+  template<TKey, TValue> void KeyTree<TKey, TValue>::addChild(KeyTree &keyTree){ 
+           ^
+./src/tool/template_tree.hpp:115:17: 错误：‘TValue’未声明
+  template<TKey, TValue> void KeyTree<TKey, TValue>::addChild(KeyTree &keyTree){ 
+                 ^
+./src/tool/template_tree.hpp:115:38: 错误：‘TKey’在此作用域中尚未声明
+  template<TKey, TValue> void KeyTree<TKey, TValue>::addChild(KeyTree &keyTree){ 
+                                      ^
+./src/tool/template_tree.hpp:115:44: 错误：‘TValue’在此作用域中尚未声明
+  template<TKey, TValue> void KeyTree<TKey, TValue>::addChild(KeyTree &keyTree){ 
+                                            ^
+./src/tool/template_tree.hpp:115:50: 错误：模板第 1 个参数无效
+  template<TKey, TValue> void KeyTree<TKey, TValue>::addChild(KeyTree &keyTree){ 
+                                                  ^
+./src/tool/template_tree.hpp:115:50: 错误：模板第 2 个参数无效
+./src/tool/template_tree.hpp:115:62: 错误：变量或字段‘addChild’声明为 void
+  template<TKey, TValue> void KeyTree<TKey, TValue>::addChild(KeyTree &keyTree){ 
+                                                              ^
+./src/tool/template_tree.hpp:115:70: 错误：missing template arguments before ‘&’ token
+  template<TKey, TValue> void KeyTree<TKey, TValue>::addChild(KeyTree &keyTree){ 
+                                                                      ^
+./src/tool/template_tree.hpp:115:71: 错误：‘keyTree’在此作用域中尚未声明
+  template<TKey, TValue> void KeyTree<TKey, TValue>::addChild(KeyTree &keyTree){ 
+                                                                       ^
+./src/tool/template_tree.hpp:119:11: 错误：‘TKey’未声明
+  template<TKey, TValue> void KeyTree<TKey, TValue>::delChild(const TKey &key){ 
+           ^
+./src/tool/template_tree.hpp:119:17: 错误：‘TValue’未声明
+  template<TKey, TValue> void KeyTree<TKey, TValue>::delChild(const TKey &key){ 
+                 ^
+./src/tool/template_tree.hpp:119:38: 错误：‘TKey’在此作用域中尚未声明
+  template<TKey, TValue> void KeyTree<TKey, TValue>::delChild(const TKey &key){ 
+                                      ^
+./src/tool/template_tree.hpp:119:44: 错误：‘TValue’在此作用域中尚未声明
+  template<TKey, TValue> void KeyTree<TKey, TValue>::delChild(const TKey &key){ 
+                                            ^
+./src/tool/template_tree.hpp:119:50: 错误：模板第 1 个参数无效
+  template<TKey, TValue> void KeyTree<TKey, TValue>::delChild(const TKey &key){ 
+                                                  ^
+./src/tool/template_tree.hpp:119:50: 错误：模板第 2 个参数无效
+./src/tool/template_tree.hpp:119:68: 错误：‘TKey’不是一个类型名
+  template<TKey, TValue> void KeyTree<TKey, TValue>::delChild(const TKey &key){ 
+                                                                    ^
+./src/tool/template_tree.hpp:119:74: 错误：ISO C++ 不允许声明无类型的‘key’ [-fpermissive]
+  template<TKey, TValue> void KeyTree<TKey, TValue>::delChild(const TKey &key){ 
+                                                                          ^
+./src/tool/template_tree.hpp: 在函数‘void Universal::delChild(const int&)’中:
+./src/tool/template_tree.hpp:120:23: 错误：实参 2 的类型/值不匹配，在‘template<class _Key, class _Tp, class _Compare, class _Alloc> class std::map’的模板参数列表中
+   map<string, iterator>::iterator iterChild = m_Child.find(origin);
+                       ^
+./src/tool/template_tree.hpp:120:23: 错误：需要一个类型，却给出了‘iterator’
+./src/tool/template_tree.hpp:120:23: 错误：模板第 4 个参数无效
+./src/tool/template_tree.hpp:120:35: 错误：expected initializer before ‘iterChild’
+   map<string, iterator>::iterator iterChild = m_Child.find(origin);
+                                   ^
+./src/tool/template_tree.hpp:121:6: 错误：‘iterChild’在此作用域中尚未声明
+   if(iterChild != m_Child.end()){
+      ^
+./src/tool/template_tree.hpp:121:19: 错误：‘m_Child’在此作用域中尚未声明
+   if(iterChild != m_Child.end()){
+                   ^
+./src/tool/template_tree.hpp:122:50: 错误：‘ITERATOR_END’在此作用域中尚未声明
+    delete iterChild->second; iterChild->second = ITERATOR_END;
+                                                  ^
+./src/tool/template_tree.hpp: 在全局域：
+./src/tool/template_tree.hpp:127:11: 错误：‘TKey’未声明
+  template<TKey, TValue> void iterator KeyTree<TKey, TValue>::changeParent(KeyTree &parent){ 
+           ^
+./src/tool/template_tree.hpp:127:17: 错误：‘TValue’未声明
+  template<TKey, TValue> void iterator KeyTree<TKey, TValue>::changeParent(KeyTree &parent){ 
+                 ^
+./src/tool/template_tree.hpp:127:39: 错误：expected initializer before ‘KeyTree’
+  template<TKey, TValue> void iterator KeyTree<TKey, TValue>::changeParent(KeyTree &parent){ 
+                                       ^
+./src/tool/template_tree.hpp:133:11: 错误：‘TKey’未声明
+  template<TKey, TValue> void iterator KeyTree<TKey, TValue>::changeChildKey(const TKey &origin, const TKey &dest){ 
+           ^
+./src/tool/template_tree.hpp:133:17: 错误：‘TValue’未声明
+  template<TKey, TValue> void iterator KeyTree<TKey, TValue>::changeChildKey(const TKey &origin, const TKey &dest){ 
+                 ^
+./src/tool/template_tree.hpp:133:39: 错误：expected initializer before ‘KeyTree’
+  template<TKey, TValue> void iterator KeyTree<TKey, TValue>::changeChildKey(const TKey &origin, const TKey &dest){ 
+                                       ^
+./src/tool/template_tree.hpp:144:11: 错误：‘TKey’未声明
+  template<TKey, TValue> void iterator KeyTree<TKey, TValue>::unlinkParent(){ 
+           ^
+./src/tool/template_tree.hpp:144:17: 错误：‘TValue’未声明
+  template<TKey, TValue> void iterator KeyTree<TKey, TValue>::unlinkParent(){ 
+                 ^
+./src/tool/template_tree.hpp:144:39: 错误：expected initializer before ‘KeyTree’
+  template<TKey, TValue> void iterator KeyTree<TKey, TValue>::unlinkParent(){ 
+                                       ^
+./src/tool/template_tree.hpp:150:11: 错误：‘TKey’未声明
+  template<TKey, TValue> void iterator KeyTree<TKey, TValue>::unlinkChild(const KeyTree &child){ 
+           ^
+./src/tool/template_tree.hpp:150:17: 错误：‘TValue’未声明
+  template<TKey, TValue> void iterator KeyTree<TKey, TValue>::unlinkChild(const KeyTree &child){ 
+                 ^
+./src/tool/template_tree.hpp:150:39: 错误：expected initializer before ‘KeyTree’
+  template<TKey, TValue> void iterator KeyTree<TKey, TValue>::unlinkChild(const KeyTree &child){ 
+                                       ^
+./src/tool/template_tree.hpp:160:11: 错误：‘TKey’未声明
+  template<TKey, TValue> iterator KeyTree<TKey, TValue>::find(const TKey &key){
+           ^
+./src/tool/template_tree.hpp:160:17: 错误：‘TValue’未声明
+  template<TKey, TValue> iterator KeyTree<TKey, TValue>::find(const TKey &key){
+                 ^
+./src/tool/template_tree.hpp:160:25: 错误：使用模板名‘std::iterator’时不带实参表无效
+  template<TKey, TValue> iterator KeyTree<TKey, TValue>::find(const TKey &key){
+                         ^
+./src/tool/template_tree.hpp:167:11: 错误：‘TKey’未声明
+  template<TKey, TValue> iterator KeyTree<TKey, TValue>::begin(){
+           ^
+./src/tool/template_tree.hpp:167:17: 错误：‘TValue’未声明
+  template<TKey, TValue> iterator KeyTree<TKey, TValue>::begin(){
+                 ^
+./src/tool/template_tree.hpp:167:25: 错误：使用模板名‘std::iterator’时不带实参表无效
+  template<TKey, TValue> iterator KeyTree<TKey, TValue>::begin(){
+                         ^
+./src/tool/template_tree.hpp:174:11: 错误：‘TKey’未声明
+  template<TKey, TValue> iterator KeyTree<TKey, TValue>::end(){ return ITERATOR_END; }
+           ^
+./src/tool/template_tree.hpp:174:17: 错误：‘TValue’未声明
+  template<TKey, TValue> iterator KeyTree<TKey, TValue>::end(){ return ITERATOR_END; }
+                 ^
+./src/tool/template_tree.hpp:174:25: 错误：使用模板名‘std::iterator’时不带实参表无效
+  template<TKey, TValue> iterator KeyTree<TKey, TValue>::end(){ return ITERATOR_END; }
+                         ^
+In file included from ./src/network/net_protocol_convert.h:14:0,
+                 from src/network/msg_cache.h:20,
+                 from src/network/msg_cache.cpp:11:
+./src/network/net_packer.h:23:7: 错误：使用枚举‘eProtocolDataFormat’前没有给出声明
+  enum eProtocolDataFormat;
+       ^
+In file included from ./src/network/net_protocol_convert.h:14:0,
+                 from src/network/msg_cache.h:20,
+                 from src/network/msg_cache.cpp:11:
+./src/network/net_packer.h:38:17: 错误：‘eProtocolDataFormat’不是一个类型名
+    inline const eProtocolDataFormat& getDataFormat()const;
+                 ^
+./src/network/net_packer.h:41:48: 错误：‘eProtocolDataFormat’不是一个类型名
+    bool parseMsg(const std::string &msg, const eProtocolDataFormat &dataFormat);
+                                                ^
+./src/network/net_packer.h:41:69: 错误：ISO C++ 不允许声明无类型的‘dataFormat’ [-fpermissive]
+    bool parseMsg(const std::string &msg, const eProtocolDataFormat &dataFormat);
+                                                                     ^
+./src/network/net_packer.h:55:36: 错误：‘CollectionName’不是一个类型名
+    inline bool addCollection(const CollectionName &name);
+                                    ^
+./src/network/net_packer.h:55:52: 错误：ISO C++ 不允许声明无类型的‘name’ [-fpermissive]
+    inline bool addCollection(const CollectionName &name);
+                                                    ^
+./src/network/net_packer.h:61:22: 错误：对‘Path’的引用有歧义
+    bool toPath(const Path &path);
+                      ^
+In file included from ./src/network/net_collection.h:15:0,
+                 from ./src/network/net_packer.h:18,
+                 from ./src/network/net_protocol_convert.h:14,
+                 from src/network/msg_cache.h:20,
+                 from src/network/msg_cache.cpp:11:
+./src/network/net_define.h:18:21: 附注：备选为： typedef std::string Path
+ typedef std::string Path;
+                     ^
+In file included from ../commonlibrary/include/json/json.h:5:0,
+                 from ./src/tool/json_tool.h:16,
+                 from ./src/network/net_collection.h:16,
+                 from ./src/network/net_packer.h:18,
+                 from ./src/network/net_protocol_convert.h:14,
+                 from src/network/msg_cache.h:20,
+                 from src/network/msg_cache.cpp:11:
+../commonlibrary/include/json/value.h:484:10: 附注：         class Json::Path
+    class Path
+          ^
+In file included from ./src/network/net_protocol_convert.h:14:0,
+                 from src/network/msg_cache.h:20,
+                 from src/network/msg_cache.cpp:11:
+./src/network/net_packer.h:61:22: 错误：‘Path’不是一个类型名
+    bool toPath(const Path &path);
+                      ^
+./src/network/net_packer.h:61:28: 错误：ISO C++ 不允许声明无类型的‘path’ [-fpermissive]
+    bool toPath(const Path &path);
+                            ^
+./src/network/net_packer.h:67:30: 错误：对‘Path’的引用有歧义
+    bool isAbsolutePath(const Path &path);
+                              ^
+In file included from ./src/network/net_collection.h:15:0,
+                 from ./src/network/net_packer.h:18,
+                 from ./src/network/net_protocol_convert.h:14,
+                 from src/network/msg_cache.h:20,
+                 from src/network/msg_cache.cpp:11:
+./src/network/net_define.h:18:21: 附注：备选为： typedef std::string Path
+ typedef std::string Path;
+                     ^
+In file included from ../commonlibrary/include/json/json.h:5:0,
+                 from ./src/tool/json_tool.h:16,
+                 from ./src/network/net_collection.h:16,
+                 from ./src/network/net_packer.h:18,
+                 from ./src/network/net_protocol_convert.h:14,
+                 from src/network/msg_cache.h:20,
+                 from src/network/msg_cache.cpp:11:
+../commonlibrary/include/json/value.h:484:10: 附注：         class Json::Path
+    class Path
+          ^
+In file included from ./src/network/net_protocol_convert.h:14:0,
+                 from src/network/msg_cache.h:20,
+                 from src/network/msg_cache.cpp:11:
+./src/network/net_packer.h:67:30: 错误：‘Path’不是一个类型名
+    bool isAbsolutePath(const Path &path);
+                              ^
+./src/network/net_packer.h:67:36: 错误：ISO C++ 不允许声明无类型的‘path’ [-fpermissive]
+    bool isAbsolutePath(const Path &path);
+                                    ^
+./src/network/net_packer.h:68:25: 错误：对‘Path’的引用有歧义
+    bool parsePath(const Path &path, vector<Name> names);
+                         ^
+In file included from ./src/network/net_collection.h:15:0,
+                 from ./src/network/net_packer.h:18,
+                 from ./src/network/net_protocol_convert.h:14,
+                 from src/network/msg_cache.h:20,
+                 from src/network/msg_cache.cpp:11:
+./src/network/net_define.h:18:21: 附注：备选为： typedef std::string Path
+ typedef std::string Path;
+                     ^
+In file included from ../commonlibrary/include/json/json.h:5:0,
+                 from ./src/tool/json_tool.h:16,
+                 from ./src/network/net_collection.h:16,
+                 from ./src/network/net_packer.h:18,
+                 from ./src/network/net_protocol_convert.h:14,
+                 from src/network/msg_cache.h:20,
+                 from src/network/msg_cache.cpp:11:
+../commonlibrary/include/json/value.h:484:10: 附注：         class Json::Path
+    class Path
+          ^
+In file included from ./src/network/net_protocol_convert.h:14:0,
+                 from src/network/msg_cache.h:20,
+                 from src/network/msg_cache.cpp:11:
+./src/network/net_packer.h:68:25: 错误：‘Path’不是一个类型名
+    bool parsePath(const Path &path, vector<Name> names);
+                         ^
+./src/network/net_packer.h:68:31: 错误：ISO C++ 不允许声明无类型的‘path’ [-fpermissive]
+    bool parsePath(const Path &path, vector<Name> names);
+                               ^
+./src/network/net_packer.h:71:4: 错误：‘eProtocolDataFormat’不是一个类型名
+    eProtocolDataFormat m_DataFormat;
+    ^
+./src/network/net_packer.h:72:4: 错误：‘Collection’不是一个类型名
+    Collection* m_pCollection;
+    ^
+./src/network/net_packer.h:77:31: 错误：‘MsgPtr’在此作用域中尚未声明
+  typedef Universal::LockQueue<MsgPtr> MPackerPtrQueue;
+                               ^
+./src/network/net_packer.h:77:37: 错误：模板第 1 个参数无效
+  typedef Universal::LockQueue<MsgPtr> MPackerPtrQueue;
+                                     ^
+./src/network/net_packer.h:77:54: 错误：invalid type in declaration before ‘;’ token
+  typedef Universal::LockQueue<MsgPtr> MPackerPtrQueue;
+                                                      ^
+In file included from src/network/msg_cache.h:20:0,
+                 from src/network/msg_cache.cpp:11:
+./src/network/net_protocol_convert.h:73:2: 错误：类定义后需要‘;’
+  }
+  ^
+./src/network/net_protocol_convert.h:77:73: 错误：‘MProtocolDataQueue’未声明
+  void convertMsgToProtocolData(const ConnectKey &key, std::string &msg, MProtocolDataQueue &packerQueue);
+                                                                         ^
+./src/network/net_protocol_convert.h:80:38: 错误：‘ConstProtocolDataPtr’不是一个类型名
+  void convertProtocolDataToMsg(const ConstProtocolDataPtr &pProtocolData, MMsgQueue &msgQueue);
+                                      ^
+./src/network/net_protocol_convert.h:80:60: 错误：ISO C++ 不允许声明无类型的‘pProtocolData’ [-fpermissive]
+  void convertProtocolDataToMsg(const ConstProtocolDataPtr &pProtocolData, MMsgQueue &msgQueue);
+                                                            ^
+./src/network/net_protocol_convert.h:80:75: 错误：‘MMsgQueue’未声明
+  void convertProtocolDataToMsg(const ConstProtocolDataPtr &pProtocolData, MMsgQueue &msgQueue);
+                                                                           ^
+In file included from src/network/msg_cache.h:23:0,
+                 from src/network/msg_cache.cpp:11:
+./src/network/net_msg_struct.h:33:33: 错误：invalid declarator before ‘MsgPtr’
+  typedef boost::shared_ptr<Msg> MsgPtr;
+                                 ^
+./src/network/net_msg_struct.h:35:31: 错误：‘MsgPtr’在此作用域中尚未声明
+  typedef Universal::LockQueue<MsgPtr> MMsgPtrQueue;
+                               ^
+./src/network/net_msg_struct.h:35:37: 错误：模板第 1 个参数无效
+  typedef Universal::LockQueue<MsgPtr> MMsgPtrQueue;
+                                     ^
+./src/network/net_msg_struct.h:35:51: 错误：invalid type in declaration before ‘;’ token
+  typedef Universal::LockQueue<MsgPtr> MMsgPtrQueue;
+                                                   ^
+In file included from src/network/msg_cache.cpp:11:0:
+src/network/msg_cache.h:26:8: 错误：使用 typedef 名‘Network::ConnectKey’，在‘class’后
+  class ConnectKey;
+        ^
+In file included from ./src/network/net_packer.h:17:0,
+                 from ./src/network/net_protocol_convert.h:14,
+                 from src/network/msg_cache.h:20,
+                 from src/network/msg_cache.cpp:11:
+./src/network/net_struct.h:21:23: 附注：‘Network::ConnectKey’ has a previous declaration here
+  typedef bufferevent* ConnectKey;
+                       ^
+In file included from src/network/msg_cache.cpp:11:0:
+src/network/msg_cache.h:42:4: 错误：‘MsgPtr’不是一个类型名
+    MsgPtr popMsg(ConnectKey connectKey);
+    ^
+src/network/msg_cache.h:46:23: 错误：‘MsgPtr’不是一个类型名
+    void pushMsg(const MsgPtr &pMsg);
+                       ^
+src/network/msg_cache.h:46:31: 错误：ISO C++ 不允许声明无类型的‘pMsg’ [-fpermissive]
+    void pushMsg(const MsgPtr &pMsg);
+                               ^
+src/network/msg_cache.cpp: 在构造函数‘Network::MsgServer::MsgServer()’中:
+src/network/msg_cache.cpp:16:4: 错误：类‘Network::MsgServer’没有名为‘m_MMsg’的字段
+    m_MMsg(),
+    ^
+src/network/msg_cache.cpp:18:4: 错误：类‘Network::MsgServer’没有名为‘m_MPacker’的字段
+    m_MPacker(),
+    ^
+src/network/msg_cache.cpp:19:4: 错误：类‘Network::MsgServer’没有名为‘m_IncompletePacker’的字段
+    m_IncompletePacker()
+    ^
+src/network/msg_cache.cpp: 在成员函数‘bool Network::MsgServer::emptyW(Network::ConnectKey)’中:
+src/network/msg_cache.cpp:27:39: 错误：‘std::map<bufferevent*, int>::iterator’没有名为‘second’的成员
+    return m_MsgCache.find(connectKey).second.empty();
+                                       ^
+src/network/msg_cache.cpp: 在全局域：
+src/network/msg_cache.cpp:32:53: 错误：成员函数‘void Network::MsgServer::sendPacker(const PackerPtr&)’未在类‘Network::MsgServer’中声明
+  void MsgServer::sendPacker(const PackerPtr &pPacker){
+                                                     ^
+src/network/msg_cache.cpp:40:2: 错误：‘MsgPtr’不是一个类型名
+  MsgPtr MsgServer::recvMsg(ConnectKey connectKey){
+  ^
+src/network/msg_cache.cpp: 在成员函数‘bool Network::MsgServer::emptyR()’中:
+src/network/msg_cache.cpp:50:49: 错误：对成员‘empty’的请求出现在‘((Network::MsgServer*)this)->Network::MsgServer::m_PackerCache’中，而后者具有非类类型‘Network::PackerCache {aka int}’
+  bool MsgServer::emptyR(){ return m_PackerCache.empty(); }
+                                                 ^
+src/network/msg_cache.cpp: 在全局域：
+src/network/msg_cache.cpp:52:32: 错误：‘MsgPtr’不是一个类型名
+  void MsgServer::sendMsg(const MsgPtr &pMsg){
+                                ^
+src/network/msg_cache.cpp:52:40: 错误：ISO C++ 不允许声明无类型的‘pMsg’ [-fpermissive]
+  void MsgServer::sendMsg(const MsgPtr &pMsg){
+                                        ^
+src/network/msg_cache.cpp:52:44: 错误：成员函数‘void Network::MsgServer::sendMsg(const int&)’未在类‘Network::MsgServer’中声明
+  void MsgServer::sendMsg(const MsgPtr &pMsg){
+                                            ^
+src/network/msg_cache.cpp:62:34: 错误：成员函数‘Network::PackerPtr Network::MsgServer::recvPacker()’未在类‘Network::MsgServer’中声明
+  PackerPtr MsgServer::recvPacker(){
+                                  ^
+make: *** [out/./src/network/msg_cache.o] 错误 1

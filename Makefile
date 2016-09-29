@@ -14,8 +14,10 @@ LIBXLS_INCLUDE=-I${THIRDPART_PATH}/include/libxls
 JSON_INCLUDE=-I${THIRDPART_PATH}/include/
 # boost
 BOOST_INC=-I${THIRDPART_PATH}/include/boost
+# event
+# EVENT_INC=-I${THIRDPART_PATH}/include/libevent
 # thirdpart include 
-THIRDPART_INC=-I${THIRDPART_PATH}/include ${MYSQL_INCLUDE} ${XLSLIB_INCLUDE} ${LIBXLS_INCLUDE} ${JSON_INCLUDE} ${BOOST_INC}
+THIRDPART_INC=-I${THIRDPART_PATH}/include ${MYSQL_INCLUDE} ${XLSLIB_INCLUDE} ${LIBXLS_INCLUDE} ${JSON_INCLUDE} ${BOOST_INC} ${EVENT_INC}
 # project child path
 PROJECT_INC=-I./src \
 		    -I./src/tool \
@@ -59,17 +61,22 @@ PROJECT_PATH=out
 PROJECT_OBJECTS= \
 	./$(PROJECT_PATH)/./src/exception/common_exception.o \
 	./$(PROJECT_PATH)/./src/sql/sql_operator.o \
-	./$(PROJECT_PATH)/./src/network/socket_simple.o \
-	./$(PROJECT_PATH)/./src/network/net_struct.o \
+	./$(PROJECT_PATH)/./src/network/msg_cache.o \
+	./$(PROJECT_PATH)/./src/network/net_collection.o \
+	./$(PROJECT_PATH)/./src/network/net_msg_struct.o \
+	./$(PROJECT_PATH)/./src/network/net_packer.o \
 	./$(PROJECT_PATH)/./src/network/net_protocol_convert.o \
+	./$(PROJECT_PATH)/./src/network/net_struct.o \
 	./$(PROJECT_PATH)/./src/network/net_transfer.o \
-	./$(PROJECT_PATH)/./src/tool/common_tool.o \
+	./$(PROJECT_PATH)/./src/network/socket_simple.o \
 	./$(PROJECT_PATH)/./src/tool/common_file.o \
+	./$(PROJECT_PATH)/./src/tool/common_mutex.o \
+	./$(PROJECT_PATH)/./src/tool/common_thread.o \
+	./$(PROJECT_PATH)/./src/tool/common_timer.o \
+	./$(PROJECT_PATH)/./src/tool/common_tool.o \
 	./$(PROJECT_PATH)/./src/tool/file_transmission.o \
 	./$(PROJECT_PATH)/./src/tool/json_tool.o \
-	./$(PROJECT_PATH)/./src/tool/common_mutex.o \
 	./$(PROJECT_PATH)/./src/tool/string_util.o \
-	./$(PROJECT_PATH)/./src/tool/common_timer.o \
 	./$(PROJECT_PATH)/./src/tool/xls_reader.o \
 	./$(PROJECT_PATH)/./src/tool/xls_struct.o \
 	./$(PROJECT_PATH)/./src/tool/xls_writer.o \

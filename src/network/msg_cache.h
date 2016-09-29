@@ -12,16 +12,12 @@
 #define _msg_cache_H
 
 #include <map>
-#include "boost/shared_ptr.hpp"
-#include "event2/bufferevent.h"
-#include "tool/lock_queue.hpp"
 #include "tool/single_mode.hpp"
-#include "tool/common_mutex.h"
-#include "network/net_protocol_convert.h"
-#include "tool/single_mode.hpp"
+#include "network/net_struct.h"
+#include "network/net_msg_struct.h"
+#include "network/net_packer.h"
 
 namespace Network{
-	class ConnectKey;
 	//! \brief	消息中间件，用于分隔应用层和传输层。
 	//! \note	类似tcp，拥有一条读通道一条写通道。
 	//! \note	读通道通过读取msg信息，输出packer包

@@ -14,14 +14,16 @@
 #include <string>
 #include <list>
 #include <map>
+#include "boost/shared_ptr.hpp"
 #include "event2/bufferevent.h"
 #include "tool/single_mode.hpp"
+#include "tool/lock_queue.hpp"
 
 namespace Network{
 	//! \todo 复制构造函数，赋值构造函数等
 	class Msg{
 		public:
-			Msg(ConnectKey *_key, const string &_msg)
+			Msg(ConnectKey *_key, const std::string &_msg)
 				:m_ConnectKey(NET_CACHEKEY_DEFAULT),
 				 m_Msg()
 			{;}
@@ -29,7 +31,7 @@ namespace Network{
 		public:
 			ConnectKey m_ConnectKey;
 			std::string m_Msg;
-	}
+	};
 	typedef boost::shared_ptr<Msg> MsgPtr;
 	typedef boost::shared_ptr<const Msg> ConstMsgPtr;
 	typedef Universal::LockQueue<MsgPtr> MMsgPtrQueue;

@@ -9,6 +9,7 @@
  * * \!author zheng39562@163.com
 **********************************************************/
 #include "net_packer.h"
+
 namespace Network{
 	//! \todo	暂时使用该标识来表明节点为集合
 	const string COLLECTION_ROOT("root");
@@ -33,13 +34,6 @@ namespace Network{
 			delete m_pCollection; 
 			m_pCollection = NULL;
 		}
-	}
-
-	const ConnectKey& Packer::getConnectKey()const{
-		return m_ConnectKey;
-	}
-	const eProtocolDataFormat& Packer::getDataFormat()const{
-		return m_DataFormat;
 	}
 
 	bool Packer::parseMsg(const std::string &msg, const eProtocolDataFormat &dataFormat){
@@ -91,7 +85,7 @@ namespace Network{
 	bool Packer::addItem(const Name &name, const string &value){
 		return m_pCollection->addItem(name, value);
 	}
-	bool Packer::addCollection(const CollectionName &name){
+	bool Packer::addCollection(const Name &name){
 		return m_pCollection->addCollection(name);
 	}
 
@@ -161,8 +155,8 @@ namespace Network{
 		m_pCollection->getItemNames(names);
 	}
 
-	void Packer::getCollectionNames(vector<Name> &names){
-		m_pCollection->getCollectionNames(names);
+	void Packer::getNames(vector<Name> &names){
+		m_pCollection->getNames(names);
 	}
 } // namespace Network{
 

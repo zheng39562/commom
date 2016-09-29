@@ -10,28 +10,13 @@
 **********************************************************/
 #include "msg_cache.h"
 
-
-namespace Network{
-	Msg::Msg(bufferevent *_bev)
-		:m_Bev(_bev)
-	{
-		;
-	}
-	Msg::~Msg(){
-		;
-	}
-	bool Msg::doPack(const std::string &msg, ePackerError error_no){
-		DEBUG_D("add " << msg);
-	}
-};
+#include "net_protocol_convert.h"
 
 namespace Network{
 	MsgServer::MsgServer()
 		:m_MsgCache(),
-		 m_MMsg(),
 		 m_PackerCache(),
-		 m_MPacker(),
-		 m_IncompletePacker()
+		 m_IncompleteMsg()
 	{
 		;
 	}
@@ -39,20 +24,20 @@ namespace Network{
 
 	bool MsgServer::emptyW(ConnectKey connectKey){
 		if(m_MsgCache.find(connectKey) != m_MsgCache.end()){
-			return m_MsgCache.find(connectKey).second.empty();
+			return m_MsgCache.find(connectKey)->second.empty();
 		}
 		return false;
 	}
 
-	void MsgServer::sendPacker(const PackerPtr &pPacker){
+	void MsgServer::pushPacker(const PackerPtr &pPacker){
 		ConnectKey connectKey = pPacker->getConnectKey();
 		if(m_MsgCache.find(connectKey) == m_MsgCache.end()){
-			m_MsgCache.insert(connectKey, MMsgQueue());
+			m_MsgCache.insert(connectKey, MMsgPtrQueue());
 		}
 		convertPackerToMsg(pPacker, m_MsgCache.find(connectKey)->second);
 	}
 
-	MsgPtr MsgServer::recvMsg(ConnectKey connectKey){
+	MsgPtr MsgServer::popMsg(ConnectKey connectKey){
 		MsgPtr pMsg;
 		if(m_MsgCache.find(connectKey) != m_MsgCache.end()){
 			if(!m_MsgCache.find(connectKey).second.empty()){
@@ -64,7 +49,7 @@ namespace Network{
 
 	bool MsgServer::emptyR(){ return m_PackerCache.empty(); }
 
-	void MsgServer::sendMsg(const MsgPtr &pMsg){
+	void MsgServer::pushMsg(const MsgPtr &pMsg){
 		ConnectKey connectKey = pMsg.m_ConnectKey;
 		if(m_IncompleteMsg.find(connectKey) == m_IncompleteMsg.end()){
 			m_IncompleteMsg.insert(pair<ConnectKey, std::string>(connectKey, std::string()));
@@ -74,7 +59,7 @@ namespace Network{
 		convertMsgToPacker(m_IncompleteMsg.find(connectKey)->second, m_PackerCache);
 	}
 
-	PackerPtr MsgServer::recvPacker(){
+	PackerPtr MsgServer::popPacker(){
 		PackerPtr pPacker;
 		if(!emptyR()){
 			pPacker = m_PackerCache.pop();

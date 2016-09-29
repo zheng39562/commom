@@ -1,4 +1,5 @@
 任务安排：
+	*	network文件名称和类名统一修改。
 	4	完成server 和 cline 端的接口。
 	5	编译，排错，测试。
 		1	测试网络的连通性。
@@ -17,3 +18,5 @@
 	*	git submodule : commonlibrary.
 	*	数据库服务器：维持连接，暂不缓存。
 	*	chosse设计。
+	*	makefile优化：具体设计未出。
+		

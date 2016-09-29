@@ -13,7 +13,7 @@
 #include <assert.h>
 #include "tool/string_util.h"
 
-namespace Universal{
+namespace Network{
 	#define CONVERT_JSON_QUOTED(content) doubleQuotedStr(strToJsonStr(content));
 
 	using namespace std;
