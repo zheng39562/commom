@@ -12,6 +12,7 @@
 
 #include <assert.h>
 #include "tool/string_util.h"
+#include "tool/json_tool.h"
 
 namespace Network{
 	#define CONVERT_JSON_QUOTED(content) doubleQuotedStr(strToJsonStr(content));
@@ -27,7 +28,7 @@ namespace Network{
 	{
 		;
 	}
-	Collection(const Name &_name, Collection* _pParent)
+	Collection::Collection(const Name &_name, Collection* _pParent)
 		:m_Name(_name),
 		 m_pParent(_pParent),
 		 m_Items(),
@@ -36,28 +37,10 @@ namespace Network{
 		;
 	}
 	Collection::Collection(const Collection &ref){
-		m_Name = ref.getName();
-		m_pParent = NULL;
-
-		vector<Name> names;
-		getItemNames(names);
-		for(vector<Name>::const_iterator citer = names.begin(); citer != names.end(); ++citer){
-			addItem(*iter, ref.getString(*iter));
-		}
-
-		getCollectionNames(names);
-		for(vector<Name>::const_iterator citer = names.begin(); citer != names.end(); ++citer){
-			Collection* child = ref.child();
-			if(child == NULL){
-				addCollection(*iter);
-			}
-			else{
-				addCollection(new Collection(*child)));
-			}
-		}
+		copyRef(ref);
 	}
 	Collection& Collection::operator=(const Collection &ref){
-		this->Collection(ref);
+		copyRef(ref);
 		return *this;
 	}
 	Collection::~Collection(){ 
@@ -75,11 +58,11 @@ namespace Network{
 		return "";
 	}
 
-	bool Collection::itemExist(const Name &name){
-		return m_Item.find(name) != m_Items.end();
+	bool Collection::itemExist(const Name &name)const{
+		return m_Items.find(name) != m_Items.end();
 	}
 
-	bool Collection::collectionExist(const Name &name){
+	bool Collection::collectionExist(const Name &name)const{
 		return m_Collection.find(name) != m_Collection.end();
 	}
 
@@ -103,13 +86,13 @@ namespace Network{
 			m_Collection.insert(pair<Name, Collection*>(pCollection->getName(), pCollection));
 		}
 		else{
-			pCollection->parent()->moveChild(pCollection->getName());
+			pCollection->parent()->moveChild(pCollection->getName(), this);
 		}
 		
 		return true;
 	}
 
-	bool addItem(const Name &name, const CollectionItem &item){
+	bool Collection::addItem(const Name &name, const CollectionItem &item){
 		if(!itemExist(name)){
 			return false;
 		}
@@ -150,10 +133,6 @@ namespace Network{
 		return true;
 	}
 
-	bool Collection::updateParent(Collection* pParent){
-		m_pParent = pParent;
-	}
-	
 	bool Collection::delItem(const Name &name){
 		if(itemExist(name)){
 			m_Items.erase(m_Items.find(name));
@@ -172,59 +151,66 @@ namespace Network{
 	}
 
 	bool Collection::moveChild(const Name &name, Collection *pNewParent){
-		Collection* child = child(name);
-		if(child == NULL){
-			DBEUG_D("找不到对应的集合[" << name << "]。");
-			return false:
+		Collection* pChild = this->child(name);
+		if(pChild == NULL){
+			//DBEUG_D("找不到对应的集合[" << name << "]。");
+			return false;
 		}
 
 		m_Collection.erase(m_Collection.find(name));
 
-		child->parent() = NULL;
-		pNewParent->addCollection(child);
+		pChild->parent() = NULL;
+		pNewParent->addCollection(pChild);
 		return true;
 	}
 
 	Collection* Collection::child(const Name &name){
-		Collection* child(NULL);
+		Collection* pChild(NULL);
 		if(collectionExist(name)){
-			child = m_Collection.find(name)->second;
+			pChild = m_Collection.find(name)->second;
 		}
-		return child;
+		return pChild;
+	}
+	const Collection* Collection::child(const Name &name)const{
+		const Collection* pChild(NULL);
+		if(collectionExist(name)){
+			pChild = m_Collection.find(name)->second;
+		}
+		return pChild;
 	}
 
 	void Collection::getItemNames(vector<Name> &names){
 		names.clear();
 		names.reserve(m_Items.size());
-		for(map<Name, CollectionItem>::const_iterator citer = m_Items.begin(); citer != m_Items.end(): ++citer){
+		for(map<Name, CollectionItem>::const_iterator citer = m_Items.begin(); citer != m_Items.end(); ++citer){
 			names.push_back(citer->first);
 		}
 	}
 
-	void Collection::getCollectionNames(vector<Name> &names){
+	void Collection::getCollectionNames(vector<Name> &names)const{
 		names.clear();
 		names.reserve(m_Collection.size());
-		for(map<Name, Collection*>::const_iterator citer = m_Collection.begin(); citer != m_Collection.end(): ++citer){
+		for(map<Name, Collection*>::const_iterator citer = m_Collection.begin(); citer != m_Collection.end(); ++citer){
 			names.push_back(citer->first);
 		}
 	}
 
-	bool Collection::isArray(const Collection &collection){
-		bool isArray(false);
+	bool Collection::isArray()const{
+		bool bIsArray(false);
 		if(itemSize()==0 && collectionSize() != 0){
-			isArray = true;
+			bIsArray = true;
 			vector<Name> names;
 			getCollectionNames(names);
 			for(int i=0; i<collectionSize(); ++i){
 				if(i != strToInt(names.at(i))){
-					isArray = false;
+					bIsArray = false;
 				}
 			}
 		}
-		return isArray;
+		return bIsArray;
 	}
 
-	string Collection::toJson(){
+	string Collection::toJson()const{
 		return toJson(*this);
 	}
 
@@ -233,12 +219,12 @@ namespace Network{
 		return xmlString;
 	}
 
-	string Collection::toJson(const Collection &collection){
+	string Collection::toJson(const Collection &collection)const{
 		string jsString;
 		if(collection.isEmpty()){
 			jsString += CONVERT_JSON_QUOTED(m_Name) + ":" + CONVERT_JSON_QUOTED("");
 		}
-		else if(collection,isArray()){
+		else if(collection.isArray()){
 			jsString += "[";
 
 			string jsCollection("");
@@ -281,7 +267,7 @@ namespace Network{
 
 	bool Collection::parseJs(const string &jsString){
 		Json::Value jsValue;
-		if(CSJsonTool::parseJs(jsString, jsValue)){
+		if(JsonTool::parseJs(jsString, jsValue)){
 			return parseJs(*this, jsValue);
 		}
 		else{
@@ -301,15 +287,15 @@ namespace Network{
 		}
 		else if(jsValue.isObject()){
 			Json::Value::Members vKeys = jsValue.getMemberNames();
-			for(Json::Value::Members::const_iterator iter = vKeys.begin; iter != vKeys.end(); ++iter){
+			for(Json::Value::Members::const_iterator iter = vKeys.begin(); iter != vKeys.end(); ++iter){
 				if(jsValue[*iter].isArray() || jsValue[*iter].isObject()){
 					Name name(*iter);
 					Collection* pCollection(new Collection(name));
-					parseJs(*pCollection, jsValue[i]);
+					parseJs(*pCollection, jsValue[*iter]);
 					addCollection(pCollection);
 				}
 				else{
-					addItem(*iter, getJsString(jsValue, *iter));
+					addItem(*iter, JsonTool::getJsString(jsValue, *iter));
 				}
 			}
 		}
@@ -325,5 +311,26 @@ namespace Network{
 		;
 	}
 
+	void Collection::copyRef(const Collection &ref){
+		m_Name = ref.getName();
+		m_pParent = NULL;
+
+		vector<Name> names;
+		getItemNames(names);
+		for(vector<Name>::const_iterator citer = names.begin(); citer != names.end(); ++citer){
+			addItem(*citer, ref.getString(*citer));
+		}
+
+		getCollectionNames(names);
+		for(vector<Name>::const_iterator citer = names.begin(); citer != names.end(); ++citer){
+			const Collection* pChild = ref.child(*citer);
+			if(pChild == NULL){
+				addCollection(*citer);
+			}
+			else{
+				addCollection(new Collection(*pChild));
+			}
+		}
+	}
 } // namespace Universal{
 

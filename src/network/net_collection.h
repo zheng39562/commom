@@ -33,8 +33,8 @@ namespace Network{
 			inline const Name& getName()const{ return m_Name; }
 			std::string getString(const Name &name)const;
 			//! \brief
-			bool itemExist(const Name &name);
-			bool collectionExist(const Name &name);
+			bool itemExist(const Name &name)const;
+			bool collectionExist(const Name &name)const;
 			//! \brief	
 			bool addCollection(const Name &name);
 			bool addCollection(Collection *pCollection);
@@ -56,23 +56,24 @@ namespace Network{
 			//! \note	不能在外界直接进行删除操作。
 			//! \note	任意修改都会直接影响到相关节点。修改时请慎重。
 			//! \note	如果想要修改节点的挂载，建议使用moveChild函数。该函数直接修改父节点会导致多重引用。
-			inline Collection* parent(){ return m_pParent; }
+			inline Collection*& parent(){ return m_pParent; }
 			//! \brief	子节点获取。
 			//! \note	不能在外界直接进行删除操作。
 			//! \note	任意修改都会直接影响到相关节点。
 			Collection* child(const Name &name);
+			const Collection* child(const Name &name)const;
 			//! \brief	
 			void getItemNames(vector<Name> &names);
-			void getCollectionNames(vector<Name> &names);
+			void getCollectionNames(vector<Name> &names)const;
 
 			inline size_t itemSize()const{ return m_Items.size(); }
 			inline size_t collectionSize()const{ return m_Collection.size(); }
 
 			//! \brief	是否是个数组i
 			//! \note	初衷用于转换格式使用，不推荐使用该函数来做循环获取。
-			bool isArray(const Collection &collection);
+			bool isArray()const;
 			//! \brief	将集合数据转化成json字符串
-			string toJson();
+			string toJson()const;
 			//! \brief	将集合数据转化成xml字符串
 			string toXml();
 			//! \brief	解析json字符并保存成collection结构。需要注意，该函数会清空collection中的数据。
@@ -80,8 +81,10 @@ namespace Network{
 			//! \brief	解析xml字符并保存成collection结构。需要注意，该函数会清空collection中的数据。
 			bool parseXml(const string &xmlString);
 		private:
-			string toJson(const Collection &collection);
+			string toJson(const Collection &collection)const;
 			bool parseJs(const Collection &collection, const Json::Value jsValue);
+
+			void copyRef(const Collection &ref);
 		private:
 			Name m_Name;
 			Collection* m_pParent;

@@ -10,15 +10,18 @@
 **********************************************************/
 #include "net_packer.h"
 
+#include "tool/string_util.h"
+
 namespace Network{
+	using namespace Universal;
 	//! \todo	暂时使用该标识来表明节点为集合
 	const string COLLECTION_ROOT("root");
 	const string PACKER_PATH_SPLIT("/");
 	const string PACKER_PATH_CURRENT_INDEX(".");
 	const string PACKER_PATH_LAST_INDEX("..");
 	Packer::Packer(const ConnectKey &_key)
-		:m_ConnectKey(_key)
-		 eProtocolDataFormat m_DataFormat(eProtocolDataFormat_String),
+		:m_ConnectKey(_key),
+		 m_DataFormat(eProtocolDataFormat_String),
 		 m_pCollection(new Collection(COLLECTION_ROOT))
 	{
 		;
@@ -29,7 +32,7 @@ namespace Network{
 	Packer& Packer::operator=(const Packer &ref){
 		;
 	}
-	~Packer(){ 
+	Packer::~Packer(){ 
 		if(m_pCollection){
 			delete m_pCollection; 
 			m_pCollection = NULL;
@@ -47,8 +50,8 @@ namespace Network{
 		}
 		return bRet;
 	}
-	string Packer::getPackerStr(){
-		switch(dataFormat){
+	string Packer::getPackerStr()const{
+		switch(m_DataFormat){
 			case eProtocolDataFormat_Json:
 				return m_pCollection->toJson();
 			default:
@@ -80,7 +83,7 @@ namespace Network{
 		return m_pCollection->addItem(name, doubleToStr(value));
 	}
 	bool Packer::addItem(const Name &name, const char &value){
-		return m_pCollection->addItem(name, value);
+		return m_pCollection->addItem(name, string(&value));
 	}
 	bool Packer::addItem(const Name &name, const string &value){
 		return m_pCollection->addItem(name, value);
@@ -128,16 +131,16 @@ namespace Network{
 		}
 
 		string path(PACKER_PATH_SPLIT + m_pCollection->getName());
-		const Collection* parent = m_pCollection->parent();
-		while(parent != NULL){
-			path = PACKER_PATH_SPLIT + parent->getName() + parent;
-			parent = parent->parent();
+		Collection* pParent = m_pCollection->parent();
+		while(pParent != NULL){
+			path = PACKER_PATH_SPLIT + pParent->getName();
+			pParent = pParent->parent();
 		}
 		return path;
 	}
 
 	bool Packer::isAbsolutePath(const Path &path){
-		return path.empty() ? false : path[0] == PACKER_PATH_SPLIT;
+		return path.empty() ? false : string(&path[0]) == PACKER_PATH_SPLIT;
 	}
 
 	bool Packer::parsePath(const Path &path, vector<Name> names){
@@ -147,7 +150,7 @@ namespace Network{
 		if(path[0] != '.' && path[0] != '/'){
 			return false;
 		}
-		names.clear():
+		names.clear();
 		return splitString(path, PACKER_PATH_SPLIT, names);
 	}
 
@@ -155,8 +158,8 @@ namespace Network{
 		m_pCollection->getItemNames(names);
 	}
 
-	void Packer::getNames(vector<Name> &names){
-		m_pCollection->getNames(names);
+	void Packer::getCollectionNames(vector<Name> &names){
+		m_pCollection->getCollectionNames(names);
 	}
 } // namespace Network{
 

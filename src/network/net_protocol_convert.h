@@ -14,6 +14,7 @@
 #include "network/net_packer.h"
 #include "network/net_msg_struct.h"
 #include "network/net_protocol_struct.h"
+#include "network/net_packer.h"
 
 //! \brief	协议内容详见net_protocol_struct.h
 namespace Network{
@@ -30,10 +31,10 @@ namespace Network{
 			~ProtocolMsg(){;}
 		public:
 			static ProtocolMsgPtr getProtocolMsg(string &msg);
-			static string convertMsgToStr(const ProtocolMsgPtr pProtocolMsg);
+			static string convertMsgToString(const ProtocolMsgPtr pProtocolMsg);
 		private:
 			static ProtocolSize StrToSize(const string &msg);
-			static string SizeToStr(const ProtocolSize size);
+			static string SizeToStr(ProtocolSize size);
 		public:
 			ProtocolSize size;
 			char flags;
@@ -43,10 +44,10 @@ namespace Network{
 	//! \brief	将msg转换成packer
 	//! \param[in,out] msg 消息字符串，已完成的消息会被打包。剩余消息通过该参数返回。
 	//! \todo	MD5验证
-	void convertMsgToProtocolData(const ConnectKey &key, std::string &msg, MProtocolDataQueue &packerQueue);
+	void convertMsgToPacker(const ConnectKey &key, std::string &msg, MPackerPtrQueue &packerPtrQueue);
 	//! \brief	将packer转换成msg
 	//! \todo	MD5验证
-	void convertProtocolDataToMsg(const ConstProtocolDataPtr &pProtocolData, MMsgQueue &msgQueue);
+	void convertPackerToMsg(const ConstPackerPtr &pPacker, MMsgPtrQueue &msgQueue);
 
 }
 #endif 

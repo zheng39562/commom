@@ -13,6 +13,8 @@
 #include "net_protocol_convert.h"
 
 namespace Network{
+	using namespace std;
+
 	MsgServer::MsgServer()
 		:m_MsgCache(),
 		 m_PackerCache(),
@@ -32,7 +34,7 @@ namespace Network{
 	void MsgServer::pushPacker(const PackerPtr &pPacker){
 		ConnectKey connectKey = pPacker->getConnectKey();
 		if(m_MsgCache.find(connectKey) == m_MsgCache.end()){
-			m_MsgCache.insert(connectKey, MMsgPtrQueue());
+			m_MsgCache.insert(MsgCache::value_type(connectKey, MMsgPtrQueue()));
 		}
 		convertPackerToMsg(pPacker, m_MsgCache.find(connectKey)->second);
 	}
@@ -40,8 +42,8 @@ namespace Network{
 	MsgPtr MsgServer::popMsg(ConnectKey connectKey){
 		MsgPtr pMsg;
 		if(m_MsgCache.find(connectKey) != m_MsgCache.end()){
-			if(!m_MsgCache.find(connectKey).second.empty()){
-				pMsg = m_MsgCache.find(connectKey).second.pop();
+			if(!m_MsgCache.find(connectKey)->second.empty()){
+				pMsg = m_MsgCache.find(connectKey)->second.pop();
 			}
 		}
 		return pMsg;
@@ -50,13 +52,13 @@ namespace Network{
 	bool MsgServer::emptyR(){ return m_PackerCache.empty(); }
 
 	void MsgServer::pushMsg(const MsgPtr &pMsg){
-		ConnectKey connectKey = pMsg.m_ConnectKey;
+		ConnectKey connectKey = pMsg->m_ConnectKey;
 		if(m_IncompleteMsg.find(connectKey) == m_IncompleteMsg.end()){
 			m_IncompleteMsg.insert(pair<ConnectKey, std::string>(connectKey, std::string()));
 		}
-		m_IncompleteMsg.find(connectKey)->second += pMsg.m_Msg;
+		m_IncompleteMsg.find(connectKey)->second += pMsg->m_Msg;
 
-		convertMsgToPacker(m_IncompleteMsg.find(connectKey)->second, m_PackerCache);
+		convertMsgToPacker(connectKey, m_IncompleteMsg.find(connectKey)->second, m_PackerCache);
 	}
 
 	PackerPtr MsgServer::popPacker(){

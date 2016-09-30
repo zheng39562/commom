@@ -16,6 +16,8 @@
 #include "event2/bufferevent.h"
 #include "tool/single_mode.hpp"
 #include "common_define.h"
+#include "network/net_msg_struct.h"
+#include "network/msg_cache.h"
 
 using namespace std;
 
@@ -51,12 +53,12 @@ namespace Network{
 		DEBUG_D(" write ");
 		MsgPtr pMsg = SingleMsgServer::getInstance()->popMsg(bev);
 		DEBUG_D(" write " << pMsg->m_Msg);
-		bufferevent_write(bev, pMsg->m_Msg.c_str(), pMsg->m_Msg.c_str());
+		bufferevent_write(bev, pMsg->m_Msg.c_str(), pMsg->m_Msg.size());
 	}
 	void NetMsgTransfer::readBack(bufferevent* bev, void *ctx){
 		DEBUG_D(" readBack ");
 		evbuffer* output = bufferevent_get_input(bev);
-		char* retLine = new char(READ_BUFFER_SIZE);
+		char* retLine = new char[READ_BUFFER_SIZE];
 		memset(retLine, '\0', sizeof(char)*READ_BUFFER_SIZE);
 		if( bufferevent_read(bev, retLine, READ_BUFFER_SIZE) > 0 ){
 			SingleMsgServer::getInstance()->pushMsg(MsgPtr(new Msg(bev, retLine)));

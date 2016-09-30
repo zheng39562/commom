@@ -22,21 +22,23 @@ namespace Universal{
 		}
 	}
 
-	void PThread::threadProxy(void* args){
+	void* PThread::threadProxy(void* args){
 		PThread *pThread = static_cast<PThread*>(args);
 		pThread->execute();
 
 		pthread_exit(NULL);
+
+		return NULL;
 	}
 
 	bool PThread::start(){
-		int iRet = pthread_create(&m_PThread, NULL, PThread::threadProxy, this);
+		int iRet = pthread_create(&m_Thread, NULL, PThread::threadProxy, this);
 		if(iRet == 0){
-			m_Thread = pthread_self;
+			m_Thread = pthread_self();
 			m_ThreadStatus = eThreadStatus_Run;
 		}
 		else{
-			DEBUG_E("create thread failed. error no [" << iRet << "]");
+			//DEBUG_E("create thread failed. error no [" << iRet << "]");
 		}
 		return iRet == 0;
 	}

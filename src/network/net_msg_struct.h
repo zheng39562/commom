@@ -18,13 +18,14 @@
 #include "event2/bufferevent.h"
 #include "tool/single_mode.hpp"
 #include "tool/lock_queue.hpp"
+#include "network/net_struct.h"
 
 namespace Network{
 	//! \todo 复制构造函数，赋值构造函数等
 	class Msg{
 		public:
-			Msg(ConnectKey *_key, const std::string &_msg)
-				:m_ConnectKey(NET_CACHEKEY_DEFAULT),
+			Msg(const ConnectKey &_key, const std::string &_msg)
+				:m_ConnectKey(_key),
 				 m_Msg()
 			{;}
 			~Msg(){;}

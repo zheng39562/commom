@@ -32,13 +32,13 @@ namespace Universal{
 			PThread();
 			virtual ~PThread();
 		public:
-			static void threadProxy(void* args);
+			static void* threadProxy(void* args);
 			//! \brief	
 			//! \note	
 			virtual void execute()=0;
 
 			//! \brief	线程启动
-			void start();
+			bool start();
 			//! \brief	线程关闭。
 			void stop();
 			//! \brief	等待线程退出。

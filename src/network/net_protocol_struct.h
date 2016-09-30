@@ -11,6 +11,8 @@
 #ifndef _net_protocol_struct_H
 #define _net_protocol_struct_H
 
+#include "boost/shared_ptr.hpp"
+
 //! \breif	本协议完全由本人(zheng39562@163.com)胡编乱造，不排除后期参考其他协议修正。
 //! \note	协议头：协议头不可缺少。
 //				0-3 包大小。4 扩展标志位。5 数据结构类型。
@@ -38,9 +40,10 @@ namespace Network{
 	};
 
 	class ProtocolMsg;
-	typedef ProtocolMsg ProtocolMsgPtr;
+	typedef boost::shared_ptr<ProtocolMsg> ProtocolMsgPtr;
 	typedef size_t ProtocolSize;
-	extern const int PROTOCOL_SIZE_STR_LENGTH;
+	extern const int PROTOCOL_MSG_SIZE_BYTE;
+	extern const int PROTOCOL_HEAD_SIZE;
 
 	extern const int PROTOCOL_INDEX_DATA_SIZE;
 	extern const int PROTOCOL_INDEX_FLAG;

@@ -15,7 +15,6 @@
 #include "common_tool.h"
 
 using namespace std;
-using namespace Inside;
 using namespace Universal;
 
 //

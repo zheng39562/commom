@@ -86,9 +86,9 @@ namespace Universal{
 		if( jsValueTmp.isString() )
 			value = jsValueTmp.asString( );
 		else if( jsValueTmp.isUInt() || jsValueTmp.isInt() )
-			value = Inside::intToStr( jsValueTmp.asUInt() );
+			value = intToStr( jsValueTmp.asUInt() );
 		else if( jsValueTmp.isDouble() )
-			value = Inside::intToStr( (long)jsValueTmp.asDouble() );
+			value = intToStr( (long)jsValueTmp.asDouble() );
 		else
 			return value;
 		return value;
@@ -234,7 +234,7 @@ namespace Universal{
 				DEBUG_D( "%s: Key is not a number. Key name is %s.", _JSONTOOL_FUNC_, key.c_str() );
 				return NULL;
 			}
-			int index = Inside::strToInt( key);
+			int index = strToInt( key);
 			if(  index >= jsValue_p->size() ) return NULL;
 			return &( *jsValue_p)[index];
 		}

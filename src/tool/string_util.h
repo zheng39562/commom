@@ -28,7 +28,7 @@ namespace Universal{
 	std::string doubleToStr( const double &number );
 
 	//! \brief	
-	//long strToInt( const string &number );
+	long strToInt( const string &number );
 	//! \brief	
 	double strToDouble( const string &number );
 

@@ -18,6 +18,7 @@
 #include "network/net_collection.h"
 #include "network/net_protocol_struct.h"
 #include "tool/single_mode.hpp"
+#include "tool/lock_queue.hpp"
 
 namespace Network{
 	//! \brief	数据包。
@@ -32,13 +33,13 @@ namespace Network{
 			Packer& operator=(const Packer &ref);
 			~Packer();
 		public:
-			inline const ConnectKey& getConnectKey()const{ return m_ConnectKey; }
+			inline ConnectKey getConnectKey()const{ return m_ConnectKey; }
 			inline const eProtocolDataFormat& getDataFormat()const{ return m_DataFormat; }
 
 			//! \brief	解析函数。
 			bool parseMsg(const std::string &msg, const eProtocolDataFormat &dataFormat);
 			//! \brief	获取数据函数。
-			string getPackerStr();
+			string getPackerStr()const;
 
 			inline string getString(const Name &name)const;
 			inline int getInt(const Name &name)const;
@@ -60,7 +61,7 @@ namespace Network{
 			//! \brief	获取当前路径
 			string curPath();
 			inline void getItemNames(vector<Name> &names);
-			inline void getNames(vector<Name> &names);
+			inline void getCollectionNames(vector<Name> &names);
 		private:
 			bool isAbsolutePath(const Path &path);
 			bool parsePath(const Path &path, vector<Name> names);
@@ -72,7 +73,7 @@ namespace Network{
 	typedef boost::shared_ptr<Packer> PackerPtr;
 	typedef boost::shared_ptr<const Packer> ConstPackerPtr;
 
-	typedef Universal::LockQueue<MsgPtr> MPackerPtrQueue;
+	typedef Universal::LockQueue<PackerPtr> MPackerPtrQueue;
 	typedef MPackerPtrQueue PackerCache;
 }
 #endif 
