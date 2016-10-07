@@ -37,7 +37,7 @@ namespace Universal{
 		 line( _line ),
 		 funcname( _funcname )
 	{ 
-//		DEBUG_E("%s: %s", funcname.c_str(), getMessage().c_str() );
+		DEBUG_E(funcname << ": " << getMessage() );
 	}
 	LogException::LogException( const string &_message, ExceptionLevel _exceptionLv, string _file, int _line, string _funcname )
 		:Exception( _message ),
@@ -46,7 +46,7 @@ namespace Universal{
 		 line( _line ),
 		 funcname( _funcname )
 	{ 
-//		DEBUG_E("%s: %s", funcname.c_str(), getMessage().c_str() );
+		DEBUG_E(funcname << ":" << getMessage() );
 	}
 	LogException::~LogException() throw() {;}
 

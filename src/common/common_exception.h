@@ -26,6 +26,7 @@ namespace Universal{
 		exceptionLv_error,
 		exceptionLv_critical
 	};
+	//! \brief	异常基类。
 	class Exception : public exception {
 		public:
 			Exception( const string &_message);
@@ -42,6 +43,7 @@ namespace Universal{
  * Exception
  */
 namespace Universal{
+	//! \brief	当认为有必要抛出异常时，使用该类会自动增加对应的日志，更容易定位对应的抛出点——当前，前提是程序没有异常崩溃。
 	class LogException : public Exception{
 		public:
 			LogException( ExceptionLevel _exceptionLv = exceptionLv_error,  
