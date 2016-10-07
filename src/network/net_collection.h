@@ -1,4 +1,5 @@
 /**********************************************************
+using namespace Network;
  *  \!file net_collection.h
  *  \!brief
  *  \!note	注意事项： 
@@ -11,7 +12,6 @@
 #ifndef _net_collection_H
 #define _net_collection_H
 
-#include <string>
 #include "network/net_define.h"
 #include "tool/json_tool.h"
 

@@ -11,7 +11,6 @@
 #ifndef _net_interface_H
 #define _net_interface_H
 
-#include <string>
 #include "network/net_packer.h"
 
 //! \brief	

@@ -10,8 +10,7 @@
 **********************************************************/
 #include "net_interface.h"
 
-#include "network/net_client.h"
-#include "network/net_server.h"
+#include "network/net_connection.h"
 
 using namespace Network;
 

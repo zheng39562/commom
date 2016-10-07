@@ -8,4 +8,4 @@
  * \!version 
  * * \!author zheng39562@163.com
 **********************************************************/
-#include "net_msg_struct.h"
+#include "net_msg.h"

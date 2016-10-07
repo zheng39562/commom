@@ -13,7 +13,7 @@
 
 #define NET_ERROR_NO -1
 
-#include <string>
+#include "common_define.h"
 
 namespace Network{
 	typedef std::string Name;

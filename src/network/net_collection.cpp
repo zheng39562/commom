@@ -10,9 +10,7 @@
 **********************************************************/
 #include "net_collection.h"
 
-#include <assert.h>
 #include "tool/string_util.h"
-#include "tool/json_tool.h"
 
 namespace Network{
 	#define CONVERT_JSON_QUOTED(content) doubleQuotedStr(strToJsonStr(content));
@@ -254,7 +252,10 @@ namespace Network{
 				if(!jsCollection.empty()){
 					jsCollection += ",";
 				}
-				assert(citerCollection->second != NULL);
+				if(citerCollection->second == NULL){
+					DEBUG_E("collection结构异常，存在为NULL的子节点。请检查相关操作是否正确。");
+					return "";
+				}
 				jsCollection += toJson(*(citerCollection->second));
 			}
 

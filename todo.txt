@@ -1,20 +1,29 @@
-任务安排：
+# 任务安排：
+## 序列1 end time : 7.15
 	*	network文件名称和类名统一修改。
-	*	编译，排错，测试。
-		1	测试网络的连通性。
-	
+	*	network测试。编写对应的测试用例，以保证后续更改可回归测试。
+	*	tool的公共函数拆分。
+	*	git submodule : commonlibrary.
+	*	makefile优化：具体设计未出。
+		*	参考公司tags
+
+## 序列2 end time : 7.22
+	*	穿插可以对freedom的一些设计文档做补全。
 	*	调整vim的功能应用:可直接应用于源码环境。
 		1	自动补全
 		2	查找功能
 		3	tab功能
 		4	查找上一个打开的文件（而不是缓存顺序）
-	*	git submodule : commonlibrary.
+
+## 序列3 end time : 7.29
+	*	freedom结构和框架。
 	*	数据库服务器：维持连接，暂不缓存。
-	*	makefile优化：具体设计未出。
-		*	参考公司tags
+
+# 不紧急任务
 	*	vim F4 UpdateTags 增加报错提醒。
 	*	(不紧急)tmux
 		1	配置保存（关机后）
 		2	专门的top页
 		3	window命名设置。
 		
+

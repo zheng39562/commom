@@ -16,7 +16,6 @@
 #include "boost/scoped_ptr.hpp"
 #include "boost/shared_ptr.hpp"
 #include "network/socket_simple.h"
-#include "network/net_transfer.h"
 #include "tool/string_util.h"
 #include "tool/single_mode.hpp"
 
@@ -34,7 +33,6 @@
 using namespace std;
 using namespace Universal;
 using namespace MyTest;
-using namespace Network;
 
 int main( int agrc, char **argv ){
 	/*

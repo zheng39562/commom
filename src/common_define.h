@@ -1,7 +1,10 @@
 /**********************************************************
  * \file logic/RptDefine.h
  * \brief 
- * \note 
+ * \note	公共define文件：只要是本人所有的项目都会包含该文件。
+ *				* 头文件
+ *				* 通用的变量（宏定义）。
+ * \note	
  * 
  * \version 
  * \author zheng39562@163.com
@@ -9,6 +12,13 @@
 #ifndef _Define_H
 #define _Define_H
 
+//! \note	string list map vector 常用的stl直接通过define包含。
+#include <string>
+#include <vector>
+#include <list>
+#include <map>
+
+//
 #include <sstream>
 #include "common_log.h"
 

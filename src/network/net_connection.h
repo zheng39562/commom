@@ -1,5 +1,5 @@
 /**********************************************************
- *  \!file net_transfer.h
+ *  \!file net_connection.h
  *  \!brief
  *  \!note	注意事项： 
  * 			1,类中的成员函数中的同名参数的含义完全相同。仅会注释其中一个函数，其他函数则不再重复注释。重名的参数意义不同时，会独立注解。 
@@ -8,16 +8,14 @@
  * \!version 
  * * \!author zheng39562@163.com
 **********************************************************/
-#ifndef _net_transfer_H
-#define _net_transfer_H
+#ifndef _net_connection_H
+#define _net_connection_H
 
-#include <string>
-#include <list>
 #include "event2/event.h"
 #include "boost/shared_ptr.hpp"
+#include "network/net_msg.h"
 #include "network/net_packer.h"
 #include "network/net_struct.h"
-#include "network/net_msg_struct.h"
 
 namespace Network{
 	extern const int READ_BUFFER_SIZE;
@@ -83,6 +81,44 @@ namespace Network{
 			PackerCache m_PackerCache;			//! 缓存类需要自身带锁。
 			std::map<ConnectKey, std::string> m_IncompleteMsg;
 	};
+
+	//! \brief	net端口监听和消息转发类：客户端版。
+	//! 
+	//! \attetion	注意不建议直接使用该类。使用下面typedef的Single类更加合适。
+	class NetClient : public NetTransfer{
+		public:
+			NetClient();
+			virtual ~NetClient();
+		public:
+			//! \brief	运行服务：连接服务器，并创建对应连接。
+			//! \note	集合 和 accpet 的功能
+			//! \note	建议单独开辟线程运行。
+			virtual bool run(const std::string &ip, const long &port);
+
+			void stop();
+		private:
+			int m_ConnectSocket;
+	};
+	typedef DesignMode::SingleMode<NetClient> SingleNetClient;
+
+	//! \brief	net端口监听和消息转发类：server版。
+	//! 
+	//! \attetion	注意不建议直接使用该类。使用下面typedef的Single类更加合适。
+	class NetServer : public NetTransfer, Universal::PThread{
+		public:
+			NetServer();
+			virtual ~NetServer();
+		public:
+			virtual void execute();
+			//! \brief	运行服务：监听端口，并创建对应连接。
+			//! \note	集合listen 和 accpet 的功能
+			//! \note	该函数使用轮询的方式反复找到链接，建议单独开辟线程运行。
+			virtual bool run(const std::string &ip, const long &port);
+		private:
+			bool m_IsRunning;
+			int m_ListenSocket;
+	};
+	typedef DesignMode::SingleMode<NetServer> SingleNetServer;
 }
 
 #endif 

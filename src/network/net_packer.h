@@ -11,12 +11,8 @@
 #ifndef _net_packer_H
 #define _net_packer_H
 
-#include <string>
-#include <list>
-#include <map>
 #include "network/net_struct.h"
 #include "network/net_collection.h"
-#include "network/net_protocol_struct.h"
 #include "tool/single_mode.hpp"
 #include "tool/lock_queue.hpp"
 
