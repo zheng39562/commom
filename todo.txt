@@ -1,6 +1,6 @@
 # 任务安排：
 ## 序列1 end time : 7.15
-	*	network文件名称和类名统一修改。
+	*	network日志信息添加。
 	*	network测试。编写对应的测试用例，以保证后续更改可回归测试。
 	*	tool的公共函数拆分。
 	*	git submodule : commonlibrary.

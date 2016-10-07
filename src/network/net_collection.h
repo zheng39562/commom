@@ -60,6 +60,7 @@ namespace Network{
 			//! \brief	子节点获取。
 			//! \note	不能在外界直接进行删除操作。
 			//! \note	任意修改都会直接影响到相关节点。
+			//! \retval	返回值为NULL，表示未找到对应子节点。
 			Collection* child(const Name &name);
 			const Collection* child(const Name &name)const;
 			//! \brief	

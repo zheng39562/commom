@@ -93,7 +93,7 @@ namespace Network{
 	int NetTransfer::addSocket(const int &socket, eSocketRWOpt socketRWOpt){
 		ConnectKey connectKey = bufferevent_socket_new(m_EventBase, socket, BEV_OPT_CLOSE_ON_FREE | BEV_OPT_THREADSAFE);
 		if(connectKey == NULL){
-			DEBUG_D("new bufferevent failed.");
+			DEBUG_E("new bufferevent failed.");
 		}
 
 		bufferevent_setcb(connectKey, NetTransfer::readBack, NetTransfer::writeBack, NetTransfer::errorBack, this);
@@ -104,26 +104,24 @@ namespace Network{
 
 	void NetTransfer::writeBack(ConnectKey connectKey, void *ctx){
 		NetTransfer* pTransfer = static_cast<NetTransfer*>(ctx);
-		DEBUG_D(" write ");
 		MsgPtr pMsg = pTransfer->popMsg(connectKey);
-		DEBUG_D(" write " << pMsg->m_Msg);
+		DEBUG_D("发送数据：" << pMsg->m_Msg);
 		bufferevent_write(connectKey, pMsg->m_Msg.c_str(), pMsg->m_Msg.size());
 	}
 	void NetTransfer::readBack(ConnectKey connectKey, void *ctx){
 		NetTransfer* pTransfer = static_cast<NetTransfer*>(ctx);
-		DEBUG_D(" readBack ");
 		evbuffer* output = bufferevent_get_input(connectKey);
 		memset(m_s_ReadBuf, '\0', sizeof(char)*READ_BUFFER_SIZE);
 		if( bufferevent_read(connectKey, m_s_ReadBuf, READ_BUFFER_SIZE) > 0 ){
+			DEBUG_D("接受数据：" << m_s_ReadBuf);
 			pTransfer->pushMsg(MsgPtr(new Msg(connectKey, m_s_ReadBuf)));
 		}
 	}
 	void NetTransfer::errorBack(ConnectKey connectKey, short events, void *ctx){
+		DEBUG_E("连接异常");
 		NetTransfer* pTransfer = static_cast<NetTransfer*>(ctx);
-		DEBUG_D(" error back ");
 		bufferevent_free(connectKey);
 		pTransfer->unregisterConnect(connectKey);
-		DEBUG_D(" connectKey addr : " << connectKey);
 	}
 
 

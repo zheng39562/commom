@@ -53,6 +53,7 @@ namespace Network{
 		if(m_Items.find(name) != m_Items.end()){
 			return m_Items.find(name)->second;
 		}
+		DEBUG_D("没有找到对应的name。");
 		return "";
 	}
 
@@ -65,7 +66,8 @@ namespace Network{
 	}
 
 	bool Collection::addCollection(const Name &name){
-		if(!collectionExist(name)){
+		if(collectionExist(name)){
+			DEBUG_D("该集合名已存在。添加集合失败。");
 			return false;
 		}
 
@@ -74,9 +76,11 @@ namespace Network{
 	}
 	bool Collection::addCollection(Collection *pCollection){
 		if(pCollection == NULL){
+			DEBUG_E("不允许添加未创建的集合指针(指针为NULL)。");
 			return false;
 		}
 		if(collectionExist(pCollection->getName())){
+			DEBUG_D("该集合名已存在。添加集合失败。");
 			return false;
 		}
 		if(pCollection->parent() == NULL){
@@ -91,7 +95,8 @@ namespace Network{
 	}
 
 	bool Collection::addItem(const Name &name, const CollectionItem &item){
-		if(!itemExist(name)){
+		if(itemExist(name)){
+			DEBUG_D("该名称已存在。添加节点失败。");
 			return false;
 		}
 
@@ -113,6 +118,11 @@ namespace Network{
 
 	bool Collection::updateItemName(const Name &oldName, const Name &newName){
 		if(!itemExist(oldName)){
+			DEBUG_D("节点" << oldName << "不存在。修改节点名失败。");
+			return false;
+		}
+		if(itemExist(newName)){
+			DEBUG_D("节点" << newName << "已存在。不能将节点" << oldName << " 修改为节点" << newName);
 			return false;
 		}
 
@@ -122,7 +132,12 @@ namespace Network{
 	}
 
 	bool Collection::updateCollectionName(const Name &oldName, const Name &newName){
-		if(!collectionExist(newName)){ 
+		if(!collectionExist(oldName)){ 
+			DEBUG_D("集合" << oldName << "不存在。修改集合名失败。");
+			return false;
+		}
+		if(collectionExist(newName)){ 
+			DEBUG_D("集合" << newName << "已存在。不能将集合" << oldName << " 修改为集合" << newName);
 			return false;
 		}
 
@@ -151,7 +166,7 @@ namespace Network{
 	bool Collection::moveChild(const Name &name, Collection *pNewParent){
 		Collection* pChild = this->child(name);
 		if(pChild == NULL){
-			//DBEUG_D("找不到对应的集合[" << name << "]。");
+			DEBUG_D("找不到对应的集合[" << name << "]。");
 			return false;
 		}
 
