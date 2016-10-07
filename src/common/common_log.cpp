@@ -44,11 +44,27 @@ namespace Universal{
 		m_MCache.lock();
 		m_Cache << "[" << time << "]"
 			<< "[" << pthread_self() << "]"
-			<< "[" << level << "]"
+			<< "[" << getLevelString(level) << "]"
 			<< "[" << funcName << "]"
 			<< "[" << line << "]"
 			<< " : " << msg << "\n";
 		m_MCache.unlock();
+	}
+
+	string LogServer::getLevelString(const eLogLevel &level){
+		switch(){
+			case eLogLevel_Debug:
+				return "调试";
+			case eLogLevel_Info:
+				return "消息";
+			case eLogLevel_Warning:
+				return "警告";
+			case eLogLevel_Error:
+				return "错误";
+			case eLogLevel_Crash:
+				return "异常";
+		}
+		return "未知";
 	}
 
 	void LogServer::execute(){

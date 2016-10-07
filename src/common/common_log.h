@@ -35,6 +35,7 @@ namespace Universal{
 			void writeLog(const std::string &time, const eLogLevel &level, const std::string &funcName, const long &line, const std::string &msg);
 		protected:
 			virtual void execute();
+			string getLevelString(const eLogLevel &level);
 		private:
 			std::string m_Path;
 			std::string m_FileName;
