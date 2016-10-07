@@ -19,41 +19,6 @@
  * template function
  */
 namespace Universal{
-	//! \brief	封装map的find函数，避免溢出。
-	//! \note	直接返回数据的重载函数 : 需要 T2 有默认构造函数。
-	//! \todo	未考虑右值引用。(大部分的函数都未考虑右值引用。)
-	template < typename T1, typename T2 >
-		bool mapFind( const std::map<T1, T2> &mapVar, const T1 &key, T2 &value ){
-			if( mapVar.find(key) != mapVar.end() ){
-				value = mapVar.find(key)->second;
-				return true;
-			}
-			return false;
-		}
-	template < typename T1, typename T2 >
-		T2 mapFind( const std::map<T1, T2> &mapVar, const T1 &key ){
-			T2 value;
-			mapFind( mapVar, key, value );
-			return value;
-		}
-
-	//! \brief	封装vector的at/[]函数。避免索引超出数据上限。
-	//! \note	直接返回数据的重载函数 : 需要 T 有默认构造函数。
-	template < typename T >
-		bool vectorAt( const std::vector<T> &vecVar, const long &index, T &data ){
-			if( vecVar.size() > index ){
-				data = vecVar.at(index);
-				return true;
-			}
-			return false;
-		}
-	template < typename T >
-		T vectorAt( const std::vector<T> &vecVar, const long &index ){
-			T data;
-			vectorAt( vecVar, index, data );
-			return data;
-		}
-
 } // namespace Universal{
 
 
