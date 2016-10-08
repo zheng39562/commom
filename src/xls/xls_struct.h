@@ -19,9 +19,8 @@
 
 #include "libxls/xlsstruct.h"
 
-#include "common_tool.h"
 #include "common_define.h"
-#include "common_exception.h"
+#include "common/common_tool.h"
 
 using namespace std;
 

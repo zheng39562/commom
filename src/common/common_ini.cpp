@@ -10,9 +10,9 @@
 **********************************************************/
 #include "common_ini.h"
 
-#include "tool/common_tool.h"
-#include "tool/common_file.h"
-#include "tool/string_util.h"
+#include "common/common_tool.h"
+#include "common/common_file.h"
+#include "common/string_util.h"
 
 namespace Universal{
 	using namespace std;

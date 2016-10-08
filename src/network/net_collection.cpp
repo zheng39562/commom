@@ -10,7 +10,7 @@
 **********************************************************/
 #include "net_collection.h"
 
-#include "tool/string_util.h"
+#include "common/string_util.h"
 
 namespace Network{
 	#define CONVERT_JSON_QUOTED(content) doubleQuotedStr(strToJsonStr(content));

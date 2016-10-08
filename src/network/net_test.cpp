@@ -9,3 +9,8 @@
  * * \!author zheng39562@163.com
 **********************************************************/
 #include "net_test.h"
+
+#include "net_interface.h"
+
+using namespace Network;
+

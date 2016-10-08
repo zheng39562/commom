@@ -10,7 +10,7 @@
 **********************************************************/
 #include "net_packer.h"
 
-#include "tool/string_util.h"
+#include "common/string_util.h"
 
 namespace Network{
 	using namespace Universal;

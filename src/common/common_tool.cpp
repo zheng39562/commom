@@ -8,7 +8,7 @@
 **********************************************************/
 #include "common_tool.h"
 
-#include "string_util.h"
+#include "common/string_util.h"
 #include "boost/regex.hpp"
 
 using namespace boost;

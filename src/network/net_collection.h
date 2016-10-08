@@ -13,7 +13,7 @@ using namespace Network;
 #define _net_collection_H
 
 #include "network/net_define.h"
-#include "tool/json_tool.h"
+#include "common/json_tool.h"
 
 namespace Network{
 	typedef std::string CollectionItem;

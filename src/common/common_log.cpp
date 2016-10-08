@@ -13,8 +13,10 @@
 #include <unistd.h>
 #include <iostream>
 #include <fstream>
-#include "tool/common_file.h"
-#include "tool/common_tool.h"
+#include <sstream>
+#include "common_define.h"
+#include "common/common_file.h"
+#include "common/common_tool.h"
 
 std::ostringstream os31415926_tmp;
 
@@ -52,7 +54,7 @@ namespace Universal{
 	}
 
 	string LogServer::getLevelString(const eLogLevel &level){
-		switch(){
+		switch(level){
 			case eLogLevel_Debug:
 				return "调试";
 			case eLogLevel_Info:

@@ -11,11 +11,10 @@
 #ifndef _common_log_H
 #define _common_log_H
 
-#include <string>
-#include <sstream>
-#include "tool/single_mode.hpp"
-#include "tool/common_mutex.h"
-#include "tool/common_thread.h"
+#include "common_define.h"
+#include "template/single_mode.hpp"
+#include "common/common_mutex.h"
+#include "common/common_thread.h"
 
 extern std::ostringstream os31415926_tmp;
 namespace Universal{

@@ -11,10 +11,8 @@
 #ifndef _common_ini_H
 #define _common_ini_H
 
-#include <string>
-#include <map>
-#include <vector>
-#include "tool/single_mode.hpp"
+#include "common_define.h"
+#include "template/single_mode.hpp"
 
 namespace Universal{
 

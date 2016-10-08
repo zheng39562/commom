@@ -13,8 +13,8 @@
 
 #include "network/net_struct.h"
 #include "network/net_collection.h"
-#include "tool/single_mode.hpp"
-#include "tool/lock_queue.hpp"
+#include "template/single_mode.hpp"
+#include "template/lock_queue.hpp"
 
 namespace Network{
 	//! \brief	数据包。

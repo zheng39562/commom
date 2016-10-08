@@ -12,7 +12,7 @@
 #include <cctype>
 #include <algorithm>
 
-#include "common_tool.h"
+#include "common/common_tool.h"
 
 using namespace std;
 using namespace Universal;

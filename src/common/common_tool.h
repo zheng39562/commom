@@ -12,17 +12,13 @@
 #define _CommonTool_H
 
 #include <stdio.h>
-#include <string>
-#include <vector>
-#include <list>
-#include <map>
 #include <sys/time.h>
 #include <algorithm>
 
-#include "common_file.h"
+#include "common/common_file.h"
 #include "common_define.h"
-#include "string_util.h"
-#include "common_timer.h"
+#include "common/string_util.h"
+#include "common/common_timer.h"
 
 using namespace std;
 

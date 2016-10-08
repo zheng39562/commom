@@ -18,14 +18,14 @@ using namespace xls;
 // XlsReader
 //
 namespace Universal{
-	XlsReader::XlsReader()throw(LogException){ ; }
-	XlsReader::XlsReader( const string &_filePath)throw(LogException ){
+	XlsReader::XlsReader(){ ; }
+	XlsReader::XlsReader( const string &_filePath){
 		parseXls( _filePath );
 	}
 	XlsReader::~XlsReader( ){ ; }
 
 
-	void XlsReader::parseXls( const string &filePath )throw(LogException ){
+	void XlsReader::parseXls( const string &filePath ){
 		m_SheetArray.clear();
 
 		xlsWorkBook *p_Wb;
@@ -34,7 +34,6 @@ namespace Universal{
 		p_Wb = xls_open( filePath.c_str(), "UTF-8" );
 		if(  p_Wb == NULL ){
 			DEBUG_I("parse failed [ " << filePath << "] ");
-			throw LogException( "parse failed : " + filePath );
 		}
 
 		for(  int indexOfSheet = 0; indexOfSheet < p_Wb->sheets.count; ++indexOfSheet ){
@@ -50,11 +49,15 @@ namespace Universal{
 	}
 
 
-	XlsSheet& XlsReader::getSheet( const long &indexOfSheet )throw(LogException ) {
-		if(  m_SheetArray.empty() )
-			throw LogException( string("this xls is empty."), exceptionLv_info );
-		if(  indexOfSheet >= m_SheetArray.size() )
-			throw LogException( string("Array bounds (check indexOfSheet)."), exceptionLv_error );
+	XlsSheet& XlsReader::getSheet( const long &indexOfSheet ){
+		if(  m_SheetArray.empty() ){
+			DEBUG_C("this xls is empty.");
+			throw;
+		}
+		if(  indexOfSheet >= m_SheetArray.size() ){
+			DEBUG_C("Array bounds (check indexOfSheet).");
+			throw;
+		}
 
 		return m_SheetArray[indexOfSheet ];
 	}

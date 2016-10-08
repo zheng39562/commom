@@ -17,9 +17,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <errno.h>
-#include "event2/buffer.h"
-#include "event2/bufferevent.h"
-#include "tool/single_mode.hpp"
+#include "template/single_mode.hpp"
 #include "network/net_protocol.h"
 
 using namespace std;

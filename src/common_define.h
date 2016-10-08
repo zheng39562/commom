@@ -18,9 +18,11 @@
 #include <list>
 #include <map>
 
+using namespace std;
+
 //
 #include <sstream>
-#include "common_log.h"
+#include "common/common_log.h"
 
 /*
  * Debug information and operator.

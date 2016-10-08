@@ -11,7 +11,7 @@
 #ifndef _SingleMode_H
 #define _SingleMode_H
 
-#include "common_mutex.h"
+#include "common/common_mutex.h"
 #include "boost/shared_ptr.hpp"
 
 namespace DesignMode{

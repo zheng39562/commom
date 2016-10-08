@@ -11,13 +11,12 @@
 #ifndef _XlsWriter_H
 #define _XlsWriter_H
 
-#include "xlslib/xlslib.h"
+#include "xlslib.h"
 
 #include "common_define.h"
-#include "common_file.h"
-#include "common_tool.h"
-#include "common_exception.h"
-#include "xls_struct.h"
+#include "common/common_file.h"
+#include "common/common_tool.h"
+#include "xls/xls_struct.h"
 
 using namespace std;
 using namespace xlslib_core;

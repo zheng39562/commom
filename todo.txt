@@ -1,10 +1,11 @@
 # 任务安排：
 ## 序列1 end time : 7.15
-	*	makefile优化：具体设计未出。
+	*	makefile优化：具体设计未出。(submodule要一起考虑)
 		*	参考公司tags
+		*	git submodule : commonlibrary.
+			*	在submodule中保存.a 还是相关源码？
 	*	network测试。编写对应的测试用例，以保证后续更改可回归测试。
 	*	tool的公共函数拆分。
-	*	git submodule : commonlibrary.
 
 ## 序列2 end time : 7.22
 	*	穿插可以对freedom的一些设计文档做补全。

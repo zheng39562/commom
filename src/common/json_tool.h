@@ -14,8 +14,8 @@
 
 #include "common_define.h"
 #include "json/json.h"
-#include "common_tool.h"
-#include "common_file.h"
+#include "common/common_tool.h"
+#include "common/common_file.h"
 
 #include <algorithm>
 using namespace std;

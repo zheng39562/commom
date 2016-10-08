@@ -14,8 +14,7 @@
 #include "libxls/xlsstruct.h"
 
 #include "common_define.h"
-#include "common_exception.h"
-#include "xls_struct.h"
+#include "xls/xls_struct.h"
 
 using namespace std;
 
@@ -31,17 +30,17 @@ namespace Universal{
 	//! \todo	增加迭代器来访问sheet。
 	class XlsReader{
 		public:
-			XlsReader()throw(LogException);
-			XlsReader( const string &_filePath )throw(LogException);
+			XlsReader();
+			XlsReader( const string &_filePath );
 			~XlsReader();
 		private:
 			XlsBookStruct						m_SheetArray;
 		private:
 			//! \brief	解析xlsWorkBook。
-			void parseXls( const string &filePath )throw(LogException );
+			void parseXls( const string &filePath );
 		public:
 			//! \brief	获取具体页。
-			XlsSheet& getSheet( const long &indexOfSheet )throw(LogException );
+			XlsSheet& getSheet( const long &indexOfSheet );
 			//! \brief	获取整个XLS。
 			XlsBookStruct& getXlsBook( );
 			//! \brief	获得页数。

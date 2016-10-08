@@ -11,7 +11,7 @@
 #ifndef _net_connection_H
 #define _net_connection_H
 
-#include "event2/event.h"
+#include "event.h"
 #include "boost/shared_ptr.hpp"
 #include "network/net_msg.h"
 #include "network/net_packer.h"

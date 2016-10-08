@@ -1,65 +1,22 @@
 # software name.
 MAIN_NAME=main
 SOFTWARE_NAME=Main_64
-
-# third part path
-THIRDPART_PATH=../commonlibrary
-# mysql ( mysql connection )
-MYSQL_INCLUDE=-I${THIRDPART_PATH}/include/mysqlcppconn
-# xlslib ( xls writer )
-XLSLIB_INCLUDE=-I${THIRDPART_PATH}/include/xlslib
-# libxls ( xls reader )
-LIBXLS_INCLUDE=-I${THIRDPART_PATH}/include/libxls
-# json ( json cpp )   json 不能直接使用目录，会和库文件冲突
-JSON_INCLUDE=-I${THIRDPART_PATH}/include/
-# boost
-BOOST_INC=-I${THIRDPART_PATH}/include/boost
-# event
-# EVENT_INC=-I${THIRDPART_PATH}/include/libevent
-# thirdpart include 
-THIRDPART_INC=-I${THIRDPART_PATH}/include ${MYSQL_INCLUDE} ${XLSLIB_INCLUDE} ${LIBXLS_INCLUDE} ${JSON_INCLUDE} ${BOOST_INC} ${EVENT_INC}
-# project child path
-PROJECT_INC=-I./src \
-		    -I./src/common \
-		    -I./src/exception \
-		    -I./src/sql
-# all include path
+#
+THIRDPART_PATH=./library
+THIRDPART_INC=-I${THIRDPART_PATH}/include -I${THIRDPART_PATH}/libevent -I${THIRDPART_PATH}/mysql -I${THIRDPART_PATH}/xlsreader -I${THIRDPART_PATH}/xlswriter
+PROJECT_INC=-I./src
 LIB_INC=-I. ${PROJECT_INC} ${THIRDPART_INC} 
-
-
-# ljsoncpp
-JSON_LIB=-ljsoncpp
-# xlslib
-XLS_WRITER_LIB=-lxls
-# libxls
-XLS_READER_LIB=-lxlsreader
-# event
-EVENT_LIB=-levent
-# mysql connector ++ lib
-MYSQL_LIB=-lmysqlcppconn-static 
-#-lmysqlclient
-# boost regex
-BOOST_LIB=-lboost_regex
-THIRDPART_LIB=${JSON_LIB} ${XLS_WRITER_LIB} ${XLS_READER_LIB} ${EVENT_LIB} ${MYSQL_LIB} ${BOOST_LIB}
-
-LIB_LIB=-L/usr/lib -L/usr/local/lib -L/usr/lib64/mysql -L${THIRDPART_PATH}/lib64 -L${THIRDPART_PATH}/lib64/boost_lib ${THIRDPART_LIB} -luuid -pthread -lrt -ldl
-
-# my local test/debug
-# DEBUG宏等级定义：
-# DETAIL_DEBUG:
-# COMMON_DEBUG:
-# [project]_DEBUG:
-LOCALDEBUG=-D__COMMON -DCOMMON_DEBUG -D__LINUX
-
+#
+THIRDPART_LIB=-ljsoncpp -lxls -lxlsreader -levent -lmysqlcppconn-static -lboost_regex
+LIB_LIB=-L${THIRDPART_PATH}/lib64 -luuid -pthread -lrt -ldl ${THIRDPART_LIB}
+#
 CXX=g++
-CXXFLAG= -g -DDEBUG $(LOCALDEBUG) -O2
-#CXXFLAG= -std=c++11 -g -DDEBUG $(LOCALDEBUG) -O2
+MACRO=-DDEBUG -D__LINUX
+CXXFLAG= -g -std=c++11 $(MACRO) -O2
 LINK_NONEEDED=-Wl,--no-as-needed
 
-	#./$(PROJECT_PATH)/./src/sql/CSSqlOperator.o
 PROJECT_PATH=out
 PROJECT_OBJECTS= \
-	./$(PROJECT_PATH)/./src/exception/common_exception.o \
 	./$(PROJECT_PATH)/./src/sql/sql_operator.o \
 	./$(PROJECT_PATH)/./src/network/net_interface.o \
 	./$(PROJECT_PATH)/./src/network/net_collection.o \
@@ -70,16 +27,16 @@ PROJECT_OBJECTS= \
 	./$(PROJECT_PATH)/./src/network/net_struct.o \
 	./$(PROJECT_PATH)/./src/network/socket_simple.o \
 	./$(PROJECT_PATH)/./src/network/net_test.o \
-	./$(PROJECT_PATH)/./src/tool/common_file.o \
-	./$(PROJECT_PATH)/./src/tool/common_ini.o \
-	./$(PROJECT_PATH)/./src/tool/common_log.o \
-	./$(PROJECT_PATH)/./src/tool/common_mutex.o \
-	./$(PROJECT_PATH)/./src/tool/common_thread.o \
-	./$(PROJECT_PATH)/./src/tool/common_timer.o \
-	./$(PROJECT_PATH)/./src/tool/common_tool.o \
-	./$(PROJECT_PATH)/./src/tool/file_transmission.o \
-	./$(PROJECT_PATH)/./src/tool/json_tool.o \
-	./$(PROJECT_PATH)/./src/tool/string_util.o \
+	./$(PROJECT_PATH)/./src/common/common_file.o \
+	./$(PROJECT_PATH)/./src/common/common_ini.o \
+	./$(PROJECT_PATH)/./src/common/common_log.o \
+	./$(PROJECT_PATH)/./src/common/common_mutex.o \
+	./$(PROJECT_PATH)/./src/common/common_thread.o \
+	./$(PROJECT_PATH)/./src/common/common_timer.o \
+	./$(PROJECT_PATH)/./src/common/common_tool.o \
+	./$(PROJECT_PATH)/./src/common/file_transmission.o \
+	./$(PROJECT_PATH)/./src/common/json_tool.o \
+	./$(PROJECT_PATH)/./src/common/string_util.o \
 	./$(PROJECT_PATH)/./src/xls/xls_reader.o \
 	./$(PROJECT_PATH)/./src/xls/xls_struct.o \
 	./$(PROJECT_PATH)/./src/xls/xls_writer.o \
@@ -92,21 +49,9 @@ PROJECT_OBJECTS= \
 all : ${PROJECT_OBJECTS}
 	$(CXX) $(CXXFLAG) -o ${SOFTWARE_NAME} ${PROJECT_OBJECTS} ${LIB_LIB} ${LINK_NONEEDED}
 
-# install software
-RELEASE_PATH=build
+.PHONY: clean tags install
+# 安装是指生成静态链接文件。
 install :
-
-restart :
-
-# tar (gz)
-tar :
-
-# common 
-	
-.PHONY: clean cleanall tags
-cleanall :
-	rm -rf ./out/
-	rm -f ${SOFTWARE_NAME}
 clean :
 	rm -rf ./out/
 	rm -f ${SOFTWARE_NAME}

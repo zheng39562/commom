@@ -14,7 +14,7 @@
 #include "network/net_define.h"
 #include "boost/shared_ptr.hpp"
 #include "event2/bufferevent.h"
-#include "tool/single_mode.hpp"
+#include "template/single_mode.hpp"
 
 //! \brief	未分类的通用结构。
 namespace Network{

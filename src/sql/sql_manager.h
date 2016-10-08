@@ -13,7 +13,7 @@
 
 #include "boost/shared_ptr.hpp"
 
-#include "sql_operator.h"
+#include "sql/sql_operator.h"
 
 namespace Sql{
 	typedef vector< boost::shared_ptr<SqlOperator> > SqlOprtPool;

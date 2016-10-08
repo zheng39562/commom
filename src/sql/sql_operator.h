@@ -11,15 +11,11 @@
 #ifndef _SqlOperator_H
 #define _SqlOperator_H
 
-#include <vector>
-#include <map>
-#include <string>
 #include "mysql_driver.h"
 #include "mysql_connection.h"
 #include "boost/shared_ptr.hpp"
 
 #include "common_define.h"
-#include "common_exception.h"
 
 namespace Universal{
 
@@ -45,10 +41,10 @@ namespace Universal{
 	//! \todo	优先mysql。后续会增加其他数据库标准操作。
 	class SqlOperator{
 		public:
-			SqlOperator( const string &_host, const int &_port, const string &_user, const string &_pwd, const string &_dbName ) throw(Exception) ;
-			SqlOperator( const string &_host, const int &_port, const string &_user, const string &_pwd, const string &_dbName, const int &_timeout ) throw(Exception) ;
+			SqlOperator( const string &_host, const int &_port, const string &_user, const string &_pwd, const string &_dbName );
+			SqlOperator( const string &_host, const int &_port, const string &_user, const string &_pwd, const string &_dbName, const int &_timeout );
 			SqlOperator( const string &_host, const int &_port, const string &_user, const string &_pwd, const string &_dbName, 
-					const int &_readTimeout, const int &_writeTimeout ) throw(Exception) ;
+					const int &_readTimeout, const int &_writeTimeout );
 			~SqlOperator();
 		private:
 			boost::shared_ptr<sql::Connection>			m_p_Connection;		//! 
@@ -56,16 +52,16 @@ namespace Universal{
 		public:
 			//! \brief	设置数据库链接。
 			bool setConnection( const string &host, const int &port, const string &user, const string &pwd, const string &dbName, 
-				const int &_readTimeout, const int &_writeTimeout  ) throw(Exception);
+				const int &_readTimeout, const int &_writeTimeout  );
 
 			//! \brief	sql条件转换函数。
-			SQLWhere convertCond( const map<string, string> &sqlWhere ) throw(Exception) ;
+			SQLWhere convertCond( const map<string, string> &sqlWhere );
 
 			//! \brief	执行SQL语句：可跨库查询。
 			//! \note	不限制跨库语句。但需要当前用户拥有对应权限。
-			bool execSQL( const string &sqlCmd ) throw(Exception) ;
+			bool execSQL( const string &sqlCmd );
 			//! \param[in] datas 仅对拥有返回值的select语句有效。其他复合语句返回空。
-			bool execQuery( const string &sqlCmd, TableDatas &datas ) throw(Exception) ;
+			bool execQuery( const string &sqlCmd, TableDatas &datas );
 	};
 } //  namespace Universal{
 

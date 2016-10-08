@@ -8,7 +8,7 @@
 **********************************************************/
 #include "json_tool.h"
 
-#include "common_tool.h"
+#include "common/common_tool.h"
 
 namespace Universal{
 #define _JSONTOOL_FUNC_								_COMMON_FUNC_( "JsonTool")

@@ -10,9 +10,6 @@
 #ifndef _StrUtil_H
 #define _StrUtil_H
 
-#include <string>
-#include <vector>
-#include <list>
 #include "common_define.h"
 
 //

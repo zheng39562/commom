@@ -14,8 +14,8 @@
 #include "network/net_define.h"
 #include "boost/shared_ptr.hpp"
 #include "event2/bufferevent.h"
-#include "tool/single_mode.hpp"
-#include "tool/lock_queue.hpp"
+#include "template/single_mode.hpp"
+#include "template/lock_queue.hpp"
 #include "network/net_struct.h"
 
 namespace Network{
