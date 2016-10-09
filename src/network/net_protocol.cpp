@@ -20,8 +20,8 @@ namespace Network{
 		if( size != NET_ERROR_NO && size <= msg.size()){
 			pProtocolMsg = ProtocolMsgPtr(new ProtocolMsg());
 			pProtocolMsg->size = size;
-			pProtocolMsg->flags = msg[PROTOCOL_INDEX_FLAG];
-			pProtocolMsg->dataFormat = (eProtocolDataFormat)msg[PROTOCOL_INDEX_DATA_FORMAT];
+			pProtocolMsg->flags = msg[PROTOCOL_INDEX_EXPAND] & PROTOCOL_EXPAND_FILTER_OTHER;
+			pProtocolMsg->dataFormat = (eProtocolDataFormat)(msg[PROTOCOL_INDEX_DATA_FORMAT] & PROTOCOL_EXPAND_FILTER_FORMAT);
 			pProtocolMsg->msg = msg.substr(PROTOCOL_INDEX_MSG, size - PROTOCOL_INDEX_MSG + 1);
 			msg = msg.substr(PROTOCOL_INDEX_MSG + 1);
 		}
@@ -33,9 +33,9 @@ namespace Network{
 		if(!pProtocolMsg->msg.empty()){
 			pProtocolMsg->size = PROTOCOL_HEAD_SIZE + pProtocolMsg->msg.size();
 
+			char expand = pProtocolMsg->flags + (char)pProtocolMsg->dataFormat;
 			msg += SizeToStr(pProtocolMsg->size);
-			msg += (char)(pProtocolMsg->flags);
-			msg += (char)(pProtocolMsg->dataFormat);
+			msg += expand;
 			msg += pProtocolMsg->msg;
 		}
 		return msg;
@@ -66,24 +66,20 @@ namespace Network{
 
 	void convertMsgToPacker(const ConnectKey &key, std::string &msg, MPackerPtrQueue &packerPtrQueue){
 		ProtocolMsgPtr pProtocolMsg = ProtocolMsg::getProtocolMsg(msg);
-		if(pProtocolMsg != NULL){
-			PackerPtr pPacker(new Packer(key));
-			pPacker->parseMsg(pProtocolMsg->msg, pProtocolMsg->dataFormat);
+		while(pProtocolMsg != NULL){
+			PackerPtr pPacker(new Packer(key, pProtocolMsg->dataFormat));
+			pPacker->setBuffer(pProtocolMsg->msg.c_str(), pProtocolMsg->msg.size());
+			packerPtrQueue->push(pPacker);
 
 			ProtocolMsgPtr pProtocolMsg = ProtocolMsg::getProtocolMsg(msg);
 		}
 	}
 
-	void convertPackerToMsg(const ConstPackerPtr &pPacker, MMsgPtrQueue &msgQueue){
+	void convertPackerToMsg(const ConstPackerPtr &pPacker, std::string &cache){
 		ProtocolMsgPtr pProtocolMsg(new ProtocolMsg());
 		pProtocolMsg->flags = '\0';
 		pProtocolMsg->dataFormat = pPacker->getDataFormat();
-		pProtocolMsg->msg = pPacker->getPackerStr();
-		string strMsg = ProtocolMsg::convertMsgToString(pProtocolMsg);
-	
-		while(!strMsg.empty()){
-			msgQueue.push(MsgPtr(new Msg(pPacker->getConnectKey(), strMsg.substr(0, WRITE_BUFFER_SIZE))));
-			strMsg.erase(0, WRITE_BUFFER_SIZE);
-		}
+		pProtocolMsg->msg(pPacker->getPackerStr();
+		cache += ProtocolMsg::convertMsgToString(pProtocolMsg);
 	}
 }

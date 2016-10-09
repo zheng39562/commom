@@ -13,7 +13,6 @@
 
 #include "event.h"
 #include "boost/shared_ptr.hpp"
-#include "network/net_msg.h"
 #include "network/net_packer.h"
 #include "network/net_struct.h"
 
@@ -25,6 +24,16 @@ namespace Network{
 		socketRWOpt_Read,
 		socketRWOpt_Write,
 		socketRWOpt_RW,
+	};
+	class MsgStruct{
+		public:
+			MsgStruct():isAlready(false),msg(){;}
+			~MsgStruct()=default;
+		public:
+			bool isAlready;
+			string msg;
+		public:
+			inline bool allowWrite(){ return isAlreay && !msg.emtpy(); } 
 	};
 	//! \brief	暂无更多设计，仅作为基类存在。
 	class Transfer{
@@ -45,20 +54,18 @@ namespace Network{
 	//! \todo	PS：可以用过在外连接好socket的方式来当作客户端使用。后期会在此类基础上做一个简易的客户端版本。
 	class NetTransfer : public Transfer {
 		public:
+			typedef map<ConnectKey, MsgStruct> MsgCache;
+		public:
 			NetTransfer();
 			virtual ~NetTransfer();
 		public:
 			virtual bool run(const std::string &ip, const long &port)=0;
-			//! \brief	注销连接。
-			//! \brief	写通道
-			bool emptyW(ConnectKey connectKey);
-			void pushPacker(const PackerPtr &pPacker);
-			MsgPtr popMsg(ConnectKey connectKey);
+			void sendPacker(const PackerPtr &pPacker);
 
-			//! \brief	读通道
-			bool emptyR();
-			void pushMsg(const MsgPtr &pMsg);
-			PackerPtr popPacker();
+			void recvMsg(const ConnectKey &connectKey, const char *pMsg);
+			PackerPtr recvPacker();
+
+			void enableWrite(const ConnectKey &connectKey);
 		protected:
 			int addSocket(const int &socket, eSocketRWOpt socketRWOpt = socketRWOpt_RW);
 		private:
@@ -73,13 +80,14 @@ namespace Network{
 			void registerConnect(const ConnectKey &connectKey);
 			void unregisterConnect(const ConnectKey &connectKey);
 		public:
-			static char* m_s_ReadBuf;
+			static void* m_s_ReadBuf;
 
 			event_base* m_EventBase;
 
-			MsgCache m_MsgCache;				//! 缓存类需要自身带锁。
+			PMutex m_MMsgCache;
+			MsgCache m_MsgCache;
 			PackerCache m_PackerCache;			//! 缓存类需要自身带锁。
-			std::map<ConnectKey, std::string> m_IncompleteMsg;
+			std::map<ConnectKey, std::string> m_IncompleteMsg; //!
 	};
 
 	//! \brief	net端口监听和消息转发类：客户端版。

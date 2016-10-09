@@ -53,8 +53,11 @@ namespace Universal{
 
 	template<typename T> T LockStack<T>::pop(){
 		m_Mutex.lock();
-		T dataTmp = m_Stack.top();
-		m_Stack.pop();
+		T dataTmp;
+		if(!m_Stack.empty()){
+			dateTmp = m_Stack.top();
+			m_Stack.pop();
+		}
 		m_Mutex.unlock();
 
 		return dateTmp;

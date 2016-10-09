@@ -19,11 +19,11 @@ bool net_connect(const string &ip, const long &port){
 }
 
 void net_send_C(const PackerPtr &pPacker){
-	SingleNetClient::getInstance()->pushPacker(pPacker);
+	SingleNetClient::getInstance()->sendPacker(pPacker);
 }
 
 bool net_recv_C(PackerPtr &pPacker){
-	pPacker = SingleNetClient::getInstance()->popPacker();
+	pPacker = SingleNetClient::getInstance()->recvPacker();
 	return pPacker != NULL;
 }
 
@@ -32,11 +32,11 @@ bool net_listen(const string &ip, const long &port){
 }
 
 void net_send_S(const PackerPtr &pPacker){
-	SingleNetClient::getInstance()->pushPacker(pPacker);
+	SingleNetClient::getInstance()->sendPacker(pPacker);
 }
 
 bool net_recv_S(PackerPtr &pPacker){
-	pPacker = SingleNetClient::getInstance()->popPacker();
+	pPacker = SingleNetClient::getInstance()->recvPacker();
 	return pPacker != NULL;
 }
 

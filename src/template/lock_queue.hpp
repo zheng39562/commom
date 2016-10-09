@@ -62,8 +62,11 @@ namespace Universal{
 
 	template < typename T > T LockQueue<T>::pop(){
 		m_Mutex.lock();
-		T dataTmp = m_Queue.front();
-		m_Queue.pop();
+		T dataTmp;
+		if(!m_Queue.empty()){
+			dataTmp = m_Queue.front();
+			m_Queue.pop();
+		}
 		m_Mutex.unlock();
 
 		return dataTmp;

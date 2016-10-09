@@ -29,7 +29,9 @@ namespace Network{
 	char* NetTransfer::m_s_ReadBuf = new char[READ_BUFFER_SIZE];
 
 	NetTransfer::NetTransfer()
-		:m_EventBase(NULL)
+		:m_EventBase(NULL),
+		 m_MMsgCache(),
+		 m_MsgCache()
 	{
 		m_EventBase = event_base_new();
 
@@ -41,51 +43,56 @@ namespace Network{
 		}
 	}
 
-	bool NetTransfer::emptyW(ConnectKey connectKey){
-		if(m_MsgCache.find(connectKey) != m_MsgCache.end()){
-			return m_MsgCache.find(connectKey)->second.empty();
-		}
-		return false;
-	}
-
-	void NetTransfer::pushPacker(const PackerPtr &pPacker){
+	void NetTransfer::sendPacker(const PackerPtr &pPacker){
 		ConnectKey connectKey = pPacker->getConnectKey();
-		if(m_MsgCache.find(connectKey) != m_MsgCache.end()){
-			convertPackerToMsg(pPacker, m_MsgCache.find(connectKey)->second);
+		m_MMsgCache.lock();
+		MsgCache::iterator iterMsgCache = m_MsgCache.find(connectKey); 
+		if(iterMsgCache != m_MsgCache.end()){
+			convertPackerToMsg(pPacker, iterMsgCache->second.msg);
+			if(iterMsgCache->second.allowWrite()){
+				bufferevent_write(connectKey, iterMsgCache->second.msg.substr(0, WRITE_BUFFER_SIZE).c_str(), WRITE_BUFFER_SIZE);
+				iterMsgCache->second.msg.erase(0, WRITE_BUFFER_SIZE);
+				iterMsgCache->second.isAlready = false;
+			}
 		}
 		else{
 			DEBUG_D("未注册该连接：连接查找不到。");
 		}
+		m_MMsgCache.unlock();
 	}
 
-	MsgPtr NetTransfer::popMsg(ConnectKey connectKey){
-		MsgPtr pMsg;
-		if(m_MsgCache.find(connectKey) != m_MsgCache.end()){
-			if(!m_MsgCache.find(connectKey)->second.empty()){
-				pMsg = m_MsgCache.find(connectKey)->second.pop();
-			}
-		}
-		return pMsg;
+	PackerPtr NetTransfer::recvPacker(){
+		return m_PackerCache.pop();
 	}
 
-	bool NetTransfer::emptyR(){ return m_PackerCache.empty(); }
-
-	void NetTransfer::pushMsg(const MsgPtr &pMsg){
-		ConnectKey connectKey = pMsg->m_ConnectKey;
+	void NetTransfer::recvMsg(const ConnectKey &connectKey, const char *pMsg){
 		if(m_IncompleteMsg.find(connectKey) == m_IncompleteMsg.end()){
-			m_IncompleteMsg.insert(pair<ConnectKey, std::string>(connectKey, std::string()));
+			m_IncompleteMsg.insert(pair<ConnectKey, std::string>(connectKey, std::string(pMsg)));
 		}
-		m_IncompleteMsg.find(connectKey)->second += pMsg->m_Msg;
+		else{
+			m_IncompleteMsg.find(connectKey)->second += string(pMsg);
+		}
 
 		convertMsgToPacker(connectKey, m_IncompleteMsg.find(connectKey)->second, m_PackerCache);
 	}
 
-	PackerPtr NetTransfer::popPacker(){
-		PackerPtr pPacker;
-		if(!emptyR()){
-			pPacker = m_PackerCache.pop();
+	void NetTransfer::enableWrite(const ConnectKey &connectKey){
+		m_MMsgCache.lock();
+		MsgCache::iterator iterMsgCache = m_MsgCache.find(connectKey); 
+		if(iterMsgCache != m_MsgCache.end() ){
+			if(iterMsgCache->second.allowWrite()){
+				bufferevent_write(connectKey, iterMsgCache->second.msg.substr(0, WRITE_BUFFER_SIZE).c_str(), WRITE_BUFFER_SIZE);
+				iterMsgCache->second.msg.erase(0, WRITE_BUFFER_SIZE);
+				iterMsgCache->second.isAlready = false;
+			}
+			else{
+				iterMsgCache->second.isAlready = true;
+			}
 		}
-		return pPacker;
+		else{
+			DEBUG_E("该连接未注册，请先注册");
+		}
+		m_MMsgCache.unlock();
 	}
 
 	int NetTransfer::addSocket(const int &socket, eSocketRWOpt socketRWOpt){
@@ -102,17 +109,15 @@ namespace Network{
 
 	void NetTransfer::writeBack(ConnectKey connectKey, void *ctx){
 		NetTransfer* pTransfer = static_cast<NetTransfer*>(ctx);
-		MsgPtr pMsg = pTransfer->popMsg(connectKey);
-		DEBUG_D("发送数据：" << pMsg->m_Msg);
-		bufferevent_write(connectKey, pMsg->m_Msg.c_str(), pMsg->m_Msg.size());
+		pTransfer->enableWrite(connectKey);
 	}
 	void NetTransfer::readBack(ConnectKey connectKey, void *ctx){
 		NetTransfer* pTransfer = static_cast<NetTransfer*>(ctx);
 		evbuffer* output = bufferevent_get_input(connectKey);
 		memset(m_s_ReadBuf, '\0', sizeof(char)*READ_BUFFER_SIZE);
-		if( bufferevent_read(connectKey, m_s_ReadBuf, READ_BUFFER_SIZE) > 0 ){
+		if(bufferevent_read(connectKey, m_s_ReadBuf, READ_BUFFER_SIZE) > 0){
 			DEBUG_D("接受数据：" << m_s_ReadBuf);
-			pTransfer->pushMsg(MsgPtr(new Msg(connectKey, m_s_ReadBuf)));
+			pTransfer->recvMsg(connectKey, m_s_ReadBuf);
 		}
 	}
 	void NetTransfer::errorBack(ConnectKey connectKey, short events, void *ctx){
@@ -124,14 +129,26 @@ namespace Network{
 
 
 	void NetTransfer::registerConnect(const ConnectKey &connectKey){
+		m_MMsgCache.lock();
 		if(m_MsgCache.find(connectKey) == m_MsgCache.end()){
 			m_MsgCache.insert(MsgCache::value_type(connectKey, MMsgPtrQueue()));
+		}
+		m_MMsgCache.unlock();
+
+		if(m_IncompleteMsg.find(connectKey) == m_IncompleteMsg.end()){
+			m_IncompleteMsg.insert(make_pair(connectKey, string()));
 		}
 	}
 
 	void NetTransfer::unregisterConnect(const ConnectKey &connectKey){
+		m_MMsgCache.lock();
 		if(m_MsgCache.find(connectKey) != m_MsgCache.end()){
 			m_MsgCache.erase(m_MsgCache.find(connectKey));
+		}
+		m_MMsgCache.unlock();
+
+		if(m_IncompleteMsg.find(connectKey) != m_IncompleteMsg.end()){
+			m_IncompleteMsg.erase(m_IncompleteMsg.find(connectKey));
 		}
 	}
 }
@@ -154,18 +171,18 @@ namespace Network{
 		}
 
 		struct sockaddr_in address;
-		bzero( &address, sizeof( address ) );
+		bzero(&address, sizeof(address));
 		address.sin_family = AF_INET;
-		inet_pton( AF_INET, ip.c_str(), &address.sin_addr );
-		address.sin_port = htons( port );
+		inet_pton(AF_INET, ip.c_str(), &address.sin_addr);
+		address.sin_port = htons(port);
 
-		int m_ConnectSocket = socket( PF_INET, SOCK_STREAM, 0 );
-		if( m_ConnectSocket < 0){
+		int m_ConnectSocket = socket(PF_INET, SOCK_STREAM, 0);
+		if(m_ConnectSocket < 0){
 			DEBUG_E("未生成正确的socker");
 			return false;
 		}
 
-		if( connect( m_ConnectSocket, (struct sockaddr * ) &address, sizeof( address ) ) == 0 ){
+		if(connect(m_ConnectSocket, (struct sockaddr *) &address, sizeof(address)) == 0){
 			addSocket(m_ConnectSocket);
 		}
 		else{
@@ -227,7 +244,7 @@ namespace Network{
 		address.sin_port = htons(port);
 
 		m_ListenSocket = socket(PF_INET, SOCK_STREAM, 0);
-		if( m_ListenSocket < 0){
+		if(m_ListenSocket < 0){
 			DEBUG_E("未生成正确的socker");
 			return false;
 		}

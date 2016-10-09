@@ -12,7 +12,6 @@
 #define _net_packer_H
 
 #include "network/net_struct.h"
-#include "network/net_collection.h"
 #include "template/single_mode.hpp"
 #include "template/lock_queue.hpp"
 
@@ -25,46 +24,23 @@ namespace Network{
 	class Packer{
 		public:
 			Packer(const ConnectKey &_key);
+			Packer(const ConnectKey &_key, const eProtocolDataFormat &_dataFormat);
 			Packer(const Packer &ref);
 			Packer& operator=(const Packer &ref);
-			~Packer();
+			virtual ~Packer();
 		public:
+			void setBuffer(const void *buffer, size_t size);
+
+			inline void* getBuffer(){ return m_Buffer; }
+			inline size_t getBufferSize()const{ return m_BufferSize; }
+
 			inline ConnectKey getConnectKey()const{ return m_ConnectKey; }
 			inline const eProtocolDataFormat& getDataFormat()const{ return m_DataFormat; }
-
-			//! \brief	解析函数。
-			bool parseMsg(const std::string &msg, const eProtocolDataFormat &dataFormat);
-			//! \brief	获取数据函数。
-			string getPackerStr()const;
-
-			inline string getString(const Name &name)const;
-			inline int getInt(const Name &name)const;
-			inline double getDouble(const Name &name)const;
-			inline bool getBoolean(const Name &name)const;
-			inline char getChar(const Name &name)const;
-			//! \brief	
-			inline bool addItem(const Name &name, const int &value);
-			inline bool addItem(const Name &name, const double &value);
-			inline bool addItem(const Name &name, const char &value);
-			inline bool addItem(const Name &name, const string &value);
-			inline bool addCollection(const Name &name);
-
-			//! \brief	设置当前路径。
-			//! \todo	修正函数名称，暂时没有更好的。
-			//! \note	可以是绝对路径，也可以是相对路径。路径规则与linux完全相同。
-			//!			例：/path1/path2 | ../path1 | ./path
-			bool toPath(const Network::Path &path);
-			//! \brief	获取当前路径
-			string curPath();
-			inline void getItemNames(vector<Name> &names);
-			inline void getCollectionNames(vector<Name> &names);
-		private:
-			bool isAbsolutePath(const Path &path);
-			bool parsePath(const Path &path, vector<Name> names);
 		private:
 			ConnectKey m_ConnectKey;
 			eProtocolDataFormat m_DataFormat;
-			Collection* m_pCollection;
+			void* m_Buffer;
+			size_t m_BufferSize;
 	};
 	typedef boost::shared_ptr<Packer> PackerPtr;
 	typedef boost::shared_ptr<const Packer> ConstPackerPtr;

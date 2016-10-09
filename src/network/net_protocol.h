@@ -12,7 +12,6 @@
 #define _net_protocol_H
 
 #include "network/net_define.h"
-#include "network/net_msg.h"
 #include "network/net_struct.h"
 #include "network/net_packer.h"
 
@@ -25,7 +24,7 @@ namespace Network{
 			ProtocolMsg()
 				:size(0),
 				 flags(0),
-				 dataFormat(eProtocolDataFormat_String),
+				 dataFormat(eProtocolDataFormat_Memory),
 				 msg()
 			{;}
 			~ProtocolMsg(){;}
@@ -39,7 +38,8 @@ namespace Network{
 			ProtocolSize size;
 			char flags;
 			eProtocolDataFormat dataFormat;
-			string msg;
+			void* m_Buffer;
+			size_t m_BufferSize;
 	};
 	//! \brief	将msg转换成packer
 	//! \param[in,out] msg 消息字符串，已完成的消息会被打包。剩余消息通过该参数返回。
@@ -47,8 +47,7 @@ namespace Network{
 	void convertMsgToPacker(const ConnectKey &key, std::string &msg, MPackerPtrQueue &packerPtrQueue);
 	//! \brief	将packer转换成msg
 	//! \todo	MD5验证
-	void convertPackerToMsg(const ConstPackerPtr &pPacker, MMsgPtrQueue &msgQueue);
-
+	void convertPackerToMsg(const ConstPackerPtr &pPacker, std::string &cache);
 }
 #endif 
 
