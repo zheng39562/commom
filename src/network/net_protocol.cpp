@@ -12,74 +12,50 @@
 
 #include "network/net_connection.h"
 
+using namespace Universal;
+
 namespace Network{
-	ProtocolMsgPtr ProtocolMsg::getProtocolMsg(string &msg){
-		ProtocolMsgPtr pProtocolMsg;
 
-		ProtocolSize size = StrToSize(msg);
-		if( size != NET_ERROR_NO && size <= msg.size()){
-			pProtocolMsg = ProtocolMsgPtr(new ProtocolMsg());
-			pProtocolMsg->size = size;
-			pProtocolMsg->flags = msg[PROTOCOL_INDEX_EXPAND] & PROTOCOL_EXPAND_FILTER_OTHER;
-			pProtocolMsg->dataFormat = (eProtocolDataFormat)(msg[PROTOCOL_INDEX_DATA_FORMAT] & PROTOCOL_EXPAND_FILTER_FORMAT);
-			pProtocolMsg->msg = msg.substr(PROTOCOL_INDEX_MSG, size - PROTOCOL_INDEX_MSG + 1);
-			msg = msg.substr(PROTOCOL_INDEX_MSG + 1);
-		}
-		return pProtocolMsg;
-
-	}
-	string ProtocolMsg::convertMsgToString(const ProtocolMsgPtr pProtocolMsg){
-		string msg("");
-		if(!pProtocolMsg->msg.empty()){
-			pProtocolMsg->size = PROTOCOL_HEAD_SIZE + pProtocolMsg->msg.size();
-
-			char expand = pProtocolMsg->flags + (char)pProtocolMsg->dataFormat;
-			msg += SizeToStr(pProtocolMsg->size);
-			msg += expand;
-			msg += pProtocolMsg->msg;
-		}
-		return msg;
-	}
-
-	ProtocolSize ProtocolMsg::StrToSize(const string &msg){
-		if(msg.size() >= PROTOCOL_MSG_SIZE_BYTE){
-			ProtocolSize size(0);
-			for(int i=0; i<PROTOCOL_MSG_SIZE_BYTE; ++i){
+	void convertMsgToPacker(const ConnectKey &key, BinaryMemory &cache, MPackerPtrQueue &packerPtrQueue){
+		char* pMsg = cache.getBuffer();
+		while(pMsg != NULL){
+			size_t size;
+			for(int i=PROTOCOL_INDEX_DATA_SIZE; i<PROTOCOL_MSG_SIZE_BYTE; ++i){
 				size = size << 8;
-				size += (ProtocolSize)msg[i];
+				size += (size_t)pMsg[i];
 			}
-		}
-		return NET_ERROR_NO;
-	}
-	string ProtocolMsg::SizeToStr(ProtocolSize size){
-		string msg;
-		for(int i=PROTOCOL_MSG_SIZE_BYTE-1; i>=0; --i){
-			msg[i] = size & 0xFF;
-			size = size >> 8;
-		}
-		return msg;
-	}
-}
 
+			if(size > cache.getBufferSize()){
+				// 当前数据包未完全被获取。
+				break;
+			}
 
-namespace Network{
+			char flags = pMsg[PROTOCOL_INDEX_EXPAND] & PROTOCOL_EXPAND_FILTER_OTHER;
+			eProtocolDataFormat dataFormat = (eProtocolDataFormat)(pMsg[PROTOCOL_INDEX_DATA_FORMAT] & PROTOCOL_EXPAND_FILTER_FORMAT);
 
-	void convertMsgToPacker(const ConnectKey &key, std::string &msg, MPackerPtrQueue &packerPtrQueue){
-		ProtocolMsgPtr pProtocolMsg = ProtocolMsg::getProtocolMsg(msg);
-		while(pProtocolMsg != NULL){
-			PackerPtr pPacker(new Packer(key, pProtocolMsg->dataFormat));
-			pPacker->setBuffer(pProtocolMsg->msg.c_str(), pProtocolMsg->msg.size());
+			PackerPtr pPacker(new Packer(key, dataFormat));
+			pPacker->setBuffer(pMsg, size - PROTOCOL_HEAD_SIZE);
 			packerPtrQueue->push(pPacker);
 
-			ProtocolMsgPtr pProtocolMsg = ProtocolMsg::getProtocolMsg(msg);
+			cache.delBuffer(0, size);
 		}
+
 	}
 
-	void convertPackerToMsg(const ConstPackerPtr &pPacker, std::string &cache){
-		ProtocolMsgPtr pProtocolMsg(new ProtocolMsg());
-		pProtocolMsg->flags = '\0';
-		pProtocolMsg->dataFormat = pPacker->getDataFormat();
-		pProtocolMsg->msg(pPacker->getPackerStr();
-		cache += ProtocolMsg::convertMsgToString(pProtocolMsg);
+	void convertPackerToMsg(const ConstPackerPtr &pPacker, BinaryMemory &buffer){
+		char* pHead = new char[PROTOCOL_HEAD_SIZE];
+
+		size_t size = pPacker->getBufferSize() + PROTOCOL_HEAD_SIZE;
+		for(int i=PROTOCOL_MSG_SIZE_BYTE-1; i>=PROTOCOL_INDEX_DATA_SIZE; i<; --i){
+			pHead[i] = size & 0xFF;
+			size = size >> 8;
+		}
+		//! flags还没有真正使用。暂时不需要添加。
+		pHead[PROTOCOL_INDEX_EXPAND] = pPacker->getDataFormat() & PROTOCOL_EXPAND_FILTER_FORMAT; 
+
+		buffer.addBuffer(pHead, PROTOCOL_HEAD_SIZE);
+		buffer.addBuffer(pPacker->getBuffer(), pPacker->getBufferSize());
+
+		delete pHead; pHead = NULL;
 	}
 }

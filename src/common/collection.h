@@ -12,10 +12,10 @@ using namespace Network;
 #ifndef _net_collection_H
 #define _net_collection_H
 
-#include "network/net_define.h"
+#include "common_define.h"
 #include "common/json_tool.h"
 
-namespace Network{
+namespace Universal{
 	typedef std::string CollectionItem;
 	//! \brief	集合类。
 	//! \note	类分为集合(collection)和项目(item).集合中能包含collection and item 

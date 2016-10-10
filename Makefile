@@ -23,7 +23,6 @@ PROJECT_PATH=out
 PROJECT_OBJECTS= \
 	./$(PROJECT_PATH)/./src/sql/sql_operator.o \
 	./$(PROJECT_PATH)/./src/network/net_interface.o \
-	./$(PROJECT_PATH)/./src/network/net_connection.o \
 	./$(PROJECT_PATH)/./src/network/net_packer.o \
 	./$(PROJECT_PATH)/./src/network/net_protocol.o \
 	./$(PROJECT_PATH)/./src/network/net_struct.o \
@@ -36,6 +35,7 @@ PROJECT_OBJECTS= \
 	./$(PROJECT_PATH)/./src/common/common_thread.o \
 	./$(PROJECT_PATH)/./src/common/common_timer.o \
 	./$(PROJECT_PATH)/./src/common/common_tool.o \
+	./$(PROJECT_PATH)/./src/common/connection.o \
 	./$(PROJECT_PATH)/./src/common/file_transmission.o \
 	./$(PROJECT_PATH)/./src/common/json_tool.o \
 	./$(PROJECT_PATH)/./src/common/string_util.o \

@@ -87,7 +87,7 @@ namespace Network{
 			PMutex m_MMsgCache;
 			MsgCache m_MsgCache;
 			PackerCache m_PackerCache;			//! 缓存类需要自身带锁。
-			std::map<ConnectKey, std::string> m_IncompleteMsg; //!
+			std::map<ConnectKey, BinaryMemory> m_IncompleteMsg; //!
 	};
 
 	//! \brief	net端口监听和消息转发类：客户端版。

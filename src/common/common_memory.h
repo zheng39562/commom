@@ -23,8 +23,14 @@ namespace Universal{
 		public:
 			BinaryMemory& operator+(BinaryMemory &ref);
 		public:
-			void setBuffer(const void *buffer, size_t size);
-			void addBuffer(const void *buffer, size_t size);
+			void addBuffer(const void* buffer, size_t size);
+			void setBuffer(const void* buffer, size_t size);
+			//! \brief	删除部分内容
+			//! \param[in] start 起始位置，如果大于当前最大尺寸则不删除任何内容。
+			//! \param[in] length 删除的字节数。如果超过当前保存内容，则只删除到末尾。
+			void delBuffer(size_t start, size_t length);
+			//! \brief	清空缓存，不释放内存。
+			void clearBuffer();
 
 			inline void* getBuffer(){ return m_Buffer; }
 			inline size_t getBufferSize()const{ return m_BufferSize; }

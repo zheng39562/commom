@@ -12,7 +12,7 @@
 
 #include "common/string_util.h"
 
-namespace Network{
+namespace Universal{
 	#define CONVERT_JSON_QUOTED(content) doubleQuotedStr(strToJsonStr(content));
 
 	using namespace std;

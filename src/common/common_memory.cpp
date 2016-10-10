@@ -66,6 +66,56 @@ namespace Universal{
 	}
 
 	void BinaryMemory::addBuffer(const void *buffer, size_t size){
+		if(m_Buffer){
+			if(m_CurBufferSize + size > m_MaxBufferSize){
+				void *pBufferTmp = (void*)char[m_CurBufferSize];
+				memcpy(pBufferTmp, m_Buffer, m_CurBufferSize);
+
+				m_MaxBufferSize = (size + m_CurBufferSize) * 2;
+
+				delete m_Buffer;
+				m_Buffer = (void*)new char[m_MaxBufferSize];
+				memset(m_Buffer, 0, m_MaxBufferSize);
+				memcpy(m_Buffer, pBufferTmp, m_CurBufferSize);
+			}
+		}
+		else{
+			m_CurBufferSize = 0;
+			m_MaxBufferSize = size;
+			m_Buffer = (void*)new char[m_MaxBufferSize];
+		}
+		void* pAddPos = (char*)m_Buffer + m_CurBufferSize;
+		memcpy(pAddPos, buffer, size);
+		m_CurBufferSize += size;
+	}
+
+	void BinaryMemory::delBuffer(size_t start, size_t length){
+		if(m_CurBufferSize > start){
+			length = length < (m_BufferSize - start) ? m_BufferSize - start : length;
+
+			char* pMoveBuffer(NULL);
+			size_t movePos = start + length;
+			size_t moveLength = m_CurBufferSize - movePos;
+
+			if(moveLength != 0){
+				pMoveBuffer = new char[moveLength];
+				memcpy(pMoveBuffer, (char*)m_Buffer + movePos, moveLength);
+			}
+
+			memset((char*)m_Buffer + start, 0, m_BufferSize - start);
+
+			if(pMoveBuffer != NULL){
+				memcpy((char*)m_Buffer + start, pMoveBuffer, moveLength);
+				delete pMoveBuffer; pMoveBuffer = NULL;
+			}
+			
+			m_CurBufferSize -= length;
+		}
+	}
+
+	void BinaryMemory::clearBuffer(){
+		m_CurBufferSize = 0;
+		memset(m_Buffer, 0, m_MaxBufferSize);
 	}
 
 }

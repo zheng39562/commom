@@ -38,15 +38,5 @@ namespace Network{
 			m_Buffer = NULL;
 		}
 	}
-
-	void Packer::setBuffer(const void *buffer, size_t size){
-		if(m_Buffer){
-			delete m_Buffer; 
-			m_Buffer = NULL;
-		}
-
-		m_Buffer = (void*) new char[size];
-		m_BufferSize = size;
-	}
 } // namespace Network{
 

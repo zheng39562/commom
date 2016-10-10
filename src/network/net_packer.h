@@ -11,6 +11,7 @@
 #ifndef _net_packer_H
 #define _net_packer_H
 
+#include "common/common_memory.h"
 #include "network/net_struct.h"
 #include "template/single_mode.hpp"
 #include "template/lock_queue.hpp"
@@ -29,18 +30,16 @@ namespace Network{
 			Packer& operator=(const Packer &ref);
 			virtual ~Packer();
 		public:
-			void setBuffer(const void *buffer, size_t size);
-
-			inline void* getBuffer(){ return m_Buffer; }
-			inline size_t getBufferSize()const{ return m_BufferSize; }
+			inline void setBuffer(const void *buffer, size_t size){ m_Buffer.setBuffer(); }
+			inline void* getBuffer(){ return m_Buffer.getBuffer(); }
+			inline size_t getBufferSize()const{ return m_Buffer.getBufferSize(); }
 
 			inline ConnectKey getConnectKey()const{ return m_ConnectKey; }
 			inline const eProtocolDataFormat& getDataFormat()const{ return m_DataFormat; }
 		private:
 			ConnectKey m_ConnectKey;
 			eProtocolDataFormat m_DataFormat;
-			void* m_Buffer;
-			size_t m_BufferSize;
+			Universal::BinaryMemory m_Buffer;
 	};
 	typedef boost::shared_ptr<Packer> PackerPtr;
 	typedef boost::shared_ptr<const Packer> ConstPackerPtr;

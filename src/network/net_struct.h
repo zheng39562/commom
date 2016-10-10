@@ -63,7 +63,6 @@ namespace Network{
 
 	class ProtocolMsg;
 	typedef boost::shared_ptr<ProtocolMsg> ProtocolMsgPtr;
-	typedef size_t ProtocolSize;
 
 	extern const int PROTOCOL_MSG_SIZE_BYTE;
 	extern const int PROTOCOL_HEAD_SIZE;
