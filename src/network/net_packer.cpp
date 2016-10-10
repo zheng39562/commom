@@ -14,12 +14,12 @@ namespace Network{
 	Packer::Packer(const ConnectKey &_key)
 		:m_ConnectKey(_key),
 		 m_DataFormat(eProtocolDataFormat_Memory),
-		 m_Buffer(NULL)
+		 m_Buffer()
 	{ ; }
 	Packer::Packer(const ConnectKey &_key, const eProtocolDataFormat &_dataFormat)
 		:m_ConnectKey(_key),
 		 m_DataFormat(_dataFormat),
-		 m_Buffer(NULL)
+		 m_Buffer()
 	{ ; }
 	Packer::Packer(const Packer &ref){
 		m_ConnectKey = ref.getConnectKey();
@@ -30,13 +30,8 @@ namespace Network{
 		m_ConnectKey = ref.getConnectKey();
 		m_DataFormat = ref.getDataFormat();
 		setBuffer(ref.getBuffer(), ref.getBufferSize());
-		return this;
+		return *this;
 	}
-	Packer::~Packer(){ 
-		if(m_Buffer){
-			delete m_Buffer; 
-			m_Buffer = NULL;
-		}
-	}
+	Packer::~Packer(){ ; }
 } // namespace Network{
 

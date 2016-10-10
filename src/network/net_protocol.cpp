@@ -17,7 +17,7 @@ using namespace Universal;
 namespace Network{
 
 	void convertMsgToPacker(const ConnectKey &key, BinaryMemory &cache, MPackerPtrQueue &packerPtrQueue){
-		char* pMsg = cache.getBuffer();
+		const char* pMsg = (char*)cache.getBuffer();
 		while(pMsg != NULL){
 			size_t size;
 			for(int i=PROTOCOL_INDEX_DATA_SIZE; i<PROTOCOL_MSG_SIZE_BYTE; ++i){
@@ -31,11 +31,11 @@ namespace Network{
 			}
 
 			char flags = pMsg[PROTOCOL_INDEX_EXPAND] & PROTOCOL_EXPAND_FILTER_OTHER;
-			eProtocolDataFormat dataFormat = (eProtocolDataFormat)(pMsg[PROTOCOL_INDEX_DATA_FORMAT] & PROTOCOL_EXPAND_FILTER_FORMAT);
+			eProtocolDataFormat dataFormat = (eProtocolDataFormat)(pMsg[PROTOCOL_INDEX_EXPAND] & PROTOCOL_EXPAND_FILTER_FORMAT);
 
 			PackerPtr pPacker(new Packer(key, dataFormat));
 			pPacker->setBuffer(pMsg, size - PROTOCOL_HEAD_SIZE);
-			packerPtrQueue->push(pPacker);
+			packerPtrQueue.push(pPacker);
 
 			cache.delBuffer(0, size);
 		}
@@ -46,7 +46,7 @@ namespace Network{
 		char* pHead = new char[PROTOCOL_HEAD_SIZE];
 
 		size_t size = pPacker->getBufferSize() + PROTOCOL_HEAD_SIZE;
-		for(int i=PROTOCOL_MSG_SIZE_BYTE-1; i>=PROTOCOL_INDEX_DATA_SIZE; i<; --i){
+		for(int i=PROTOCOL_MSG_SIZE_BYTE-1; i>=PROTOCOL_INDEX_DATA_SIZE; --i){
 			pHead[i] = size & 0xFF;
 			size = size >> 8;
 		}

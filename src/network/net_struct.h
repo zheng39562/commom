@@ -44,6 +44,7 @@ namespace Network{
 namespace Network{
 	//! \brief	扩展标志位
 	extern const char PROTOCOL_EXPAND_FILTER_OTHER;
+	extern const char PROTOCOL_EXPAND_FILTER_FORMAT;
 	extern const char PROTOCOL_EXPAND_DATA_VERIFY;
 	extern const char PROTOCOL_EXPAND_;
 

@@ -8,7 +8,7 @@
  * \!version 
  * * \!author zheng39562@163.com
 **********************************************************/
-#include "net_connection.h"
+#include "network/net_connection.h"
 
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -26,20 +26,24 @@ namespace Network{
 	const int READ_BUFFER_SIZE = 4000;
 	const int WRITE_BUFFER_SIZE = 4000;
 
-	char* NetTransfer::m_s_ReadBuf = new char[READ_BUFFER_SIZE];
-
 	NetTransfer::NetTransfer()
 		:m_EventBase(NULL),
 		 m_MMsgCache(),
-		 m_MsgCache()
+		 m_MsgCache(),
+		 m_pRecvBuffer(NULL)
 	{
 		m_EventBase = event_base_new();
+
+		m_pRecvBuffer = new char[READ_BUFFER_SIZE];
 
 		event_base_dispatch(m_EventBase);
 	}
 	NetTransfer::~NetTransfer(){
 		if(m_EventBase != NULL){
 			event_base_free(m_EventBase);
+		}
+		if(m_pRecvBuffer != NULL){
+			delete m_pRecvBuffer; m_pRecvBuffer = NULL;
 		}
 	}
 
@@ -48,10 +52,18 @@ namespace Network{
 		m_MMsgCache.lock();
 		MsgCache::iterator iterMsgCache = m_MsgCache.find(connectKey); 
 		if(iterMsgCache != m_MsgCache.end()){
-			convertPackerToMsg(pPacker, iterMsgCache->second.msg);
+			convertPackerToMsg(pPacker, iterMsgCache->second.buffer);
 			if(iterMsgCache->second.allowWrite()){
-				bufferevent_write(connectKey, iterMsgCache->second.msg.substr(0, WRITE_BUFFER_SIZE).c_str(), WRITE_BUFFER_SIZE);
-				iterMsgCache->second.msg.erase(0, WRITE_BUFFER_SIZE);
+				BinaryMemory& buffer = iterMsgCache->second.buffer;
+				if(buffer.getBufferSize() > WRITE_BUFFER_SIZE){
+					bufferevent_write(connectKey, buffer.getBuffer(), WRITE_BUFFER_SIZE);
+					buffer.delBuffer(0, WRITE_BUFFER_SIZE);
+				}
+				else{
+					bufferevent_write(connectKey, buffer.getBuffer(), buffer.getBufferSize());
+					buffer.clearBuffer();
+				}
+
 				iterMsgCache->second.isAlready = false;
 			}
 		}
@@ -65,14 +77,12 @@ namespace Network{
 		return m_PackerCache.pop();
 	}
 
-	void NetTransfer::recvMsg(const ConnectKey &connectKey, const char *pMsg){
+	void NetTransfer::recvMsg(const ConnectKey &connectKey, const char *pMsg, size_t size){
 		if(m_IncompleteMsg.find(connectKey) == m_IncompleteMsg.end()){
-			m_IncompleteMsg.insert(pair<ConnectKey, std::string>(connectKey, std::string(pMsg)));
-		}
-		else{
-			m_IncompleteMsg.find(connectKey)->second += string(pMsg);
+			m_IncompleteMsg.insert(make_pair(connectKey, BinaryMemory()));
 		}
 
+		m_IncompleteMsg.find(connectKey)->second.addBuffer(pMsg, size);
 		convertMsgToPacker(connectKey, m_IncompleteMsg.find(connectKey)->second, m_PackerCache);
 	}
 
@@ -81,8 +91,16 @@ namespace Network{
 		MsgCache::iterator iterMsgCache = m_MsgCache.find(connectKey); 
 		if(iterMsgCache != m_MsgCache.end() ){
 			if(iterMsgCache->second.allowWrite()){
-				bufferevent_write(connectKey, iterMsgCache->second.msg.substr(0, WRITE_BUFFER_SIZE).c_str(), WRITE_BUFFER_SIZE);
-				iterMsgCache->second.msg.erase(0, WRITE_BUFFER_SIZE);
+				BinaryMemory& buffer = iterMsgCache->second.buffer;
+				if(buffer.getBufferSize() > WRITE_BUFFER_SIZE){
+					bufferevent_write(connectKey, buffer.getBuffer(), WRITE_BUFFER_SIZE);
+					buffer.delBuffer(0, WRITE_BUFFER_SIZE);
+				}
+				else{
+					bufferevent_write(connectKey, buffer.getBuffer(), buffer.getBufferSize());
+					buffer.clearBuffer();
+				}
+
 				iterMsgCache->second.isAlready = false;
 			}
 			else{
@@ -114,10 +132,12 @@ namespace Network{
 	void NetTransfer::readBack(ConnectKey connectKey, void *ctx){
 		NetTransfer* pTransfer = static_cast<NetTransfer*>(ctx);
 		evbuffer* output = bufferevent_get_input(connectKey);
-		memset(m_s_ReadBuf, '\0', sizeof(char)*READ_BUFFER_SIZE);
-		if(bufferevent_read(connectKey, m_s_ReadBuf, READ_BUFFER_SIZE) > 0){
-			DEBUG_D("接受数据：" << m_s_ReadBuf);
-			pTransfer->recvMsg(connectKey, m_s_ReadBuf);
+
+		memset(m_pRecvBuffer, 0, READ_BUFFER_SIZE);
+		size_t recvSize = bufferevent_read(connectKey, m_pRecvBuffer, READ_BUFFER_SIZE);
+		if(recvSize > 0){
+			DEBUG_D("接受数据：" << m_pRecvBuffer);
+			pTransfer->recvMsg(connectKey, m_pRecvBuffer, recvSize);
 		}
 	}
 	void NetTransfer::errorBack(ConnectKey connectKey, short events, void *ctx){
@@ -131,7 +151,7 @@ namespace Network{
 	void NetTransfer::registerConnect(const ConnectKey &connectKey){
 		m_MMsgCache.lock();
 		if(m_MsgCache.find(connectKey) == m_MsgCache.end()){
-			m_MsgCache.insert(MsgCache::value_type(connectKey, MMsgPtrQueue()));
+			m_MsgCache.insert(MsgCache::value_type(connectKey, MsgStruct()));
 		}
 		m_MMsgCache.unlock();
 
@@ -154,8 +174,6 @@ namespace Network{
 }
 
 namespace Network{
-	using namespace std;
-
 	NetClient::NetClient()
 		:m_ConnectSocket(-1)
 	{
@@ -198,7 +216,6 @@ namespace Network{
 }
 
 namespace Network{
-	using namespace std;
 
 	NetServer::NetServer()
 		:m_IsRunning(false)

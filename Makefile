@@ -28,20 +28,21 @@ PROJECT_OBJECTS= \
 	./$(PROJECT_PATH)/./src/network/net_struct.o \
 	./$(PROJECT_PATH)/./src/network/socket_simple.o \
 	./$(PROJECT_PATH)/./src/network/net_test.o \
+	./$(PROJECT_PATH)/./src/common/collection.o \
 	./$(PROJECT_PATH)/./src/common/common_file.o \
 	./$(PROJECT_PATH)/./src/common/common_ini.o \
 	./$(PROJECT_PATH)/./src/common/common_log.o \
+	./$(PROJECT_PATH)/./src/common/common_memory.o \
 	./$(PROJECT_PATH)/./src/common/common_mutex.o \
 	./$(PROJECT_PATH)/./src/common/common_thread.o \
 	./$(PROJECT_PATH)/./src/common/common_timer.o \
 	./$(PROJECT_PATH)/./src/common/common_tool.o \
-	./$(PROJECT_PATH)/./src/common/connection.o \
-	./$(PROJECT_PATH)/./src/common/file_transmission.o \
 	./$(PROJECT_PATH)/./src/common/json_tool.o \
 	./$(PROJECT_PATH)/./src/common/string_util.o \
 	./$(PROJECT_PATH)/./src/xls/xls_reader.o \
 	./$(PROJECT_PATH)/./src/xls/xls_struct.o \
 	./$(PROJECT_PATH)/./src/xls/xls_writer.o
+
 MAIN_OBJECT=./$(PROJECT_PATH)/./src/${MAIN_NAME}.o
 
 ./${PROJECT_PATH}/%.o : %.cpp

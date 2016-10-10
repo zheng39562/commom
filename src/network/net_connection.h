@@ -27,13 +27,13 @@ namespace Network{
 	};
 	class MsgStruct{
 		public:
-			MsgStruct():isAlready(false),msg(){;}
+			MsgStruct():isAlready(false),buffer(){;}
 			~MsgStruct()=default;
 		public:
 			bool isAlready;
-			string msg;
+			Universal::BinaryMemory buffer;
 		public:
-			inline bool allowWrite(){ return isAlreay && !msg.emtpy(); } 
+			inline bool allowWrite(){ return isAlready && !buffer.empty(); } 
 	};
 	//! \brief	暂无更多设计，仅作为基类存在。
 	class Transfer{
@@ -80,14 +80,13 @@ namespace Network{
 			void registerConnect(const ConnectKey &connectKey);
 			void unregisterConnect(const ConnectKey &connectKey);
 		public:
-			static void* m_s_ReadBuf;
-
+			char* m_pRecvBuffer;
 			event_base* m_EventBase;
 
-			PMutex m_MMsgCache;
+			Universal::PMutex m_MMsgCache;
 			MsgCache m_MsgCache;
 			PackerCache m_PackerCache;			//! 缓存类需要自身带锁。
-			std::map<ConnectKey, BinaryMemory> m_IncompleteMsg; //!
+			std::map<ConnectKey, Universal::BinaryMemory> m_IncompleteMsg; //!
 	};
 
 	//! \brief	net端口监听和消息转发类：客户端版。

@@ -30,8 +30,8 @@ namespace Network{
 			Packer& operator=(const Packer &ref);
 			virtual ~Packer();
 		public:
-			inline void setBuffer(const void *buffer, size_t size){ m_Buffer.setBuffer(); }
-			inline void* getBuffer(){ return m_Buffer.getBuffer(); }
+			inline void setBuffer(const void *buffer, size_t size){ m_Buffer.setBuffer(buffer, size); }
+			inline const void* getBuffer()const{ return m_Buffer.getBuffer(); }
 			inline size_t getBufferSize()const{ return m_Buffer.getBufferSize(); }
 
 			inline ConnectKey getConnectKey()const{ return m_ConnectKey; }

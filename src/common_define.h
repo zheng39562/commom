@@ -19,6 +19,8 @@
 #include <map>
 
 using namespace std;
+typedef std::string Name;
+typedef std::string Path;
 
 //
 #include <sstream>

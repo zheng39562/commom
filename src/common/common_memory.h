@@ -11,12 +11,15 @@
 #ifndef _common_memory_H
 #define _common_memory_H
 
+#include "common_define.h"
+
 namespace Universal{
 	//! \brief	用于储存二进制流数据。并支持类似string的运算符操作。
 	//! \note
 	class BinaryMemory{
 		public:
 			BinaryMemory();
+			BinaryMemory(const void *_buffer, size_t _size);
 			~BinaryMemory();
 			BinaryMemory(BinaryMemory &ref);
 			BinaryMemory& operator=(BinaryMemory &ref);
@@ -31,9 +34,11 @@ namespace Universal{
 			void delBuffer(size_t start, size_t length);
 			//! \brief	清空缓存，不释放内存。
 			void clearBuffer();
+			void reserve(size_t size);
 
-			inline void* getBuffer(){ return m_Buffer; }
-			inline size_t getBufferSize()const{ return m_BufferSize; }
+			inline bool empty(){ return m_CurBufferSize == 0; }
+			inline const void* getBuffer()const{ return m_Buffer; }
+			inline size_t getBufferSize()const{ return m_CurBufferSize; }
 		private:
 			void* m_Buffer;
 			size_t m_CurBufferSize;

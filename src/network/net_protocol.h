@@ -21,7 +21,7 @@ namespace Network{
 	//! \brief	将msg转换成packer
 	//! \param[in,out] msg 消息字符串，已完成的消息会被打包。剩余消息通过该参数返回。
 	//! \todo	MD5验证
-	void convertMsgToPacker(const ConnectKey &key, BinaryMemory &cache, MPackerPtrQueue &packerPtrQueue);
+	void convertMsgToPacker(const ConnectKey &key, Universal::BinaryMemory &cache, MPackerPtrQueue &packerPtrQueue);
 	//! \brief	将packer转换成msg
 	//! \todo	MD5验证
 	void convertPackerToMsg(const ConstPackerPtr &pPacker, std::string &cache);

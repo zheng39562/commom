@@ -28,7 +28,7 @@ namespace Universal{
 
 	BinaryMemory::~BinaryMemory(){
 		if(m_Buffer){
-			delete m_Buffer;
+			delete (char*)m_Buffer;
 			m_Buffer = NULL;
 		}
 	}
@@ -39,12 +39,12 @@ namespace Universal{
 
 	BinaryMemory& BinaryMemory::operator=(BinaryMemory &ref){
 		setBuffer(ref.getBuffer(), ref.getBufferSize());
-		return this;
+		return *this;
 	}
 
 	BinaryMemory& BinaryMemory::operator+(BinaryMemory &ref){
 		addBuffer(ref.getBuffer(), ref.getBufferSize());
-		return this;
+		return *this;
 	}
 
 	void BinaryMemory::setBuffer(const void *buffer, size_t size){
@@ -53,7 +53,7 @@ namespace Universal{
 			if(size > m_MaxBufferSize){
 				m_MaxBufferSize = size;
 
-				delete m_Buffer;
+				delete (char*)m_Buffer;
 				m_Buffer = (void*)new char[m_MaxBufferSize];
 			}
 		}
@@ -68,15 +68,17 @@ namespace Universal{
 	void BinaryMemory::addBuffer(const void *buffer, size_t size){
 		if(m_Buffer){
 			if(m_CurBufferSize + size > m_MaxBufferSize){
-				void *pBufferTmp = (void*)char[m_CurBufferSize];
+				void* pBufferTmp = (void*)new char[m_CurBufferSize];
 				memcpy(pBufferTmp, m_Buffer, m_CurBufferSize);
 
 				m_MaxBufferSize = (size + m_CurBufferSize) * 2;
 
-				delete m_Buffer;
+				delete (char*)m_Buffer;
 				m_Buffer = (void*)new char[m_MaxBufferSize];
 				memset(m_Buffer, 0, m_MaxBufferSize);
 				memcpy(m_Buffer, pBufferTmp, m_CurBufferSize);
+
+				delete (char*)pBufferTmp;
 			}
 		}
 		else{
@@ -91,7 +93,7 @@ namespace Universal{
 
 	void BinaryMemory::delBuffer(size_t start, size_t length){
 		if(m_CurBufferSize > start){
-			length = length < (m_BufferSize - start) ? m_BufferSize - start : length;
+			length = length < (m_CurBufferSize - start) ? m_CurBufferSize - start : length;
 
 			char* pMoveBuffer(NULL);
 			size_t movePos = start + length;
@@ -102,7 +104,7 @@ namespace Universal{
 				memcpy(pMoveBuffer, (char*)m_Buffer + movePos, moveLength);
 			}
 
-			memset((char*)m_Buffer + start, 0, m_BufferSize - start);
+			memset((char*)m_Buffer + start, 0, m_CurBufferSize - start);
 
 			if(pMoveBuffer != NULL){
 				memcpy((char*)m_Buffer + start, pMoveBuffer, moveLength);
@@ -118,4 +120,26 @@ namespace Universal{
 		memset(m_Buffer, 0, m_MaxBufferSize);
 	}
 
+	void BinaryMemory::reserve(size_t size){
+		if(m_MaxBufferSize < size){
+			char* pSaveBuffer(NULL);
+			if(m_CurBufferSize != 0){
+				pSaveBuffer= new char[m_CurBufferSize];
+				memcpy(pSaveBuffer, m_Buffer, m_CurBufferSize);
+			}
+			if(m_Buffer != NULL){
+				delete (char*)m_Buffer; m_Buffer = NULL;
+			}
+
+			m_Buffer = (void*)new char[size];
+			m_MaxBufferSize = size;
+
+			if(pSaveBuffer != NULL && m_Buffer != NULL){
+				memcpy(m_Buffer, pSaveBuffer, m_CurBufferSize);
+				delete pSaveBuffer; pSaveBuffer = NULL;
+			}
+		}
+	}
+
 }
+

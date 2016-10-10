@@ -1,5 +1,6 @@
 # 任务安排：
 ## 序列1 end time : 7.15
+	*	makefile 按文件make的方案
 	*	net的可写逻辑可能需要对应修正。
 	*	需要修正packer 还有 协议即可。
 	*	增加mempacker 可以直接用来初始化结构。
