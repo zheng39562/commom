@@ -33,16 +33,16 @@ namespace Universal{
 		}
 	}
 
-	BinaryMemory::BinaryMemory(BinaryMemory &ref){
+	BinaryMemory::BinaryMemory(const BinaryMemory &ref){
 		setBuffer(ref.getBuffer(), ref.getBufferSize());
 	}
 
-	BinaryMemory& BinaryMemory::operator=(BinaryMemory &ref){
+	BinaryMemory& BinaryMemory::operator=(const BinaryMemory &ref){
 		setBuffer(ref.getBuffer(), ref.getBufferSize());
 		return *this;
 	}
 
-	BinaryMemory& BinaryMemory::operator+(BinaryMemory &ref){
+	BinaryMemory& BinaryMemory::operator+(const BinaryMemory &ref){
 		addBuffer(ref.getBuffer(), ref.getBufferSize());
 		return *this;
 	}

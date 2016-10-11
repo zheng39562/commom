@@ -21,10 +21,10 @@ namespace Universal{
 			BinaryMemory();
 			BinaryMemory(const void *_buffer, size_t _size);
 			~BinaryMemory();
-			BinaryMemory(BinaryMemory &ref);
-			BinaryMemory& operator=(BinaryMemory &ref);
+			BinaryMemory(const BinaryMemory &ref);
+			BinaryMemory& operator=(const BinaryMemory &ref);
 		public:
-			BinaryMemory& operator+(BinaryMemory &ref);
+			BinaryMemory& operator+(const BinaryMemory &ref);
 		public:
 			void addBuffer(const void* buffer, size_t size);
 			void setBuffer(const void* buffer, size_t size);
@@ -36,7 +36,7 @@ namespace Universal{
 			void clearBuffer();
 			void reserve(size_t size);
 
-			inline bool empty(){ return m_CurBufferSize == 0; }
+			inline bool empty()const{ return m_CurBufferSize == 0; }
 			inline const void* getBuffer()const{ return m_Buffer; }
 			inline size_t getBufferSize()const{ return m_CurBufferSize; }
 		private:

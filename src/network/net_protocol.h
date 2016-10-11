@@ -24,7 +24,7 @@ namespace Network{
 	void convertMsgToPacker(const ConnectKey &key, Universal::BinaryMemory &cache, MPackerPtrQueue &packerPtrQueue);
 	//! \brief	将packer转换成msg
 	//! \todo	MD5验证
-	void convertPackerToMsg(const ConstPackerPtr &pPacker, std::string &cache);
+	void convertPackerToMsg(const ConstPackerPtr &pPacker, Universal::BinaryMemory &buffer);
 }
 #endif 
 

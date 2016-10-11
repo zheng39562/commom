@@ -13,6 +13,8 @@
 
 #include "event.h"
 #include "boost/shared_ptr.hpp"
+#include "common/common_memory.h"
+#include "network/net_define.h"
 #include "network/net_packer.h"
 #include "network/net_struct.h"
 
@@ -28,12 +30,15 @@ namespace Network{
 	class MsgStruct{
 		public:
 			MsgStruct():isAlready(false),buffer(){;}
-			~MsgStruct()=default;
+			MsgStruct(const MsgStruct &ref){
+				isAlready = ref.isAlready;
+				buffer = ref.buffer;
+			}
 		public:
 			bool isAlready;
 			Universal::BinaryMemory buffer;
 		public:
-			inline bool allowWrite(){ return isAlready && !buffer.empty(); } 
+			inline bool allowWrite()const{ return isAlready && !buffer.empty(); } 
 	};
 	//! \brief	暂无更多设计，仅作为基类存在。
 	class Transfer{
@@ -62,7 +67,7 @@ namespace Network{
 			virtual bool run(const std::string &ip, const long &port)=0;
 			void sendPacker(const PackerPtr &pPacker);
 
-			void recvMsg(const ConnectKey &connectKey, const char *pMsg);
+			void recvMsg(const ConnectKey &connectKey, const char *pMsg, size_t size);
 			PackerPtr recvPacker();
 
 			void enableWrite(const ConnectKey &connectKey);
@@ -80,7 +85,7 @@ namespace Network{
 			void registerConnect(const ConnectKey &connectKey);
 			void unregisterConnect(const ConnectKey &connectKey);
 		public:
-			char* m_pRecvBuffer;
+			static char* m_s_pRecvBuffer;
 			event_base* m_EventBase;
 
 			Universal::PMutex m_MMsgCache;

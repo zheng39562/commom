@@ -8,7 +8,7 @@
  * \!version 
  * * \!author zheng39562@163.com
 **********************************************************/
-#include "network/net_connection.h"
+#include "net_connection.h"
 
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -21,29 +21,26 @@
 #include "network/net_protocol.h"
 
 using namespace std;
+using namespace Universal;
 
 namespace Network{
 	const int READ_BUFFER_SIZE = 4000;
 	const int WRITE_BUFFER_SIZE = 4000;
 
+	char* NetTransfer::m_s_pRecvBuffer = new char[READ_BUFFER_SIZE];
+
 	NetTransfer::NetTransfer()
 		:m_EventBase(NULL),
 		 m_MMsgCache(),
-		 m_MsgCache(),
-		 m_pRecvBuffer(NULL)
+		 m_MsgCache()
 	{
 		m_EventBase = event_base_new();
-
-		m_pRecvBuffer = new char[READ_BUFFER_SIZE];
 
 		event_base_dispatch(m_EventBase);
 	}
 	NetTransfer::~NetTransfer(){
 		if(m_EventBase != NULL){
 			event_base_free(m_EventBase);
-		}
-		if(m_pRecvBuffer != NULL){
-			delete m_pRecvBuffer; m_pRecvBuffer = NULL;
 		}
 	}
 
@@ -52,9 +49,10 @@ namespace Network{
 		m_MMsgCache.lock();
 		MsgCache::iterator iterMsgCache = m_MsgCache.find(connectKey); 
 		if(iterMsgCache != m_MsgCache.end()){
-			convertPackerToMsg(pPacker, iterMsgCache->second.buffer);
+			BinaryMemory& buffer = iterMsgCache->second.buffer;
+
+			convertPackerToMsg(pPacker, buffer);
 			if(iterMsgCache->second.allowWrite()){
-				BinaryMemory& buffer = iterMsgCache->second.buffer;
 				if(buffer.getBufferSize() > WRITE_BUFFER_SIZE){
 					bufferevent_write(connectKey, buffer.getBuffer(), WRITE_BUFFER_SIZE);
 					buffer.delBuffer(0, WRITE_BUFFER_SIZE);
@@ -78,12 +76,14 @@ namespace Network{
 	}
 
 	void NetTransfer::recvMsg(const ConnectKey &connectKey, const char *pMsg, size_t size){
-		if(m_IncompleteMsg.find(connectKey) == m_IncompleteMsg.end()){
-			m_IncompleteMsg.insert(make_pair(connectKey, BinaryMemory()));
+		if(m_IncompleteMsg.find(connectKey) != m_IncompleteMsg.end()){
+			m_IncompleteMsg.find(connectKey)->second.addBuffer(pMsg, size);
+			convertMsgToPacker(connectKey, m_IncompleteMsg.find(connectKey)->second, m_PackerCache);
+		}
+		else{
+			DEBUG_E("该链接未注册。请先注册。");
 		}
 
-		m_IncompleteMsg.find(connectKey)->second.addBuffer(pMsg, size);
-		convertMsgToPacker(connectKey, m_IncompleteMsg.find(connectKey)->second, m_PackerCache);
 	}
 
 	void NetTransfer::enableWrite(const ConnectKey &connectKey){
@@ -133,11 +133,11 @@ namespace Network{
 		NetTransfer* pTransfer = static_cast<NetTransfer*>(ctx);
 		evbuffer* output = bufferevent_get_input(connectKey);
 
-		memset(m_pRecvBuffer, 0, READ_BUFFER_SIZE);
-		size_t recvSize = bufferevent_read(connectKey, m_pRecvBuffer, READ_BUFFER_SIZE);
+		memset(m_s_pRecvBuffer, 0, READ_BUFFER_SIZE);
+		size_t recvSize = bufferevent_read(connectKey, m_s_pRecvBuffer, READ_BUFFER_SIZE);
 		if(recvSize > 0){
-			DEBUG_D("接受数据：" << m_pRecvBuffer);
-			pTransfer->recvMsg(connectKey, m_pRecvBuffer, recvSize);
+			DEBUG_D("接受数据：" << m_s_pRecvBuffer);
+			pTransfer->recvMsg(connectKey, m_s_pRecvBuffer, recvSize);
 		}
 	}
 	void NetTransfer::errorBack(ConnectKey connectKey, short events, void *ctx){
@@ -156,7 +156,7 @@ namespace Network{
 		m_MMsgCache.unlock();
 
 		if(m_IncompleteMsg.find(connectKey) == m_IncompleteMsg.end()){
-			m_IncompleteMsg.insert(make_pair(connectKey, string()));
+			m_IncompleteMsg.insert(make_pair(connectKey, BinaryMemory()));
 		}
 	}
 
