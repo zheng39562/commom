@@ -12,7 +12,7 @@ PROJECT_INC=-I./src
 LIB_INC=${PROJECT_INC} ${THIRDPART_INC}
 #
 THIRDPART_LIB=-ljsoncpp -lxls -lxlsreader -levent -lmysqlcppconn-static -lboost_regex
-LIB_LIB=-L${THIRDPART_PATH}/lib64 -luuid -pthread -lrt -ldl ${THIRDPART_LIB}
+LIB_LIB=-L${THIRDPART_PATH}/lib64 ${THIRDPART_LIB} -luuid -pthread -lrt -ldl
 #
 CXX=g++
 MACRO=-DDEBUG -D__LINUX
