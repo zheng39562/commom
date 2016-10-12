@@ -57,7 +57,7 @@ namespace Network{
 	//!
 	//! \todo	可以再扩展IO/文件等传输类。可能需要对类名进行一定修正。
 	//! \todo	PS：可以用过在外连接好socket的方式来当作客户端使用。后期会在此类基础上做一个简易的客户端版本。
-	class NetTransfer : public Transfer {
+	class NetTransfer : public Transfer{
 		public:
 			typedef map<ConnectKey, MsgStruct> MsgCache;
 		public:
@@ -78,9 +78,9 @@ namespace Network{
 			PackerPtr recvPacker();
 
 			void enableWrite(const ConnectKey &connectKey);
-		protected:
 			virtual bool addSocket(int socket, eSocketRWOpt socketRWOpt = socketRWOpt_RW);
-		private:
+		//private:
+		protected:
 			//! \brief	写 回调函数。
 			static void writeBack(ConnectKey connectKey, void *ctx);
 			//! \brief	读 回调函数。
@@ -127,7 +127,7 @@ namespace Network{
 	//! \brief	net端口监听和消息转发类：server版。
 	//! 
 	//! \attetion	注意不建议直接使用该类。使用下面typedef的Single类更加合适。
-	class NetServer : public NetTransfer, Universal::PThread{
+	class NetServer : public NetTransfer, Universal::PThread {
 		public:
 			NetServer();
 			virtual ~NetServer();

@@ -64,8 +64,9 @@ string g_TestContext_3 = "daskfvaovuqovqir124190";
 			while(bRet){
 				DEBUG_D("链接成功，准备发送数据。");
 				PackerPtr pPacker(new Packer(NULL));
-				DEBUG_D("发送数据:" << g_TestContext_1);
 				pPacker->setBuffer(g_TestContext_1.c_str(), g_TestContext_1.size());
+
+				DEBUG_D("发送数据:" << g_TestContext_1);
 				net_sendAll_C(pPacker);
 
 				sleep(3);

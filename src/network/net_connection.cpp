@@ -78,20 +78,29 @@ namespace Network{
 	void NetTransfer::sendAll(const Universal::BinaryMemory &buffer){
 		m_MSend.lock();
 
+		DEBUG_D("开始广播发送消息 : [" << string((char*)buffer.getBuffer(), buffer.getBufferSize()) << "]");
 		list<ConnectKey>::iterator iterConnectKey = m_ConnectKeyList.begin();
 		while(iterConnectKey != m_ConnectKeyList.end()){
+			DEBUG_D("1");
 			if(m_UnconnectSet.find(*iterConnectKey) != m_UnconnectSet.end()){
+			DEBUG_D("2");
 				m_UnconnectSet.erase(m_UnconnectSet.find(*iterConnectKey));
 				iterConnectKey = m_ConnectKeyList.erase(iterConnectKey);
+			DEBUG_D("3");
 				continue;
 			}
 			else{
+			DEBUG_D("4");
 				MsgCache::iterator iterMsgCache = m_MsgCache.find(*iterConnectKey); 
+			DEBUG_D("5");
 				if(iterMsgCache != m_MsgCache.end()){
+			DEBUG_D("6");
 					BinaryMemory& bufferRef = iterMsgCache->second.buffer;
 					bufferRef = bufferRef + buffer;
+			DEBUG_D("7");
 
 					if(iterMsgCache->second.allowWrite()){
+			DEBUG_D("8.1");
 						if(bufferRef.getBufferSize() > WRITE_BUFFER_SIZE){
 							bufferevent_write(*iterConnectKey, bufferRef.getBuffer(), WRITE_BUFFER_SIZE);
 							bufferRef.delBuffer(0, WRITE_BUFFER_SIZE);
@@ -103,11 +112,15 @@ namespace Network{
 
 						iterMsgCache->second.isAlready = false;
 					}
+			DEBUG_D("8");
 				}
 				else{
 					DEBUG_D("未注册该连接：连接查找不到。");
 				}
 			}
+
+			DEBUG_D("9");
+			++iterConnectKey;
 		}
 		m_MSend.unlock();
 	}
@@ -155,6 +168,8 @@ namespace Network{
 	}
 
 	bool NetTransfer::addSocket(int socket, eSocketRWOpt socketRWOpt){
+		DEBUG_D("开始注册套接字。");
+
 		if(m_EventBase == NULL){
 			DEBUG_E("Event base 未初始化或初始化失败。");
 			return false;
@@ -166,8 +181,17 @@ namespace Network{
 			return false;
 		}
 
+		DEBUG_D("设置回调函数。");
 		bufferevent_setcb(connectKey, NetTransfer::readBack, NetTransfer::writeBack, NetTransfer::errorBack, this);
+		DEBUG_D("设置链接为可读可写。");
 		bufferevent_enable(connectKey, EV_READ|EV_WRITE);
+
+		if(EV_READ & bufferevent_get_enabled(connectKey)){
+			DEBUG_D("缓存写入已启用。");
+		}
+		if(EV_WRITE & bufferevent_get_enabled(connectKey)){
+			DEBUG_D("缓存读入已启用。");
+		}
 
 		registerConnect(connectKey);
 
@@ -175,10 +199,13 @@ namespace Network{
 	}
 
 	void NetTransfer::writeBack(ConnectKey connectKey, void *ctx){
+		DEBUG_D("链接写就绪。");
 		NetTransfer* pTransfer = static_cast<NetTransfer*>(ctx);
 		pTransfer->enableWrite(connectKey);
 	}
 	void NetTransfer::readBack(ConnectKey connectKey, void *ctx){
+		DEBUG_D("链路上有数据发送到端，正在接收数据。");
+
 		NetTransfer* pTransfer = static_cast<NetTransfer*>(ctx);
 		evbuffer* output = bufferevent_get_input(connectKey);
 
@@ -252,14 +279,47 @@ namespace Network{
 			return false;
 		}
 
-		if(connect(m_ConnectSocket, (struct sockaddr *) &address, sizeof(address)) == 0){
-			return addSocket(m_ConnectSocket);
+		DEBUG_D("开始注册套接字。");
+
+		if(m_EventBase == NULL){
+			DEBUG_E("Event base 未初始化或初始化失败。");
+			return false;
+		}
+
+		ConnectKey connectKey = bufferevent_socket_new(m_EventBase, m_ConnectSocket, BEV_OPT_CLOSE_ON_FREE);
+		if(connectKey == NULL){
+			DEBUG_E("new bufferevent failed.");
+			return false;
+		}
+
+		DEBUG_D("设置回调函数。");
+		bufferevent_setcb(connectKey, NetTransfer::readBack, NetTransfer::writeBack, NetTransfer::errorBack, this);
+		DEBUG_D("设置链接为可读可写。");
+		bufferevent_enable(connectKey, EV_READ|EV_WRITE);
+
+		if(EV_READ & bufferevent_get_enabled(connectKey)){
+			DEBUG_D("缓存写入已启用。");
+		}
+		if(EV_WRITE & bufferevent_get_enabled(connectKey)){
+			DEBUG_D("缓存读入已启用。");
+		}
+		if(bufferevent_socket_connect(connectKey, (struct sockaddr *) &address, sizeof(address)) < 0){
+			return false;
+		}
+
+		registerConnect(connectKey);
+
+		return true;
+		/*
+		if(addSocket(m_ConnectSocket)){
+			return connect(m_ConnectSocket, (struct sockaddr *) &address, sizeof(address)) == 0;
 		}
 		else{
 			DEBUG_E("connect failed");
 		}
 
 		return false;
+		*/
 	}
 	void NetClient::stop(){ 
 		DEBUG_D("socket client is closing.");
@@ -283,24 +343,29 @@ namespace Network{
 		socklen_t client_addrlength = sizeof(client);
 		int connfd(-1);
 		char remote[ INET_ADDRSTRLEN ];
+
+		evconnlistener_new_bind
+
+		/*
 		while(m_IsRunning){
 			// 印象里accept是阻塞的。需要确认下。
 			connfd = accept(m_ListenSocket, (struct sockaddr *) &client, &client_addrlength);
 
-			DEBUG_D("connected with ip : " << inet_ntop(AF_INET, &client.sin_addr, remote, INET_ADDRSTRLEN) << " and port : " << ntohs(client.sin_port));
-
 			if(connfd >= 0){
+				DEBUG_D("链接成功 ip : " << inet_ntop(AF_INET, &client.sin_addr, remote, INET_ADDRSTRLEN) << " and port : " << ntohs(client.sin_port));
 				if(!addSocket(connfd)){
 					DEBUG_E("添加监听端口失败。");
 					break;
 				}
 			}
 			else{
+				DEBUG_D("链接失败 with ip : " << inet_ntop(AF_INET, &client.sin_addr, remote, INET_ADDRSTRLEN) << " and port : " << ntohs(client.sin_port));
 				break;
 			}
 		}
 
 		close(m_ListenSocket);
+		*/
 		m_ListenSocket = -1;
 	}
 
@@ -322,10 +387,12 @@ namespace Network{
 		int on(0);
 		setsockopt(m_ListenSocket,SOL_SOCKET,SO_REUSEADDR,&on,sizeof(on));
 
+		/*
 		int ret = bind(m_ListenSocket, (struct sockaddr*) &address,  sizeof(address));
 		if(ret == -1){ DEBUG_E("绑定socket出错。errno :" << errno); return false; }
 		ret = listen(m_ListenSocket, 5);
 		if(ret == -1){ DEBUG_E("监听socket出错。errno :" << errno); return false; }
+		*/
 
 		return start();
 	}
