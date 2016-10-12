@@ -62,7 +62,9 @@ string g_TestContext_3 = "daskfvaovuqovqir124190";
 			if(!bRet){ DEBUG_E("client 连接失败。"); }
 
 			while(bRet){
+				DEBUG_D("链接成功，准备发送数据。");
 				PackerPtr pPacker(new Packer(NULL));
+				DEBUG_D("发送数据:" << g_TestContext_1);
 				pPacker->setBuffer(g_TestContext_1.c_str(), g_TestContext_1.size());
 				net_sendAll_C(pPacker);
 
@@ -74,8 +76,10 @@ string g_TestContext_3 = "daskfvaovuqovqir124190";
 			if(!bRet){ DEBUG_E("server 监听失败。"); }
 
 			while(bRet){
+				DEBUG_D("开始监听，等待链接和数据。");
 				PackerPtr pPacker;
 				if(net_recv_S(pPacker)){
+					DEBUG_D("成功接收数据。");
 					string ret((char*)pPacker->getBuffer(), pPacker->getBufferSize());
 					if(g_TestContext_1 == ret){
 						DEBUG_D("接收到消息" << ret );

@@ -154,16 +154,24 @@ namespace Network{
 		m_MSend.unlock();
 	}
 
-	int NetTransfer::addSocket(const int &socket, eSocketRWOpt socketRWOpt){
-		ConnectKey connectKey = bufferevent_socket_new(m_EventBase, socket, BEV_OPT_CLOSE_ON_FREE | BEV_OPT_THREADSAFE);
+	bool NetTransfer::addSocket(int socket, eSocketRWOpt socketRWOpt){
+		if(m_EventBase == NULL){
+			DEBUG_E("Event base 未初始化或初始化失败。");
+			return false;
+		}
+
+		ConnectKey connectKey = bufferevent_socket_new(m_EventBase, socket, BEV_OPT_CLOSE_ON_FREE);
 		if(connectKey == NULL){
 			DEBUG_E("new bufferevent failed.");
+			return false;
 		}
 
 		bufferevent_setcb(connectKey, NetTransfer::readBack, NetTransfer::writeBack, NetTransfer::errorBack, this);
 		bufferevent_enable(connectKey, EV_READ|EV_WRITE);
 
 		registerConnect(connectKey);
+
+		return true;
 	}
 
 	void NetTransfer::writeBack(ConnectKey connectKey, void *ctx){
@@ -198,7 +206,8 @@ namespace Network{
 
 		m_ConnectKeyList.push_back(connectKey);
 
-		m_IncompleteMsg.insert(make_pair(connectKey, BinaryMemory()));
+		m_IncompleteMsg.insert(pair<ConnectKey, BinaryMemory>(connectKey, BinaryMemory()));
+		
 	}
 
 	void NetTransfer::unregisterConnect(const ConnectKey &connectKey){
@@ -228,7 +237,7 @@ namespace Network{
 
 	bool NetClient::run(const string &ip, const long &port){
 		if(m_ConnectSocket >= 0){
-			cout << "already connect socket is [" << m_ConnectSocket << "]" << endl;
+			DEBUG_E("already connect socket is [" << m_ConnectSocket << "]");
 		}
 
 		struct sockaddr_in address;
@@ -244,16 +253,16 @@ namespace Network{
 		}
 
 		if(connect(m_ConnectSocket, (struct sockaddr *) &address, sizeof(address)) == 0){
-			addSocket(m_ConnectSocket);
+			return addSocket(m_ConnectSocket);
 		}
 		else{
-			cout << "connect failed" << endl;
+			DEBUG_E("connect failed");
 		}
 
-		return true;
+		return false;
 	}
 	void NetClient::stop(){ 
-		cout << "socket client is closing." << endl;
+		DEBUG_D("socket client is closing.");
 		close(m_ConnectSocket); 
 	}
 }
@@ -278,10 +287,13 @@ namespace Network{
 			// 印象里accept是阻塞的。需要确认下。
 			connfd = accept(m_ListenSocket, (struct sockaddr *) &client, &client_addrlength);
 
-			DEBUG_D("connected with ip : " << inet_ntop(AF_INET, &client.sin_addr, remote, INET_ADDRSTRLEN) << " and port : %d\n" << ntohs(client.sin_port));
+			DEBUG_D("connected with ip : " << inet_ntop(AF_INET, &client.sin_addr, remote, INET_ADDRSTRLEN) << " and port : " << ntohs(client.sin_port));
 
 			if(connfd >= 0){
-				addSocket(connfd);
+				if(!addSocket(connfd)){
+					DEBUG_E("添加监听端口失败。");
+					break;
+				}
 			}
 			else{
 				break;

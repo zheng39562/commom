@@ -13,6 +13,9 @@
 #include <iostream>
 
 #include "network/net_test.h"
+#include "common/common_memory.h"
+
+using namespace Universal;
 
 int main( int agrc, char **argv ){
 	for(int i =0; i<agrc; ++i){

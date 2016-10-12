@@ -20,10 +20,10 @@ namespace Universal{
 		public:
 			BinaryMemory();
 			BinaryMemory(const void *_buffer, size_t _size);
-			~BinaryMemory();
 			BinaryMemory(const BinaryMemory &ref);
-			BinaryMemory& operator=(const BinaryMemory &ref);
+			~BinaryMemory();
 		public:
+			BinaryMemory& operator=(const BinaryMemory &ref);
 			BinaryMemory& operator+(const BinaryMemory &ref);
 		public:
 			void addBuffer(const void* buffer, size_t size);

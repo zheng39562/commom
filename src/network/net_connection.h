@@ -79,7 +79,7 @@ namespace Network{
 
 			void enableWrite(const ConnectKey &connectKey);
 		protected:
-			virtual int addSocket(const int &socket, eSocketRWOpt socketRWOpt = socketRWOpt_RW);
+			virtual bool addSocket(int socket, eSocketRWOpt socketRWOpt = socketRWOpt_RW);
 		private:
 			//! \brief	写 回调函数。
 			static void writeBack(ConnectKey connectKey, void *ctx);

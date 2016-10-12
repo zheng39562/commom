@@ -34,6 +34,9 @@ namespace Universal{
 	}
 
 	BinaryMemory::BinaryMemory(const BinaryMemory &ref){
+		m_Buffer = NULL;
+		m_CurBufferSize = 0;
+		m_MaxBufferSize = 0;
 		setBuffer(ref.getBuffer(), ref.getBufferSize());
 	}
 
