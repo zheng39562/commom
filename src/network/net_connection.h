@@ -65,14 +65,21 @@ namespace Network{
 			virtual ~NetTransfer();
 		public:
 			virtual bool run(const std::string &ip, const long &port)=0;
+			//! \brief	发送数据包。
+			//! \note	数据包中包含发送地址。该功能只支持端到端的发送。
 			void sendPacker(const PackerPtr &pPacker);
+			//! \brief	想所有维持的连接中发送消息。
+			//! \note	函数会忽略包中的保存地址——无论包中的链接地址是否存在。
+			void sendAll(const PackerPtr &pPacker);
+			//! \brief	想所有维持的连接中发送消息。
+			void sendAll(const Universal::BinaryMemory &buffer);
 
 			void recvMsg(const ConnectKey &connectKey, const char *pMsg, size_t size);
 			PackerPtr recvPacker();
 
 			void enableWrite(const ConnectKey &connectKey);
 		protected:
-			int addSocket(const int &socket, eSocketRWOpt socketRWOpt = socketRWOpt_RW);
+			virtual int addSocket(const int &socket, eSocketRWOpt socketRWOpt = socketRWOpt_RW);
 		private:
 			//! \brief	写 回调函数。
 			static void writeBack(ConnectKey connectKey, void *ctx);
@@ -88,10 +95,14 @@ namespace Network{
 			static char* m_s_pRecvBuffer;
 			event_base* m_EventBase;
 
-			Universal::PMutex m_MMsgCache;
+			Universal::PMutex m_MSend;  //! \todo 需要考虑是否可以减小锁粒度。
+			Universal::PMutex m_MRecv;
 			MsgCache m_MsgCache;
 			PackerCache m_PackerCache;			//! 缓存类需要自身带锁。
 			std::map<ConnectKey, Universal::BinaryMemory> m_IncompleteMsg; //!
+
+			std::list<ConnectKey> m_ConnectKeyList;  //! 当前所有链接。
+			std::set<ConnectKey> m_UnconnectSet; //! 已断开但未处理链接。
 	};
 
 	//! \brief	net端口监听和消息转发类：客户端版。

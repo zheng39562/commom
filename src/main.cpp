@@ -12,8 +12,19 @@
 
 #include <iostream>
 
+#include "network/net_test.h"
 
 int main( int agrc, char **argv ){
+	for(int i =0; i<agrc; ++i){
+		cout << argv[i] << endl;
+	}
+	if(agrc >= 2){
+		NetworkTest::doTest(argv[1]);
+	}
+	else{
+		cout << "parameter error" << endl;
+	}
+
 	return 0;
 }
 

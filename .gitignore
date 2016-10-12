@@ -6,3 +6,4 @@ wget-log
 *.o
 tags
 Main_64
+core.*

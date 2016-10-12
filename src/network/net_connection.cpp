@@ -31,7 +31,8 @@ namespace Network{
 
 	NetTransfer::NetTransfer()
 		:m_EventBase(NULL),
-		 m_MMsgCache(),
+		 m_MSend(),
+		 m_MRecv(),
 		 m_MsgCache()
 	{
 		m_EventBase = event_base_new();
@@ -46,7 +47,7 @@ namespace Network{
 
 	void NetTransfer::sendPacker(const PackerPtr &pPacker){
 		ConnectKey connectKey = pPacker->getConnectKey();
-		m_MMsgCache.lock();
+		m_MSend.lock();
 		MsgCache::iterator iterMsgCache = m_MsgCache.find(connectKey); 
 		if(iterMsgCache != m_MsgCache.end()){
 			BinaryMemory& buffer = iterMsgCache->second.buffer;
@@ -68,7 +69,47 @@ namespace Network{
 		else{
 			DEBUG_D("未注册该连接：连接查找不到。");
 		}
-		m_MMsgCache.unlock();
+		m_MSend.unlock();
+	}
+
+	void NetTransfer::sendAll(const PackerPtr &pPacker){
+		sendAll(BinaryMemory(pPacker->getBuffer(), pPacker->getBufferSize()));
+	}
+	void NetTransfer::sendAll(const Universal::BinaryMemory &buffer){
+		m_MSend.lock();
+
+		list<ConnectKey>::iterator iterConnectKey = m_ConnectKeyList.begin();
+		while(iterConnectKey != m_ConnectKeyList.end()){
+			if(m_UnconnectSet.find(*iterConnectKey) != m_UnconnectSet.end()){
+				m_UnconnectSet.erase(m_UnconnectSet.find(*iterConnectKey));
+				iterConnectKey = m_ConnectKeyList.erase(iterConnectKey);
+				continue;
+			}
+			else{
+				MsgCache::iterator iterMsgCache = m_MsgCache.find(*iterConnectKey); 
+				if(iterMsgCache != m_MsgCache.end()){
+					BinaryMemory& bufferRef = iterMsgCache->second.buffer;
+					bufferRef = bufferRef + buffer;
+
+					if(iterMsgCache->second.allowWrite()){
+						if(bufferRef.getBufferSize() > WRITE_BUFFER_SIZE){
+							bufferevent_write(*iterConnectKey, bufferRef.getBuffer(), WRITE_BUFFER_SIZE);
+							bufferRef.delBuffer(0, WRITE_BUFFER_SIZE);
+						}
+						else{
+							bufferevent_write(*iterConnectKey, bufferRef.getBuffer(), bufferRef.getBufferSize());
+							bufferRef.clearBuffer();
+						}
+
+						iterMsgCache->second.isAlready = false;
+					}
+				}
+				else{
+					DEBUG_D("未注册该连接：连接查找不到。");
+				}
+			}
+		}
+		m_MSend.unlock();
 	}
 
 	PackerPtr NetTransfer::recvPacker(){
@@ -87,7 +128,7 @@ namespace Network{
 	}
 
 	void NetTransfer::enableWrite(const ConnectKey &connectKey){
-		m_MMsgCache.lock();
+		m_MSend.lock();
 		MsgCache::iterator iterMsgCache = m_MsgCache.find(connectKey); 
 		if(iterMsgCache != m_MsgCache.end() ){
 			if(iterMsgCache->second.allowWrite()){
@@ -110,7 +151,7 @@ namespace Network{
 		else{
 			DEBUG_E("该连接未注册，请先注册");
 		}
-		m_MMsgCache.unlock();
+		m_MSend.unlock();
 	}
 
 	int NetTransfer::addSocket(const int &socket, eSocketRWOpt socketRWOpt){
@@ -149,23 +190,25 @@ namespace Network{
 
 
 	void NetTransfer::registerConnect(const ConnectKey &connectKey){
-		m_MMsgCache.lock();
+		m_MSend.lock();
 		if(m_MsgCache.find(connectKey) == m_MsgCache.end()){
 			m_MsgCache.insert(MsgCache::value_type(connectKey, MsgStruct()));
 		}
-		m_MMsgCache.unlock();
+		m_MSend.unlock();
 
-		if(m_IncompleteMsg.find(connectKey) == m_IncompleteMsg.end()){
-			m_IncompleteMsg.insert(make_pair(connectKey, BinaryMemory()));
-		}
+		m_ConnectKeyList.push_back(connectKey);
+
+		m_IncompleteMsg.insert(make_pair(connectKey, BinaryMemory()));
 	}
 
 	void NetTransfer::unregisterConnect(const ConnectKey &connectKey){
-		m_MMsgCache.lock();
+		m_MSend.lock();
 		if(m_MsgCache.find(connectKey) != m_MsgCache.end()){
 			m_MsgCache.erase(m_MsgCache.find(connectKey));
 		}
-		m_MMsgCache.unlock();
+		m_MSend.unlock();
+
+		m_UnconnectSet.insert(connectKey);
 
 		if(m_IncompleteMsg.find(connectKey) != m_IncompleteMsg.end()){
 			m_IncompleteMsg.erase(m_IncompleteMsg.find(connectKey));
@@ -235,9 +278,7 @@ namespace Network{
 			// 印象里accept是阻塞的。需要确认下。
 			connfd = accept(m_ListenSocket, (struct sockaddr *) &client, &client_addrlength);
 
-			printf("connected with ip : %s and port : %d\n", 
-					inet_ntop(AF_INET, &client.sin_addr, remote, INET_ADDRSTRLEN), 
-					ntohs(client.sin_port));
+			DEBUG_D("connected with ip : " << inet_ntop(AF_INET, &client.sin_addr, remote, INET_ADDRSTRLEN) << " and port : %d\n" << ntohs(client.sin_port));
 
 			if(connfd >= 0){
 				addSocket(connfd);

@@ -20,6 +20,9 @@
 bool net_connect(const std::string &ip, const long &port);
 //! \note	需要注意未packer的指针类。不支持直接的packer类。
 void net_send_C(const Network::PackerPtr &pPacker);
+//! \brief	发送广播	
+//! \note	函数会自动忽略包中的地址。
+void net_sendAll_C(const Network::PackerPtr &pPacker);
 bool net_recv_C(Network::PackerPtr &pPacker);
 
 //! \brief	
@@ -29,6 +32,9 @@ bool net_recv_C(Network::PackerPtr &pPacker);
 bool net_listen(const std::string &ip, const long &port);
 //! \note	需要注意未packer的指针类。不支持直接的packer类。
 void net_send_S(const Network::PackerPtr &pPacker);
+//! \brief	发送广播	
+//! \note	函数会自动忽略包中的地址。
+void net_sendAll_S(const Network::PackerPtr &pPacker);
 bool net_recv_S(Network::PackerPtr &pPacker);
 
 #endif 

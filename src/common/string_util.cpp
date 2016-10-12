@@ -198,14 +198,14 @@ namespace Universal{
 namespace Universal{
 	string strToUpper( const string &str ){
 		string strTmp = str;
-		transform( strTmp.begin(), strTmp.end(), strTmp.begin(), (int (*)(int))tolower );
+		transform( strTmp.begin(), strTmp.end(), strTmp.begin(), (int (*)(int))toupper );
 		return strTmp;
 	}
 
 
 	string strToLower( const string &str ){
 		string strTmp = str;
-		transform( strTmp.begin(), strTmp.end(), strTmp.begin(), (int (*)(int))toupper );
+		transform( strTmp.begin(), strTmp.end(), strTmp.begin(), (int (*)(int))tolower );
 		return strTmp;
 	}
 
