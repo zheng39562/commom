@@ -48,6 +48,9 @@ namespace Universal{
 	}
 
 	void BinaryMemory::setBuffer(const void *buffer, size_t size){
+		if(buffer == NULL || size == 0){
+			return;
+		}
 		m_CurBufferSize = size;
 		if(m_Buffer){
 			if(size > m_MaxBufferSize){
@@ -66,6 +69,9 @@ namespace Universal{
 	}
 
 	void BinaryMemory::addBuffer(const void *buffer, size_t size){
+		if(buffer == NULL || size == 0){
+			return;
+		}
 		if(m_Buffer){
 			if(m_CurBufferSize + size > m_MaxBufferSize){
 				void* pBufferTmp = (void*)new char[m_CurBufferSize];
