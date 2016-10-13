@@ -16,6 +16,33 @@
 #include "network/net_connection.h"
 #include "network/net_packer.h"
 
+
+#include <string.h>
+#include <errno.h>
+#include <stdio.h>
+#include <signal.h>
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#include <event2/bufferevent.h>
+#include <event2/buffer.h>
+#include <event2/listener.h>
+#include <event2/util.h>
+#include <event2/event.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include "event.h"
+#include <event2/event_struct.h>
+#include <event2/event.h>
+#include <event2/event_compat.h>
+#include <event2/buffer.h>
+#include <event2/buffer_compat.h>
+#include <event2/bufferevent.h>
+#include <event2/bufferevent_struct.h>
+#include <event2/bufferevent_compat.h>
+#include <event2/tag.h>
+#include <event2/tag_compat.h>
+
 using namespace Network;
 using namespace Universal;
 
@@ -42,7 +69,7 @@ string g_TestContext_3 = "daskfvaovuqovqir124190";
 #define ARG_SERVER "server"
 #define ARG_CLIENT "client"
 
-#define TEST_IP "127.0.0.1"
+#define TEST_IP string("127.0.0.1")
 #define TEST_LISTEN_PORT 12345
 #define TEST_CONNECT_PORT TEST_LISTEN_PORT
 	void doTest(const string &arg){
@@ -92,7 +119,7 @@ string g_TestContext_3 = "daskfvaovuqovqir124190";
 					}
 				}
 
-				sleep(1);
+				sleep(3);
 			}
 		}
 	}

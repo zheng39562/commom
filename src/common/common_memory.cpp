@@ -34,9 +34,11 @@ namespace Universal{
 	}
 
 	BinaryMemory::BinaryMemory(const BinaryMemory &ref){
-		m_Buffer = NULL;
-		m_CurBufferSize = 0;
-		m_MaxBufferSize = 0;
+		if(m_Buffer != ref.getBuffer()){
+			m_Buffer = NULL;
+			m_CurBufferSize = 0;
+			m_MaxBufferSize = 0;
+		}
 		setBuffer(ref.getBuffer(), ref.getBufferSize());
 	}
 
@@ -51,7 +53,7 @@ namespace Universal{
 	}
 
 	void BinaryMemory::setBuffer(const void *buffer, size_t size){
-		if(buffer == NULL || size == 0){
+		if(buffer == NULL || size == 0 || m_Buffer == buffer){
 			return;
 		}
 		m_CurBufferSize = size;
@@ -72,9 +74,10 @@ namespace Universal{
 	}
 
 	void BinaryMemory::addBuffer(const void *buffer, size_t size){
-		if(buffer == NULL || size == 0){
+		if(buffer == NULL || size == 0 || m_Buffer == buffer){
 			return;
 		}
+
 		if(m_Buffer){
 			if(m_CurBufferSize + size > m_MaxBufferSize){
 				void* pBufferTmp = (void*)new char[m_CurBufferSize];

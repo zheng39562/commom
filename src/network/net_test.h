@@ -26,6 +26,8 @@ namespace NetworkTest{
 	//! \note
 	void doTest(const std::string &arg);
 
+	//void libevent_test(const std::string &arg);
+
 	//! \brief	连通性测试。
 	void doLink(const std::string &arg);
 

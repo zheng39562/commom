@@ -27,6 +27,15 @@ int main( int agrc, char **argv ){
 	else{
 		cout << "parameter error" << endl;
 	}
+	/*
+	string s1 = "1213141";
+	BinaryMemory b1, b2;
+	b1.setBuffer(s1.c_str(), s1.size());
+	//b2.addBuffer(b1.getBuffer(), b1.getBufferSize());
+	b2 = b2 + b1;
+
+	cout << string((char*)b2.getBuffer(), b2.getBufferSize()) << endl;
+	*/
 
 	return 0;
 }
