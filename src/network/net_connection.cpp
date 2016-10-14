@@ -93,12 +93,12 @@ namespace Network{
 
 					if(iterMsgCache->second.allowWrite()){
 						if(bufferRef.getBufferSize() > WRITE_BUFFER_SIZE){
-							DEBUG_D("发送数据" << string((char*)bufferRef.getBuffer(), WRITE_BUFFER_SIZE));
+							DEBUG_D("发送数据1 : " << string((char*)bufferRef.getBuffer(), WRITE_BUFFER_SIZE));
 							bufferevent_write(*iterConnectKey, bufferRef.getBuffer(), WRITE_BUFFER_SIZE);
 							bufferRef.delBuffer(0, WRITE_BUFFER_SIZE);
 						}
 						else{
-							DEBUG_D("发送数据" << string((char*)bufferRef.getBuffer(), bufferRef.getBufferSize()));
+							DEBUG_D("发送数据2 : " << string((char*)bufferRef.getBuffer(), bufferRef.getBufferSize()));
 							bufferevent_write(*iterConnectKey, bufferRef.getBuffer(), bufferRef.getBufferSize());
 							bufferRef.clearBuffer();
 						}
@@ -138,15 +138,17 @@ namespace Network{
 		m_MSend.lock();
 		MsgCache::iterator iterMsgCache = m_MsgCache.find(connectKey); 
 		if(iterMsgCache != m_MsgCache.end() ){
+			iterMsgCache->second.isAlready = true;
+			DEBUG_D("激活写标志。");
 			if(iterMsgCache->second.allowWrite()){
 				BinaryMemory& buffer = iterMsgCache->second.buffer;
 				if(buffer.getBufferSize() > WRITE_BUFFER_SIZE){
-					DEBUG_D("发送数据" << string((char*)buffer.getBuffer(), WRITE_BUFFER_SIZE));
+					DEBUG_D("发送数据3 : " << string((char*)buffer.getBuffer(), WRITE_BUFFER_SIZE));
 					bufferevent_write(connectKey, buffer.getBuffer(), WRITE_BUFFER_SIZE);
 					buffer.delBuffer(0, WRITE_BUFFER_SIZE);
 				}
 				else{
-					DEBUG_D("发送数据" << string((char*)buffer.getBuffer(), buffer.getBufferSize()));
+					DEBUG_D("发送数据4 : " << string((char*)buffer.getBuffer(), buffer.getBufferSize()));
 					bufferevent_write(connectKey, buffer.getBuffer(), buffer.getBufferSize());
 					buffer.clearBuffer();
 				}
@@ -154,8 +156,7 @@ namespace Network{
 				iterMsgCache->second.isAlready = false;
 			}
 			else{
-				iterMsgCache->second.isAlready = true;
-				DEBUG_D("没有数据，使能写标志。");
+				DEBUG_D("没有数据。");
 			}
 		}
 		else{
@@ -190,9 +191,6 @@ namespace Network{
 	}
 
 	void NetTransfer::addSocket(int socket, eSocketRWOpt socketRWOpt){
-		DEBUG_D("开始注册套接字。");
-		m_EventBase = event_base_new();
-
 		if(m_EventBase == NULL){
 			DEBUG_E("Event base 未初始化或初始化失败。");
 			return;
