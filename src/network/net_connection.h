@@ -41,7 +41,7 @@ namespace Network{
 			Universal::BinaryMemory buffer;
 		public:
 			inline bool allowWrite()const{ 
-				DEBUG_D("buffer size" << buffer.getBufferSize() << string((char*)buffer.getBuffer(), buffer.getBufferSize()));
+				DEBUG_D("buffer size : [" << buffer.getBufferSize() << "]" << string((char*)buffer.getBuffer(), buffer.getBufferSize()));
 				return isAlready && !buffer.empty(); 
 			} 
 	};

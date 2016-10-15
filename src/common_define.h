@@ -43,6 +43,11 @@ typedef std::string Path;
 #define DEBUG_W(msg) 							os31415926_tmp << msg; Log_W(os31415926_tmp.str());
 #define DEBUG_E(msg) 							os31415926_tmp << msg; Log_E(os31415926_tmp.str());
 #define DEBUG_C(msg) 							os31415926_tmp << msg; Log_C(os31415926_tmp.str());
+#define DEBUG_D(msg) 							
+#define DEBUG_I(msg) 							
+#define DEBUG_W(msg) 							
+#define DEBUG_E(msg) 							
+#define DEBUG_C(msg) 							
 */
 #define DEBUG_D(msg) 							cout << msg << endl;
 #define DEBUG_I(msg) 							cout << msg << endl;

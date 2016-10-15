@@ -35,6 +35,9 @@ namespace Universal{
 			//! \brief	清空缓存，不释放内存。
 			void clearBuffer();
 			void reserve(size_t size);
+			//! \brief	按字节打印数据。
+			//! \note	使用循环打印，效率不高。日志级别为D。
+			void print();
 
 			inline bool empty()const{ return m_CurBufferSize == 0; }
 			inline const void* getBuffer()const{ return m_Buffer; }

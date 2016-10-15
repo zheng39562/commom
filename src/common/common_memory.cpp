@@ -105,7 +105,7 @@ namespace Universal{
 
 	void BinaryMemory::delBuffer(size_t start, size_t length){
 		if(m_CurBufferSize > start){
-			length = length < (m_CurBufferSize - start) ? m_CurBufferSize - start : length;
+			length = length < (m_CurBufferSize - start) ? length : m_CurBufferSize - start;
 
 			char* pMoveBuffer(NULL);
 			size_t movePos = start + length;
@@ -150,6 +150,22 @@ namespace Universal{
 				memcpy(m_Buffer, pSaveBuffer, m_CurBufferSize);
 				delete pSaveBuffer; pSaveBuffer = NULL;
 			}
+		}
+	}
+
+	void BinaryMemory::print(){
+		if(m_Buffer == NULL){
+			DEBUG_D("对象缓存未初始化。");
+			return;
+		}
+
+		char* msg = (char*)m_Buffer;
+		long index(0);
+		while(index < m_CurBufferSize){
+			DEBUG_D("buffer[" << index << "]"
+				<<"C[" << msg[index] << "]"
+				<<"I[" << (unsigned)msg[index] << "]");
+			++index;
 		}
 	}
 

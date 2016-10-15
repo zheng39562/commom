@@ -24,8 +24,8 @@ using namespace std;
 using namespace Universal;
 
 namespace Network{
-	const int READ_BUFFER_SIZE = 4000;
-	const int WRITE_BUFFER_SIZE = 4000;
+	const int READ_BUFFER_SIZE = 1000;
+	const int WRITE_BUFFER_SIZE = 1000;
 
 	char* NetTransfer::m_s_pRecvBuffer = new char[READ_BUFFER_SIZE];
 
@@ -76,7 +76,7 @@ namespace Network{
 	void NetTransfer::sendAll(const Universal::BinaryMemory &buffer){
 		m_MSend.lock();
 
-		DEBUG_D("开始广播发送消息 : [" << string((char*)buffer.getBuffer(), buffer.getBufferSize()) << "]");
+		DEBUG_D("开始广播发送消息 : [" << string((char*)buffer.getBuffer(), buffer.getBufferSize()) << "] size " << buffer.getBufferSize());
 		list<ConnectKey>::iterator iterConnectKey = m_ConnectKeyList.begin();
 		while(iterConnectKey != m_ConnectKeyList.end()){
 			if(m_UnconnectSet.find(*iterConnectKey) != m_UnconnectSet.end()){
@@ -89,16 +89,18 @@ namespace Network{
 				MsgCache::iterator iterMsgCache = m_MsgCache.find(*iterConnectKey); 
 				if(iterMsgCache != m_MsgCache.end()){
 					BinaryMemory& bufferRef = iterMsgCache->second.buffer;
-					bufferRef = bufferRef + buffer;
+					PackerPtr pPacker(new Packer(*iterConnectKey));
+					pPacker->setBuffer(buffer);
 
+					convertPackerToMsg(pPacker, bufferRef);
 					if(iterMsgCache->second.allowWrite()){
 						if(bufferRef.getBufferSize() > WRITE_BUFFER_SIZE){
-							DEBUG_D("发送数据1 : " << string((char*)bufferRef.getBuffer(), WRITE_BUFFER_SIZE));
+							DEBUG_D("发送数据 : " << string((char*)bufferRef.getBuffer(), WRITE_BUFFER_SIZE));
 							bufferevent_write(*iterConnectKey, bufferRef.getBuffer(), WRITE_BUFFER_SIZE);
 							bufferRef.delBuffer(0, WRITE_BUFFER_SIZE);
 						}
 						else{
-							DEBUG_D("发送数据2 : " << string((char*)bufferRef.getBuffer(), bufferRef.getBufferSize()));
+							DEBUG_D("发送数据 : " << string((char*)bufferRef.getBuffer(), bufferRef.getBufferSize()));
 							bufferevent_write(*iterConnectKey, bufferRef.getBuffer(), bufferRef.getBufferSize());
 							bufferRef.clearBuffer();
 						}
@@ -143,12 +145,12 @@ namespace Network{
 			if(iterMsgCache->second.allowWrite()){
 				BinaryMemory& buffer = iterMsgCache->second.buffer;
 				if(buffer.getBufferSize() > WRITE_BUFFER_SIZE){
-					DEBUG_D("发送数据3 : " << string((char*)buffer.getBuffer(), WRITE_BUFFER_SIZE));
+					DEBUG_D("发送数据 : " << string((char*)buffer.getBuffer(), WRITE_BUFFER_SIZE));
 					bufferevent_write(connectKey, buffer.getBuffer(), WRITE_BUFFER_SIZE);
 					buffer.delBuffer(0, WRITE_BUFFER_SIZE);
 				}
 				else{
-					DEBUG_D("发送数据4 : " << string((char*)buffer.getBuffer(), buffer.getBufferSize()));
+					DEBUG_D("发送数据 : " << string((char*)buffer.getBuffer(), buffer.getBufferSize()));
 					bufferevent_write(connectKey, buffer.getBuffer(), buffer.getBufferSize());
 					buffer.clearBuffer();
 				}
@@ -179,7 +181,7 @@ namespace Network{
 		memset(m_s_pRecvBuffer, 0, READ_BUFFER_SIZE);
 		size_t recvSize = bufferevent_read(connectKey, m_s_pRecvBuffer, READ_BUFFER_SIZE);
 		if(recvSize > 0){
-			DEBUG_D("接受数据：" << m_s_pRecvBuffer);
+			DEBUG_D("接收数据：" << string(m_s_pRecvBuffer, recvSize));
 			pTransfer->recvMsg(connectKey, m_s_pRecvBuffer, recvSize);
 		}
 	}

@@ -36,15 +36,15 @@ bool net_listen(const string &ip, const long &port){
 }
 
 void net_send_S(const PackerPtr &pPacker){
-	SingleNetClient::getInstance()->sendPacker(pPacker);
+	SingleNetServer::getInstance()->sendPacker(pPacker);
 }
 
 void net_sendAll_S(const Network::PackerPtr &pPacker){
-	SingleNetClient::getInstance()->sendAll(pPacker);
+	SingleNetServer::getInstance()->sendAll(pPacker);
 }
 
 bool net_recv_S(PackerPtr &pPacker){
-	pPacker = SingleNetClient::getInstance()->recvPacker();
+	pPacker = SingleNetServer::getInstance()->recvPacker();
 	return pPacker != NULL;
 }
 

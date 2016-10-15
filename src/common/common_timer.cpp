@@ -213,9 +213,7 @@ namespace Universal{
 		return (m_TvStop.tv_sec - m_TvStart.tv_sec) * _TIMECONVERSION_SECTOMS + (m_TvStop.tv_usec - m_TvStart.tv_usec) / _TIMECONVERSION_MSTOUS;
 	}
 
-
 	long TimeCounter::getUsTime(){ return (long)getUsTimeD(); }
-
 
 	double TimeCounter::getUsTimeD(){
 		return (m_TvStop.tv_sec - m_TvStart.tv_sec) * _TIMECONVERSION_SECTOMS * _TIMECONVERSION_MSTOUS + (m_TvStop.tv_usec - m_TvStart.tv_usec);

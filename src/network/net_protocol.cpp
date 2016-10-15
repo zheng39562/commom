@@ -18,12 +18,14 @@ namespace Network{
 
 	void convertMsgToPacker(const ConnectKey &key, BinaryMemory &cache, MPackerPtrQueue &packerPtrQueue){
 		const char* pMsg = (char*)cache.getBuffer();
-		while(pMsg != NULL){
-			size_t size;
-			for(int i=PROTOCOL_INDEX_DATA_SIZE; i<PROTOCOL_MSG_SIZE_BYTE; ++i){
+		while(pMsg != NULL && !cache.empty()){
+			size_t size(0);
+			for(int i=PROTOCOL_INDEX_DATA_SIZE; i < PROTOCOL_INDEX_DATA_SIZE+PROTOCOL_MSG_SIZE_BYTE; ++i){
+				DEBUG_D("size[" << size << "] [" << (size_t)pMsg[i] << "]");
 				size = size << 8;
 				size += (size_t)pMsg[i];
 			}
+			DEBUG_D("接受到[" << cache.getBufferSize() << "]个字节的数据。完整的数据包大小为[" << size << "]");
 
 			if(size > cache.getBufferSize()){
 				// 当前数据包未完全被获取。
@@ -34,10 +36,13 @@ namespace Network{
 			eProtocolDataFormat dataFormat = (eProtocolDataFormat)(pMsg[PROTOCOL_INDEX_EXPAND] & PROTOCOL_EXPAND_FILTER_FORMAT);
 
 			PackerPtr pPacker(new Packer(key, dataFormat));
-			pPacker->setBuffer(pMsg, size - PROTOCOL_HEAD_SIZE);
+			pPacker->setBuffer((char*)pMsg + PROTOCOL_INDEX_MSG, size - PROTOCOL_HEAD_SIZE);
+			DEBUG_D("begin packer size " << packerPtrQueue.size());
 			packerPtrQueue.push(pPacker);
+			DEBUG_D("end packer size " << packerPtrQueue.size());
 
 			cache.delBuffer(0, size);
+			DEBUG_D("cache size " << cache.getBufferSize());
 		}
 
 	}
@@ -46,16 +51,23 @@ namespace Network{
 		char* pHead = new char[PROTOCOL_HEAD_SIZE];
 
 		size_t size = pPacker->getBufferSize() + PROTOCOL_HEAD_SIZE;
-		for(int i=PROTOCOL_MSG_SIZE_BYTE-1; i>=PROTOCOL_INDEX_DATA_SIZE; --i){
+		for(int i = (PROTOCOL_INDEX_DATA_SIZE+PROTOCOL_MSG_SIZE_BYTE-1); i>=PROTOCOL_INDEX_DATA_SIZE; --i){
 			pHead[i] = size & 0xFF;
+			DEBUG_D("size[" << size << "] " << i << "[" << (size_t)pHead[i] << "]");
 			size = size >> 8;
+			DEBUG_D("size[" << size << "]");
 		}
+		DEBUG_D("111");
 		//! flags还没有真正使用。暂时不需要添加。
 		pHead[PROTOCOL_INDEX_EXPAND] = pPacker->getDataFormat() & PROTOCOL_EXPAND_FILTER_FORMAT; 
+		DEBUG_D("111");
 
 		buffer.addBuffer(pHead, PROTOCOL_HEAD_SIZE);
+		buffer.print();
 		buffer.addBuffer(pPacker->getBuffer(), pPacker->getBufferSize());
+		buffer.print();
 
 		delete pHead; pHead = NULL;
 	}
 }
+

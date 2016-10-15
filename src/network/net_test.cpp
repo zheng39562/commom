@@ -13,6 +13,7 @@
 #include <string.h>
 #include "net_interface.h"
 #include "common/string_util.h"
+#include "common/common_timer.h"
 #include "network/net_connection.h"
 #include "network/net_packer.h"
 
@@ -62,7 +63,7 @@ bool net_listen(const std::string &ip, const long &port);
 void net_send_S(const Network::PackerPtr &pPacker);
 bool net_recv_S(Network::PackerPtr &pPacker);
 */
-string g_TestContext_1 = "1234567890987654321";
+string g_TestContext_1 = "[1234567890987654321]";
 string g_TestContext_2 = "fqefqkfejqlkefjqlwekfjlqwekfjqlwkefjqlkfjlk";
 string g_TestContext_3 = "daskfvaovuqovqir124190";
 
@@ -78,9 +79,9 @@ string g_TestContext_3 = "daskfvaovuqovqir124190";
 		string argTmp = strToLower(arg);
 		DEBUG_D("run doTest : = " << argTmp);
 
-		doLink(argTmp);
+		//doLink(argTmp);
 		//doMemCpy(argTmp);
-		//doPerformance(argTmp);
+		doPerformance(argTmp);
 	}
 
 	void doLink(const string &arg){
@@ -88,16 +89,14 @@ string g_TestContext_3 = "daskfvaovuqovqir124190";
 			bool bRet = net_connect(TEST_IP, TEST_CONNECT_PORT);
 			if(!bRet){ DEBUG_E("client 连接失败。"); }
 
-			while(bRet){
-				DEBUG_D("链接成功，准备发送数据。");
-				PackerPtr pPacker(new Packer(NULL));
-				pPacker->setBuffer(g_TestContext_1.c_str(), g_TestContext_1.size());
+			DEBUG_D("链接成功，准备发送数据。");
+			PackerPtr pPacker(new Packer(NULL));
+			pPacker->setBuffer(g_TestContext_1.c_str(), g_TestContext_1.size());
 
-				DEBUG_D("发送数据:" << g_TestContext_1);
-				net_sendAll_C(pPacker);
+			DEBUG_D("发送数据:" << g_TestContext_1);
+			net_sendAll_C(pPacker);
 
-				sleep(3);
-			}
+			sleep(10);
 		}
 		if(arg == ARG_SERVER){
 			bool bRet = net_listen(TEST_IP, TEST_LISTEN_PORT);
@@ -119,63 +118,45 @@ string g_TestContext_3 = "daskfvaovuqovqir124190";
 					}
 				}
 
-				sleep(3);
+				usleep(1000);
 			}
 		}
 	}
 
 	void doMemCpy(const string &arg){
+		// 转换class为二进制流的方法未找到(有复杂的方式，但没必要使用)，暂时只能使用结构体。
 		DataStruct dataStruct;
 		dataStruct.i = 100;
 		dataStruct.d = 100.1;
 		dataStruct.c = 'A';
-		DataClass dataClass;
-		dataClass.i = 100;
-		dataClass.d = 100.1;
-		dataClass.c = 'A';
 
 		if(arg == ARG_CLIENT){
 			if(net_connect(TEST_IP, TEST_CONNECT_PORT));
 
 			PackerPtr pPacker(new Packer(NULL));
+			DEBUG_D("data struct size " << sizeof(dataStruct));
 			pPacker->setBuffer(&dataStruct, sizeof(dataStruct));
 			net_sendAll_C(pPacker);
-			pPacker->setBuffer(&dataClass, sizeof(dataClass));
-			net_sendAll_C(pPacker);
+
+			sleep(10);
 		}
 		if(arg == ARG_SERVER){
 			net_listen(TEST_IP, TEST_LISTEN_PORT);
 			int recvSize = 0;
 			while(1){
-				if(recvSize >= 2){
-					break;
-				}
-				
 				PackerPtr pPacker;
 				if(net_recv_S(pPacker)){
-					if(recvSize == 0){
-						DataStruct* pDataStruct = new DataStruct();
-						memcpy(pDataStruct, pPacker->getBuffer(), pPacker->getBufferSize());
-						if(dataStruct.i == pDataStruct->i && dataStruct.d == pDataStruct->d && dataStruct.c == pDataStruct->c ){
-							DEBUG_D("Struct 接收到消息");
-						}
-						else{
-							DEBUG_D("接收到的消息和发送消息不一致. ");
-						}
-						delete pDataStruct; pDataStruct = NULL;
+					DataStruct* pDataStruct = new DataStruct();
+					memcpy(pDataStruct, pPacker->getBuffer(), pPacker->getBufferSize());
+					if(dataStruct.i == pDataStruct->i && dataStruct.d == pDataStruct->d && dataStruct.c == pDataStruct->c ){
+						DEBUG_D("Struct 接收到消息");
+						break;
 					}
 					else{
-						DataClass* pDataClass = new DataClass();
-						memcpy(pDataClass, pPacker->getBuffer(), pPacker->getBufferSize());
-						if(dataClass.i == pDataClass->i && dataClass.d == pDataClass->d && dataClass.c == pDataClass->c ){
-							DEBUG_D("Class 接收到消息");
-						}
-						else{
-							DEBUG_D("接收到的消息和发送消息不一致. ");
-						}
-						delete pDataClass; pDataClass = NULL;
+						DEBUG_D("接收到的消息和发送消息不一致. ");
+						break;
 					}
-					++recvSize;
+					delete pDataStruct; pDataStruct = NULL;
 				}
 			}
 		}
@@ -184,8 +165,56 @@ string g_TestContext_3 = "daskfvaovuqovqir124190";
 
 
 #define PERFROMANCE_TIMES  100000   //! 性能测试的次数。
+//#define PERFROMANCE_TIMES  3   //! 性能测试的次数。
 
 	void doPerformance(const string &arg){
+		if(arg == ARG_CLIENT){
+			bool bRet = net_connect(TEST_IP, TEST_CONNECT_PORT);
+			if(!bRet){ DEBUG_E("client 连接失败。"); }
+
+			PackerPtr pPacker(new Packer(NULL));
+			pPacker->setBuffer(g_TestContext_1.c_str(), g_TestContext_1.size());
+
+			long times(PERFROMANCE_TIMES);
+			while(times--){
+				net_sendAll_C(pPacker);
+				usleep(1);
+			}
+
+			sleep(100);
+		}
+		if(arg == ARG_SERVER){
+			TimeCounter timeCount;
+
+			bool bRet = net_listen(TEST_IP, TEST_LISTEN_PORT);
+			if(!bRet){ DEBUG_E("server 监听失败。"); }
+
+			PackerPtr pPacker;
+
+			long times(PERFROMANCE_TIMES);
+
+			bool bNotFull(true);
+
+			timeCount.start();
+			while(bRet && times>0){
+				if(net_recv_S(pPacker)){
+					if(g_TestContext_1 == string((char*)pPacker->getBuffer(), pPacker->getBufferSize())){
+						cout << --times << endl; 
+					}
+					else{
+						bNotFull = false;
+						DEBUG_E("接收数据出错。" << string((char*)pPacker->getBuffer(), pPacker->getBufferSize()));
+						break;
+					}
+					if(!bNotFull){
+						cout << "有数据丢失" << endl;
+					}
+				}
+			}
+			timeCount.stop();
+
+			cout << "发送[" << PERFROMANCE_TIMES << "] use time [" << timeCount.getSecTimeD() << "]s" << endl;
+		}
 	}
 
 }
