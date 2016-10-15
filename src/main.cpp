@@ -21,6 +21,7 @@ using namespace NetworkTest;
 using namespace MyTest;
 
 int main( int agrc, char **argv ){
+	/*
 	for(int i =0; i<agrc; ++i){
 		cout << argv[i] << endl;
 	}

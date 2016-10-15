@@ -49,6 +49,9 @@ namespace Network{
 		MsgCache::iterator iterMsgCache = m_MsgCache.find(connectKey); 
 		if(iterMsgCache != m_MsgCache.end()){
 			BinaryMemory& buffer = iterMsgCache->second.buffer;
+			if(buffer.getBufferSize() > WRITE_BUFFER_SIZE * 2){
+				usleep(100*1000);
+			}
 
 			convertPackerToMsg(pPacker, buffer);
 			if(iterMsgCache->second.allowWrite()){
