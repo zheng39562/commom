@@ -70,11 +70,13 @@ string g_TestContext_3 = "daskfvaovuqovqir124190";
 #define ARG_SERVER "server"
 #define ARG_CLIENT "client"
 
-#define TEST_IP string("127.0.0.1")
+string g_Ip;
 #define TEST_LISTEN_PORT 12345
 #define TEST_CONNECT_PORT TEST_LISTEN_PORT
-	void doTest(const string &arg){
+	void doTest(const string &arg, const string &ip){
 		SingleLogServer::getInstance()->InitLog("./log", "network_");
+
+		g_Ip = ip;
 
 		string argTmp = strToLower(arg);
 		DEBUG_D("run doTest : = " << argTmp);
@@ -86,7 +88,7 @@ string g_TestContext_3 = "daskfvaovuqovqir124190";
 
 	void doLink(const string &arg){
 		if(arg == ARG_CLIENT){
-			bool bRet = net_connect(TEST_IP, TEST_CONNECT_PORT);
+			bool bRet = net_connect(g_Ip, TEST_CONNECT_PORT);
 			if(!bRet){ DEBUG_E("client 连接失败。"); }
 
 			DEBUG_D("链接成功，准备发送数据。");
@@ -99,7 +101,7 @@ string g_TestContext_3 = "daskfvaovuqovqir124190";
 			sleep(10);
 		}
 		if(arg == ARG_SERVER){
-			bool bRet = net_listen(TEST_IP, TEST_LISTEN_PORT);
+			bool bRet = net_listen(g_Ip, TEST_LISTEN_PORT);
 			if(!bRet){ DEBUG_E("server 监听失败。"); }
 
 			while(bRet){
@@ -131,7 +133,7 @@ string g_TestContext_3 = "daskfvaovuqovqir124190";
 		dataStruct.c = 'A';
 
 		if(arg == ARG_CLIENT){
-			if(net_connect(TEST_IP, TEST_CONNECT_PORT));
+			if(net_connect(g_Ip, TEST_CONNECT_PORT));
 
 			PackerPtr pPacker(new Packer(NULL));
 			DEBUG_D("data struct size " << sizeof(dataStruct));
@@ -141,7 +143,7 @@ string g_TestContext_3 = "daskfvaovuqovqir124190";
 			sleep(10);
 		}
 		if(arg == ARG_SERVER){
-			net_listen(TEST_IP, TEST_LISTEN_PORT);
+			net_listen(g_Ip, TEST_LISTEN_PORT);
 			int recvSize = 0;
 			while(1){
 				PackerPtr pPacker;
@@ -164,12 +166,12 @@ string g_TestContext_3 = "daskfvaovuqovqir124190";
 	}
 
 
-#define PERFROMANCE_TIMES  100000   //! 性能测试的次数。
+#define PERFROMANCE_TIMES  1000000   //! 性能测试的次数。
 //#define PERFROMANCE_TIMES  3   //! 性能测试的次数。
 
 	void doPerformance(const string &arg){
 		if(arg == ARG_CLIENT){
-			bool bRet = net_connect(TEST_IP, TEST_CONNECT_PORT);
+			bool bRet = net_connect(g_Ip, TEST_CONNECT_PORT);
 			if(!bRet){ DEBUG_E("client 连接失败。"); }
 
 			PackerPtr pPacker(new Packer(NULL));
@@ -186,7 +188,7 @@ string g_TestContext_3 = "daskfvaovuqovqir124190";
 		if(arg == ARG_SERVER){
 			TimeCounter timeCount;
 
-			bool bRet = net_listen(TEST_IP, TEST_LISTEN_PORT);
+			bool bRet = net_listen(g_Ip, TEST_LISTEN_PORT);
 			if(!bRet){ DEBUG_E("server 监听失败。"); }
 
 			PackerPtr pPacker;
