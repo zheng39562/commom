@@ -70,7 +70,7 @@ string g_TestContext_3 = "daskfvaovuqovqir124190";
 #define ARG_SERVER "server"
 #define ARG_CLIENT "client"
 
-string g_Ip;
+string g_Ip("");
 #define TEST_LISTEN_PORT 12345
 #define TEST_CONNECT_PORT TEST_LISTEN_PORT
 	void doTest(const string &arg, const string &ip){
