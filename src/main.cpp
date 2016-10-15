@@ -13,16 +13,19 @@
 #include <iostream>
 
 #include "network/net_test.h"
+#include "network/socket_simple.h"
 #include "common/common_memory.h"
 
 using namespace Universal;
+using namespace NetworkTest;
+using namespace MyTest;
 
 int main( int agrc, char **argv ){
 	for(int i =0; i<agrc; ++i){
 		cout << argv[i] << endl;
 	}
-	if(agrc >= 2){
-		NetworkTest::doTest(argv[1]);
+	if(agrc >= 3){
+		NetworkTest::doTest(argv[1], argv[2]);
 	}
 	else{
 		cout << "parameter error" << endl;
