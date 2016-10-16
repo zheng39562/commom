@@ -15,6 +15,7 @@
 #include "network/net_test.h"
 #include "network/socket_simple.h"
 #include "common/common_memory.h"
+#include "common/common_thread.h"
 
 using namespace Universal;
 using namespace NetworkTest;
@@ -40,6 +41,11 @@ int main( int agrc, char **argv ){
 
 	cout << string((char*)b2.getBuffer(), b2.getBufferSize()) << endl;
 	*/
+
+	int i = 7;
+	while(--i){
+		sleep(1);
+	}
 
 	return 0;
 }

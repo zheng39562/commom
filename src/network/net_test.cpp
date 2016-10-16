@@ -74,7 +74,7 @@ string g_Ip("");
 #define TEST_LISTEN_PORT 12345
 #define TEST_CONNECT_PORT TEST_LISTEN_PORT
 	void doTest(const string &arg, const string &ip){
-		SingleLogServer::getInstance()->InitLog("./log", "network_");
+		SingleLogServer::getInstance()->InitLog("./log", "network");
 
 		g_Ip = ip;
 

@@ -16,7 +16,12 @@
 #include "common/common_mutex.h"
 #include "common/common_thread.h"
 
-extern std::ostringstream os31415926_tmp;
+#define DEBUG_D(msg) 							{std::ostringstream osTmp; osTmp << msg; Log_D(osTmp.str(), __FILE__, __FUNCTION__, __LINE__);}
+#define DEBUG_I(msg) 							{std::ostringstream osTmp; osTmp << msg; Log_D(osTmp.str(), __FILE__, __FUNCTION__, __LINE__);}
+#define DEBUG_W(msg) 							{std::ostringstream osTmp; osTmp << msg; Log_D(osTmp.str(), __FILE__, __FUNCTION__, __LINE__);}
+#define DEBUG_E(msg) 							{std::ostringstream osTmp; osTmp << msg; Log_D(osTmp.str(), __FILE__, __FUNCTION__, __LINE__);}
+#define DEBUG_C(msg) 							{std::ostringstream osTmp; osTmp << msg; Log_D(osTmp.str(), __FILE__, __FUNCTION__, __LINE__);}
+
 namespace Universal{
 	enum eLogLevel{
 		eLogLevel_Debug,
@@ -25,13 +30,15 @@ namespace Universal{
 		eLogLevel_Error,
 		eLogLevel_Crash
 	};
+	//! \brief	日志记录类。
+	//! \note	简略的提供分文件功能：100W条数据作为一个文件。
 	class LogServer : public PThread{
 		public:
 			LogServer();
 			~LogServer();
 		public:
 			void InitLog(const std::string &path, const std::string &fileName);
-			void writeLog(const std::string &time, const eLogLevel &level, const std::string &funcName, const long &line, const std::string &msg);
+			void writeLog(const std::string &time, const eLogLevel &level, const std::string &fileName, const std::string &funcName, const long &line, const std::string &msg);
 		protected:
 			virtual void execute();
 			string getLevelString(const eLogLevel &level);
@@ -40,15 +47,17 @@ namespace Universal{
 			std::string m_FileName;
 			std::ostringstream m_Cache;
 			PMutex m_MCache;
+			size_t m_MaxLine; 
+			size_t m_CurLine; 
 	};
 	typedef DesignMode::SingleMode<LogServer> SingleLogServer;
 }
 
-void Log_D(const std::string &msg, std::string funcName = __FUNCTION__, long line = __LINE__);
-void Log_I(const std::string &msg, std::string funcName = __FUNCTION__, long line = __LINE__);
-void Log_W(const std::string &msg, std::string funcName = __FUNCTION__, long line = __LINE__);
-void Log_E(const std::string &msg, std::string funcName = __FUNCTION__, long line = __LINE__);
-void Log_C(const std::string &msg, std::string funcName = __FUNCTION__, long line = __LINE__);
+void Log_D(const std::string &msg, const std::string &fileName, const std::string funcName, long line);
+void Log_I(const std::string &msg, const std::string &fileName, const std::string funcName, long line);
+void Log_W(const std::string &msg, const std::string &fileName, const std::string funcName, long line);
+void Log_E(const std::string &msg, const std::string &fileName, const std::string funcName, long line);
+void Log_C(const std::string &msg, const std::string &fileName, const std::string funcName, long line);
 
 #endif 
 

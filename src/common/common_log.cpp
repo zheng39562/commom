@@ -18,8 +18,6 @@
 #include "common/common_file.h"
 #include "common/common_tool.h"
 
-std::ostringstream os31415926_tmp;
-
 using namespace std;
 using namespace Universal;
 namespace Universal{
@@ -28,9 +26,10 @@ namespace Universal{
 		:m_Path(),
 		 m_FileName(),
 		 m_Cache(),
-		 m_MCache()
+		 m_MCache(),
+		 m_CurLine(0),
+		 m_MaxLine(1000 * 1000)
 	{
-		;
 	}
 
 	LogServer::~LogServer(){
@@ -40,16 +39,19 @@ namespace Universal{
 	void LogServer::InitLog(const string &path, const string &fileName){
 		m_FileName = fileName;
 		m_Path = completePath(path);
+
+		start();
 	}
 
-	void LogServer::writeLog(const string &time, const eLogLevel &level, const string &funcName, const long &line, const string &msg){
+	void LogServer::writeLog(const string &time, const eLogLevel &level, const std::string &fileName, const string &funcName, const long &line, const string &msg){
 		m_MCache.lock();
 		m_Cache << "[" << time << "]"
 			<< "[" << pthread_self() << "]"
 			<< "[" << getLevelString(level) << "]"
-			<< "[" << funcName << "]"
-			<< "[" << line << "]"
+			<< "[" << fileName << "]"
+			<< "[" << funcName << ":"<< line << "]"
 			<< " : " << msg << "\n";
+		++m_CurLine;
 		m_MCache.unlock();
 	}
 
@@ -70,47 +72,52 @@ namespace Universal{
 	}
 
 	void LogServer::execute(){
+		int fileIndex(0);
+
 		string curDate;
 		ofstream outfile;
 		while(1){
 			usleep(10 * 1000); // 10ms
 
 			if(!m_FileName.empty() && !m_Path.empty()){
-				if(curDate.empty() || curDate != getLocalTime("%Y%m%d")){
+				if(curDate.empty() || curDate != getLocalTime("%Y%m%d") || m_CurLine >= m_MaxLine){
+					m_CurLine = 0;
 					curDate = getLocalTime("%Y%m%d");
 					outfile.close();
-					outfile.open(string(m_Path + m_FileName + "_" + curDate + ".log").c_str(), ios::app);
+					outfile.open(string(m_Path + m_FileName + "_" + curDate + "_" + intToStr(++fileIndex) + ".log").c_str(), ios::app);
+					//outfile.open(string(m_Path + m_FileName + "_" + curDate  + ".log").c_str(), ios::app);
 				}
 
 				m_MCache.lock();
 				if(outfile){
 					outfile << m_Cache.str();
+					outfile.flush();
 				}
 				m_Cache.str(""); // clear cache
 				m_MCache.unlock();
 			}
 		}
-		outfile.close( );
+		outfile.close();
 	}
 }
 
-void Log_D(const string &msg, string funcName, long line){
-	SingleLogServer::getInstance()->writeLog(getLocalTimeU("%D %T"), eLogLevel_Debug, funcName, line, msg);
+void Log_D(const std::string &msg, const std::string &fileName, const std::string funcName, long line){
+	SingleLogServer::getInstance()->writeLog(getLocalTimeU("%Y/%m/%d %T"), eLogLevel_Debug, fileName, funcName, line, msg);
 }
 
-void Log_I(const string &msg, string funcName, long line){
-	SingleLogServer::getInstance()->writeLog(getLocalTimeU("%D %T"), eLogLevel_Info, funcName, line, msg);
+void Log_I(const std::string &msg, const std::string &fileName, const std::string funcName, long line){
+	SingleLogServer::getInstance()->writeLog(getLocalTimeU("%Y/%m/%d %T"), eLogLevel_Info, fileName, funcName, line, msg);
 }
 
-void Log_W(const string &msg, string funcName, long line){
-	SingleLogServer::getInstance()->writeLog(getLocalTimeU("%D %T"), eLogLevel_Warning, funcName, line, msg);
+void Log_W(const std::string &msg, const std::string &fileName, const std::string funcName, long line){
+	SingleLogServer::getInstance()->writeLog(getLocalTimeU("%Y/%m/%d %T"), eLogLevel_Warning, fileName, funcName, line, msg);
 }
 
-void Log_E(const string &msg, string funcName, long line){
-	SingleLogServer::getInstance()->writeLog(getLocalTimeU("%D %T"), eLogLevel_Error, funcName, line, msg);
+void Log_E(const std::string &msg, const std::string &fileName, const std::string funcName, long line){
+	SingleLogServer::getInstance()->writeLog(getLocalTimeU("%Y/%m/%d %T"), eLogLevel_Error, fileName, funcName, line, msg);
 }
 
-void Log_C(const string &msg, string funcName, long line){
-	SingleLogServer::getInstance()->writeLog(getLocalTimeU("%D %T"), eLogLevel_Crash, funcName, line, msg);
+void Log_C(const std::string &msg, const std::string &fileName, const std::string funcName, long line){
+	SingleLogServer::getInstance()->writeLog(getLocalTimeU("%Y/%m/%d %T"), eLogLevel_Crash, fileName, funcName, line, msg);
 }
 
