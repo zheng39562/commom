@@ -23,6 +23,8 @@
 using namespace std;
 using namespace Universal;
 
+static size_t sizeTmp(0);
+
 namespace Network{
 	const int READ_BUFFER_SIZE = 1000;
 	const int WRITE_BUFFER_SIZE = 1000;
@@ -56,10 +58,14 @@ namespace Network{
 			convertPackerToMsg(pPacker, buffer);
 			if(iterMsgCache->second.allowWrite()){
 				if(buffer.getBufferSize() > WRITE_BUFFER_SIZE){
+					sizeTmp += WRITE_BUFFER_SIZE;
+					DEBUG_D("已发送数据@@@ : " << sizeTmp);
 					bufferevent_write(connectKey, buffer.getBuffer(), WRITE_BUFFER_SIZE);
 					buffer.delBuffer(0, WRITE_BUFFER_SIZE);
 				}
 				else{
+					sizeTmp += buffer.getBufferSize();
+					DEBUG_D("已发送数据@@@ : " << sizeTmp);
 					bufferevent_write(connectKey, buffer.getBuffer(), buffer.getBufferSize());
 					buffer.clearBuffer();
 				}
@@ -99,11 +105,15 @@ namespace Network{
 					if(iterMsgCache->second.allowWrite()){
 						if(bufferRef.getBufferSize() > WRITE_BUFFER_SIZE){
 							DEBUG_D("发送数据 : " << string((char*)bufferRef.getBuffer(), WRITE_BUFFER_SIZE));
+							sizeTmp += WRITE_BUFFER_SIZE;
+							DEBUG_D("已发送数据@@@ : " << sizeTmp);
 							bufferevent_write(*iterConnectKey, bufferRef.getBuffer(), WRITE_BUFFER_SIZE);
 							bufferRef.delBuffer(0, WRITE_BUFFER_SIZE);
 						}
 						else{
 							DEBUG_D("发送数据 : " << string((char*)bufferRef.getBuffer(), bufferRef.getBufferSize()));
+							sizeTmp += bufferRef.getBufferSize();
+							DEBUG_D("已发送数据@@@ : " << sizeTmp);
 							bufferevent_write(*iterConnectKey, bufferRef.getBuffer(), bufferRef.getBufferSize());
 							bufferRef.clearBuffer();
 						}
@@ -149,11 +159,15 @@ namespace Network{
 				BinaryMemory& buffer = iterMsgCache->second.buffer;
 				if(buffer.getBufferSize() > WRITE_BUFFER_SIZE){
 					DEBUG_D("发送数据 : " << string((char*)buffer.getBuffer(), WRITE_BUFFER_SIZE));
+					sizeTmp += WRITE_BUFFER_SIZE;
+					DEBUG_D("已发送数据@@@ : " << sizeTmp);
 					bufferevent_write(connectKey, buffer.getBuffer(), WRITE_BUFFER_SIZE);
 					buffer.delBuffer(0, WRITE_BUFFER_SIZE);
 				}
 				else{
 					DEBUG_D("发送数据 : " << string((char*)buffer.getBuffer(), buffer.getBufferSize()));
+					sizeTmp += buffer.getBufferSize();
+					DEBUG_D("已发送数据@@@ : " << sizeTmp);
 					bufferevent_write(connectKey, buffer.getBuffer(), buffer.getBufferSize());
 					buffer.clearBuffer();
 				}
@@ -184,7 +198,8 @@ namespace Network{
 		memset(m_s_pRecvBuffer, 0, READ_BUFFER_SIZE);
 		size_t recvSize = bufferevent_read(connectKey, m_s_pRecvBuffer, READ_BUFFER_SIZE);
 		if(recvSize > 0){
-			DEBUG_D("接收数据：" << string(m_s_pRecvBuffer, recvSize));
+			sizeTmp += recvSize;
+			DEBUG_D("接收数据：" << string(m_s_pRecvBuffer, recvSize) << "已接受数据### : " << sizeTmp);
 			pTransfer->recvMsg(connectKey, m_s_pRecvBuffer, recvSize);
 		}
 	}

@@ -40,7 +40,12 @@ namespace Universal{
 		m_FileName = fileName;
 		m_Path = completePath(path);
 
-		start();
+		if(createFolder(m_Path)){
+			start();
+		}
+		else{
+			throw string("create folder failed.path is [") + path + "]";
+		}
 	}
 
 	void LogServer::writeLog(const string &time, const eLogLevel &level, const std::string &fileName, const string &funcName, const long &line, const string &msg){

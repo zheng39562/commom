@@ -22,12 +22,14 @@ using namespace NetworkTest;
 using namespace MyTest;
 
 int main( int agrc, char **argv ){
-	/*
 	for(int i =0; i<agrc; ++i){
 		cout << argv[i] << endl;
 	}
-	if(agrc >= 3){
+	if(agrc = 3){
 		NetworkTest::doTest(argv[1], argv[2]);
+	}
+	if(agrc = 4){
+		NetworkTest::doTest(argv[1], argv[2], argv[3]);
 	}
 	else{
 		cout << "parameter error" << endl;
@@ -42,10 +44,6 @@ int main( int agrc, char **argv ){
 	cout << string((char*)b2.getBuffer(), b2.getBufferSize()) << endl;
 	*/
 
-	int i = 7;
-	while(--i){
-		sleep(1);
-	}
 
 	return 0;
 }

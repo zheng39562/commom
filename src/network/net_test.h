@@ -24,7 +24,7 @@
 namespace NetworkTest{
 	//! \brief	总测试接口：外部进行回归测试直接使用该接口即可。
 	//! \note
-	void doTest(const std::string &arg, const string &ip);
+	void doTest(const std::string &arg, const string &ip, string expand = "");
 
 	//void libevent_test(const std::string &arg);
 

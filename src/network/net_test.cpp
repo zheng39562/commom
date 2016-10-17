@@ -73,8 +73,8 @@ string g_TestContext_3 = "daskfvaovuqovqir124190";
 string g_Ip("");
 #define TEST_LISTEN_PORT 12345
 #define TEST_CONNECT_PORT TEST_LISTEN_PORT
-	void doTest(const string &arg, const string &ip){
-		SingleLogServer::getInstance()->InitLog("./log", "network");
+	void doTest(const string &arg, const string &ip, string expand){
+		SingleLogServer::getInstance()->InitLog("./log", "network_" + arg + "_" + expand);
 
 		g_Ip = ip;
 
@@ -166,7 +166,7 @@ string g_Ip("");
 	}
 
 
-#define PERFROMANCE_TIMES  1000000   //! 性能测试的次数。
+#define PERFROMANCE_TIMES  10000   //! 性能测试的次数。
 //#define PERFROMANCE_TIMES  3   //! 性能测试的次数。
 
 	void doPerformance(const string &arg){
@@ -183,7 +183,7 @@ string g_Ip("");
 				usleep(1);
 			}
 
-			sleep(100);
+			sleep(10);
 		}
 		if(arg == ARG_SERVER){
 			TimeCounter timeCount;
@@ -193,15 +193,17 @@ string g_Ip("");
 
 			PackerPtr pPacker;
 
-			long times(PERFROMANCE_TIMES);
+			//long times(PERFROMANCE_TIMES);
+			long times(0);
 
 			bool bNotFull(true);
 
 			timeCount.start();
-			while(bRet && times>0){
+			//while(bRet && times>0){
+			while(bRet){
 				if(net_recv_S(pPacker)){
 					if(g_TestContext_1 == string((char*)pPacker->getBuffer(), pPacker->getBufferSize())){
-						cout << --times << endl; 
+						cout << ++times << endl; 
 					}
 					else{
 						bNotFull = false;
