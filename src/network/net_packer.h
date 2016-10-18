@@ -44,9 +44,6 @@ namespace Network{
 	};
 	typedef boost::shared_ptr<Packer> PackerPtr;
 	typedef boost::shared_ptr<const Packer> ConstPackerPtr;
-
-	typedef Universal::LockQueue<PackerPtr> MPackerPtrQueue;
-	typedef MPackerPtrQueue PackerCache;
 }
 #endif 
 

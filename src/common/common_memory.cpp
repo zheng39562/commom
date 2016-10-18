@@ -152,6 +152,16 @@ namespace Universal{
 			}
 		}
 	}
+	void BinaryMemory::setBufferSize(size_t size){
+		if(m_Buffer != NULL){
+			delete m_Buffer;
+			m_Buffer = NULL;
+		}
+
+		m_Buffer = (void*)new char[size];
+		m_CurBufferSize = 0;
+		m_MaxBufferSize = size;
+	}
 
 	void BinaryMemory::print(){
 		if(m_Buffer == NULL){

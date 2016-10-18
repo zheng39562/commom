@@ -34,7 +34,13 @@ namespace Universal{
 			void delBuffer(size_t start, size_t length);
 			//! \brief	清空缓存，不释放内存。
 			void clearBuffer();
+			//! \brief	设置预留内存大小。
+			//! \note	如果大小超过不做任何操作，扩容时会保存原有数据
 			void reserve(size_t size);
+			//! \brief	重新设置内存尺寸（可能缩减，也可能增加）
+			//! \note	与reserve不同的，函数不会保留数据。
+			//! \note	没有对size大小作任何限制，所以需要注意如果申请超过预料的大小（例如100G），可能会导致程序异常。
+			void setBufferSize(size_t size);
 			//! \brief	按字节打印数据。
 			//! \note	使用循环打印，效率不高。日志级别为D。
 			void print();

@@ -61,7 +61,16 @@ namespace Network{
 	//! \note		* 写通道通过读取packer包，输出msg信息
 	//!
 	//! \todo	可以再扩展IO/文件等传输类。可能需要对类名进行一定修正。
-	//! \todo	PS：可以用过在外连接好socket的方式来当作客户端使用。后期会在此类基础上做一个简易的客户端版本。
+	/*
+			*	base link：
+				*	需要支持二进制流的数据接收和发送功能。
+				*	需要支持私有协议解析二进制流：从流到包，以及从包到流的双向支持。
+					*	外界推送和获取包都支持批量获取的(通过packer内的conneckey队列)。
+				*	支持套接字的连接和断开请求：连接支持socket，断开支持connectkey的入参方式。（libevent底层导致。）
+				*	支持链接成功后的回调函数(不支持带锁的回调，如果带锁回调死锁，会导致整个连接出问题。)。
+				*	支持错误/断开后的回调函数(不支持带锁的回调，如果带锁回调死锁，会导致整个连接出问题。)。
+				*	需要保证内存占用太高时的释放问题。
+				*	*/
 	class NetTransfer : public Transfer, public Universal::PThread{
 		public:
 			typedef map<ConnectKey, MsgStruct> MsgCache;
@@ -106,11 +115,11 @@ namespace Network{
 			Universal::PMutex m_MSend;  //! \todo 需要考虑是否可以减小锁粒度。
 			Universal::PMutex m_MRecv;
 			MsgCache m_MsgCache;
-			PackerCache m_PackerCache;			//! 缓存类需要自身带锁。
+			boost::shared_ptr<list<PackerPtr> > m_PackerList;
 			std::map<ConnectKey, Universal::BinaryMemory> m_IncompleteMsg; //!
 
-			std::list<ConnectKey> m_ConnectKeyList;  //! 当前所有链接。
-			std::set<ConnectKey> m_UnconnectSet; //! 已断开但未处理链接。
+//			std::list<ConnectKey> m_ConnectKeyList;  //! 当前所有链接。
+//			std::set<ConnectKey> m_UnconnectSet; //! 已断开但未处理链接。
 	};
 
 	//! \brief	net端口监听和消息转发类：客户端版。
