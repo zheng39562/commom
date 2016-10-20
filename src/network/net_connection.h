@@ -53,6 +53,7 @@ namespace Network{
 	};
 	//! \brief	网络传输类。
 	//! \note	基于TCP libevent socket 结构完成。不排除未来支持UDP
+	//! \note	可以学习参考使用，但并不建议在不修正的情况下直接使用（小流量没问题，但效率不佳）
 	//! 
 	//! \note	功能：
 	//! \note	1	监听端口，维护TCP连接，连接关闭通知。
@@ -60,17 +61,12 @@ namespace Network{
 	//! \note		* 读通道通过读取msg信息，输出packer包
 	//! \note		* 写通道通过读取packer包，输出msg信息
 	//!
+	//! \note	缺陷和其他：
+	//! \note	1	该类最初是期望作为游戏服务器的基础库。但详细设计思考后，发现没有能力做出一个非常好的封装。所以该功能暂时不在更新。可以作为一个简单的应用功能。
+	//! \note	2	无法删除，无法主动断开链接。
+	//! \note	3	可能因为锁的问题。效率上不算太高。
+	//!
 	//! \todo	可以再扩展IO/文件等传输类。可能需要对类名进行一定修正。
-	/*
-			*	base link：
-				*	需要支持二进制流的数据接收和发送功能。
-				*	需要支持私有协议解析二进制流：从流到包，以及从包到流的双向支持。
-					*	外界推送和获取包都支持批量获取的(通过packer内的conneckey队列)。
-				*	支持套接字的连接和断开请求：连接支持socket，断开支持connectkey的入参方式。（libevent底层导致。）
-				*	支持链接成功后的回调函数(不支持带锁的回调，如果带锁回调死锁，会导致整个连接出问题。)。
-				*	支持错误/断开后的回调函数(不支持带锁的回调，如果带锁回调死锁，会导致整个连接出问题。)。
-				*	需要保证内存占用太高时的释放问题。
-				*	*/
 	class NetTransfer : public Transfer, public Universal::PThread{
 		public:
 			typedef map<ConnectKey, MsgStruct> MsgCache;
