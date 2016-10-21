@@ -26,7 +26,7 @@
 
 #include <unistd.h>
 
-#include "common_define.h"
+#include "c_define.h"
 
 using namespace std;
 
@@ -55,7 +55,18 @@ namespace Universal{
 	//! \param[in] filePattern	正则表达式，用来获取不匹配的文件。
 	bool findFileFromDir( string path, vector<string> &fileNames );
 	bool findFileFromDir( string path, const string &filePattern, vector<string> &fileNames );
-}
+	//! \brief	利用popen/pclose函数调用用shell指令来完成绝对路径的获取。
+	//! \note	路径最大值不能超过300.
+	//! \note	此函数效率不高，不建议大量的重复调用。
+	//! \param[in]	filepath	相对路径。
+	string getAbsPath( string filepath = "." );
+	//! \brief	从路径中提取文件名。支持绝对路径和相对路径。
+	//! \note	仅支持分隔符为 '/'。
+	//! \param[in] filepath	文件路径。支持绝对路径和相对路径。但分隔符必须为 '/'
+	string getFileNameByPath( const string &filepath );
+	//! \brief	补全路径中缺失的斜杠。(如需要可扩充语义一致的相关功能)
+	string completePath( const string &path );
+}  // namespace : Universal
 
 #endif
 

@@ -13,7 +13,7 @@
 #define _LockStack_H
 
 #include <stack>
-#include "common/common_mutex.h"
+#include "common/c_thread.h"
 
 namespace Universal{
 	//! \brief	自实现的栈操作。

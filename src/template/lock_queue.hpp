@@ -12,7 +12,7 @@
 #define _LockQueue_H
 
 #include <queue>
-#include "common/common_mutex.h"
+#include "common/c_thread.h"
 
 namespace Universal{
 	//! \brief	自实现的队列操作：队列使用先进先出模式（堆）。

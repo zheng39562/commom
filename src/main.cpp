@@ -8,20 +8,15 @@
  * \version 
  * \author zheng39562@163.com
 **********************************************************/
-#include "common_define.h"
-
 #include <iostream>
 
-#include "network/net_test.h"
-#include "network/socket_simple.h"
-#include "common/common_memory.h"
-#include "common/common_thread.h"
+#include "common/c_string.h"
+#include "common/c_json.h"
 
 using namespace Universal;
-using namespace NetworkTest;
-using namespace MyTest;
 
 int main( int agrc, char **argv ){
+	/*
 	for(int i =0; i<agrc; ++i){
 		cout << argv[i] << endl;
 	}
@@ -34,16 +29,14 @@ int main( int agrc, char **argv ){
 	else{
 		cout << "parameter error" << endl;
 	}
-	/*
-	string s1 = "1213141";
-	BinaryMemory b1, b2;
-	b1.setBuffer(s1.c_str(), s1.size());
-	//b2.addBuffer(b1.getBuffer(), b1.getBufferSize());
-	b2 = b2 + b1;
-
-	cout << string((char*)b2.getBuffer(), b2.getBufferSize()) << endl;
 	*/
 
+	string s = "{\"key\":1}";
+
+	Json::Value jsValue;
+	if(JsonTool::parseJs(s, jsValue)){
+		cout << jsValue.toStyledString() << endl;
+	}
 
 	return 0;
 }

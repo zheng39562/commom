@@ -6,13 +6,13 @@
  * \version 
  * \author zheng39562@163.com
 **********************************************************/
-#include "string_util.h"
+#include "c_string.h"
 
 #include <sstream>
 #include <cctype>
 #include <algorithm>
 
-#include "common/common_tool.h"
+#include "c_tool.h"
 
 using namespace std;
 using namespace Universal;

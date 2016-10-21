@@ -6,10 +6,10 @@
  * \version 
  * \author zheng39562@163.com
 **********************************************************/
-#include "common_file.h"
+#include "c_file.h"
 
 #include "boost/regex.hpp"
-#include "common/common_tool.h"
+#include "c_tool.h"
 
 namespace Universal{
 	string readFile( const string &path ){
@@ -24,7 +24,7 @@ namespace Universal{
 			return strTmp;
 		}
 		else{
-			DEBUG_I(_RUN_FUNC_ << ": open aciton is failed.Please check arg of path:" << path << ".");
+			DEBUG_I("open aciton is failed.Please check arg of path:" << path << ".");
 			return _STRINGFALSE;
 		}
 	}
@@ -36,7 +36,7 @@ namespace Universal{
 			return true;
 		}
 		else{
-			DEBUG_I(_RUN_FUNC_ << ": open aciton is failed.Please check arg of path:" << path << ".");
+			DEBUG_I("open aciton is failed.Please check arg of path:" << path << ".");
 		}
 		return false;
 	}
@@ -48,7 +48,7 @@ namespace Universal{
 			return true;
 		}
 		else{
-			DEBUG_I(_RUN_FUNC_ << ": open aciton is failed.Please check arg of path:" << path << ".");
+			DEBUG_I("open aciton is failed.Please check arg of path:" << path << ".");
 			return false;
 		}
 	}
@@ -64,7 +64,7 @@ namespace Universal{
 			curFolder = path.substr( 0, index+1 );
 			if( access(curFolder.c_str(), F_OK ) != 0 ){
 				if( mkdir( curFolder.c_str(), mode ) != 0){
-					DEBUG_I(_RUN_FUNC_ << ": Can't create this folder.full path is " << path << ",current index is " << index << ". folder name is " << curFolder);
+					DEBUG_I("Can't create this folder.full path is " << path << ",current index is " << index << ". folder name is " << curFolder);
 					return false;
 				}
 			}
@@ -100,11 +100,10 @@ namespace Universal{
 				fileNames.push_back( dirent_p->d_name );
 			}
 		}
-		else DEBUG_I(_RUN_FUNC_ << ": open aciton is failed.Please check arg of path:" << path << ".");
+		else DEBUG_I("open aciton is failed.Please check arg of path:" << path << ".");
 		closedir( pDir);  pDir = NULL;
 		return true;
 	}
-
 
 	bool findFileFromDir( string path, const string &filePattern, vector<string> &fileNames ){
 		if( !findFileFromDir( path, fileNames ) ){ return false; }
@@ -121,6 +120,34 @@ namespace Universal{
 		}
 
 		return true;
+	}
+
+	string getAbsPath( string filepath ){
+		FILE* fp = NULL;
+		string shellCmd = "cd " + filepath + ";pwd";
+		if( (fp=popen(shellCmd.c_str(), "r" ) ) != NULL ){
+			int arraynum = 300;
+			char cpath[arraynum];
+			// 去掉获取到的\n
+			filepath = trimRight( fgets(cpath, arraynum, fp) );
+			pclose( fp);  fp = NULL;
+		}
+		if( filepath.find_last_of("/") != filepath.size()-1 )
+			filepath += "/";
+
+		return filepath;
+	}
+
+	string getFileNameByPath( const string &filepath ){
+		long folderIndex = filepath.find_last_of( '/', filepath.size() )+1;
+		return filepath.substr( folderIndex, filepath.size()-folderIndex );
+	}
+
+	string completePath( const string &path ){
+		if( !path.empty() && path[path.size()-1 ] != '/' ){
+			return path + "/";
+		}
+		return path;
 	}
 } // namespace
 

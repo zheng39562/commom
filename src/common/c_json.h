@@ -12,10 +12,10 @@
 #ifndef _JsonTool_H
 #define _JsonTool_H
 
-#include "common_define.h"
+#include "c_define.h"
 #include "json/json.h"
-#include "common/common_tool.h"
-#include "common/common_file.h"
+#include "c_tool.h"
+#include "c_file.h"
 
 #include <algorithm>
 using namespace std;

@@ -12,8 +12,8 @@ using namespace Network;
 #ifndef _net_collection_H
 #define _net_collection_H
 
-#include "common_define.h"
-#include "common/json_tool.h"
+#include "c_define.h"
+#include "c_json.h"
 
 namespace Universal{
 	typedef std::string CollectionItem;

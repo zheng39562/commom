@@ -1,5 +1,5 @@
 /**********************************************************
- *  \!file common_log.h
+ *  \!file c_log.h
  *  \!brief
  *  \!note	注意事项： 
  * 			1,类中的成员函数中的同名参数的含义完全相同。仅会注释其中一个函数，其他函数则不再重复注释。重名的参数意义不同时，会独立注解。 
@@ -8,13 +8,12 @@
  * \!version 
  * * \!author zheng39562@163.com
 **********************************************************/
-#ifndef _common_log_H
-#define _common_log_H
+#ifndef _c_log_H
+#define _c_log_H
 
-#include "common_define.h"
+#include "c_define.h"
 #include "template/single_mode.hpp"
-#include "common/common_mutex.h"
-#include "common/common_thread.h"
+#include "c_thread.h"
 
 #define DEBUG_D(msg) 							{std::ostringstream osTmp; osTmp << msg; Log_D(osTmp.str(), __FILE__, __FUNCTION__, __LINE__);}
 #define DEBUG_I(msg) 							{std::ostringstream osTmp; osTmp << msg; Log_D(osTmp.str(), __FILE__, __FUNCTION__, __LINE__);}
@@ -41,7 +40,7 @@ namespace Universal{
 			void writeLog(const std::string &time, const eLogLevel &level, const std::string &fileName, const std::string &funcName, const long &line, const std::string &msg);
 		protected:
 			virtual void execute();
-			string getLevelString(const eLogLevel &level);
+			std::string getLevelString(const eLogLevel &level);
 		private:
 			std::string m_Path;
 			std::string m_FileName;

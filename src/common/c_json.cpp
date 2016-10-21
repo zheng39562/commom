@@ -6,14 +6,13 @@
  * \version 
  * \author zheng39562@163.com
 **********************************************************/
-#include "json_tool.h"
+#include "c_json.h"
 
-#include "common/common_tool.h"
+#include "c_tool.h"
 
 namespace Universal{
-#define _JSONTOOL_FUNC_								_COMMON_FUNC_( "JsonTool")
-	string JsonTool::indexOfSplittingPath = _SPLITKEY_POINT;
-	string JsonTool::indexOfSplittingKey = _SPLITKEY_COMMA;
+	string JsonTool::indexOfSplittingPath = ".";
+	string JsonTool::indexOfSplittingKey = ",";
 
 	JsonTool::JsonTool( ){;}
 	JsonTool::~JsonTool( ){;}

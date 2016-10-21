@@ -13,7 +13,6 @@
 
 #include <map>
 #include <vector>
-#include "common_define.h"
 
 /*
  * template function

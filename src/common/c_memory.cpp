@@ -1,5 +1,5 @@
 /**********************************************************
- *  \!file common_memory.cpp
+ *  \!file c_memory.cpp
  *  \!brief
  *  \!note	注意事项： 
  * 			1,类中的成员函数中的同名参数的含义完全相同。仅会注释其中一个函数，其他函数则不再重复注释。重名的参数意义不同时，会独立注解。 
@@ -8,7 +8,7 @@
  * \!version 
  * * \!author zheng39562@163.com
 **********************************************************/
-#include "common_memory.h"
+#include "c_memory.h"
 
 #include <string.h>
 
@@ -28,7 +28,7 @@ namespace Universal{
 
 	BinaryMemory::~BinaryMemory(){
 		if(m_Buffer){
-			delete (char*)m_Buffer;
+			free(m_Buffer);
 			m_Buffer = NULL;
 		}
 	}
@@ -61,13 +61,13 @@ namespace Universal{
 			if(size > m_MaxBufferSize){
 				m_MaxBufferSize = size;
 
-				delete (char*)m_Buffer;
-				m_Buffer = (void*)new char[m_MaxBufferSize];
+				free(m_Buffer);
+				m_Buffer = malloc(m_MaxBufferSize);
 			}
 		}
 		else{
 			m_MaxBufferSize = size;
-			m_Buffer = (void*)new char[m_MaxBufferSize];
+			m_Buffer = malloc(m_MaxBufferSize);
 		}
 		memset(m_Buffer, 0, m_MaxBufferSize);
 		memcpy(m_Buffer, buffer, m_CurBufferSize);
@@ -80,23 +80,23 @@ namespace Universal{
 
 		if(m_Buffer){
 			if(m_CurBufferSize + size > m_MaxBufferSize){
-				void* pBufferTmp = (void*)new char[m_CurBufferSize];
+				void* pBufferTmp = malloc(m_MaxBufferSize);
 				memcpy(pBufferTmp, m_Buffer, m_CurBufferSize);
 
 				m_MaxBufferSize = (size + m_CurBufferSize) * 2;
 
-				delete (char*)m_Buffer;
-				m_Buffer = (void*)new char[m_MaxBufferSize];
+				free(m_Buffer);
+				m_Buffer = malloc(m_MaxBufferSize);
 				memset(m_Buffer, 0, m_MaxBufferSize);
 				memcpy(m_Buffer, pBufferTmp, m_CurBufferSize);
 
-				delete (char*)pBufferTmp;
+				free(pBufferTmp);
 			}
 		}
 		else{
 			m_CurBufferSize = 0;
 			m_MaxBufferSize = size;
-			m_Buffer = (void*)new char[m_MaxBufferSize];
+			m_Buffer = malloc(m_MaxBufferSize);
 		}
 		void* pAddPos = (char*)m_Buffer + m_CurBufferSize;
 		memcpy(pAddPos, buffer, size);
@@ -107,12 +107,12 @@ namespace Universal{
 		if(m_CurBufferSize > start){
 			length = length < (m_CurBufferSize - start) ? length : m_CurBufferSize - start;
 
-			char* pMoveBuffer(NULL);
+			void* pMoveBuffer(NULL);
 			size_t movePos = start + length;
 			size_t moveLength = m_CurBufferSize - movePos;
 
 			if(moveLength != 0){
-				pMoveBuffer = new char[moveLength];
+				pMoveBuffer = malloc(moveLength);
 				memcpy(pMoveBuffer, (char*)m_Buffer + movePos, moveLength);
 			}
 
@@ -120,7 +120,7 @@ namespace Universal{
 
 			if(pMoveBuffer != NULL){
 				memcpy((char*)m_Buffer + start, pMoveBuffer, moveLength);
-				delete pMoveBuffer; pMoveBuffer = NULL;
+				free(pMoveBuffer); pMoveBuffer = NULL;
 			}
 			
 			m_CurBufferSize -= length;
@@ -134,31 +134,31 @@ namespace Universal{
 
 	void BinaryMemory::reserve(size_t size){
 		if(m_MaxBufferSize < size){
-			char* pSaveBuffer(NULL);
+			void* pSaveBuffer(NULL);
 			if(m_CurBufferSize != 0){
-				pSaveBuffer= new char[m_CurBufferSize];
+				pSaveBuffer= (void*)malloc(m_CurBufferSize);
 				memcpy(pSaveBuffer, m_Buffer, m_CurBufferSize);
 			}
 			if(m_Buffer != NULL){
-				delete (char*)m_Buffer; m_Buffer = NULL;
+				free(m_Buffer); m_Buffer = NULL;
 			}
 
-			m_Buffer = (void*)new char[size];
+			m_Buffer = malloc(size);
 			m_MaxBufferSize = size;
 
 			if(pSaveBuffer != NULL && m_Buffer != NULL){
 				memcpy(m_Buffer, pSaveBuffer, m_CurBufferSize);
-				delete pSaveBuffer; pSaveBuffer = NULL;
+				free(pSaveBuffer); pSaveBuffer = NULL;
 			}
 		}
 	}
 	void BinaryMemory::setBufferSize(size_t size){
 		if(m_Buffer != NULL){
-			delete m_Buffer;
+			free(m_Buffer);
 			m_Buffer = NULL;
 		}
 
-		m_Buffer = (void*)new char[size];
+		m_Buffer = malloc(size);
 		m_CurBufferSize = 0;
 		m_MaxBufferSize = size;
 	}

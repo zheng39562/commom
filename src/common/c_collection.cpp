@@ -8,9 +8,9 @@
  * \!version 
  * * \!author zheng39562@163.com
 **********************************************************/
-#include "collection.h"
+#include "c_collection.h"
 
-#include "common/string_util.h"
+#include "c_string.h"
 
 namespace Universal{
 	#define CONVERT_JSON_QUOTED(content) doubleQuotedStr(strToJsonStr(content));

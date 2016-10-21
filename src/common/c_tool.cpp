@@ -6,68 +6,19 @@
  * \version 
  * \author zheng39562@163.com
 **********************************************************/
-#include "common_tool.h"
+#include "c_tool.h"
 
-#include "common/string_util.h"
+#include "common/c_string.h"
 #include "boost/regex.hpp"
 
 using namespace boost;
 
-/*
- * file path 
- */
-namespace Universal{
-	string getAbsPath( string filepath ){
-		FILE* fp = NULL;
-		string shellCmd = "cd " + filepath + ";pwd";
-		if( (fp=popen(shellCmd.c_str(), "r" ) ) != NULL ){
-			int arraynum = 300;
-			char cpath[arraynum];
-			// 去掉获取到的\n
-			filepath = trimRight( fgets(cpath, arraynum, fp) );
-			pclose( fp);  fp = NULL;
-		}
-		if( filepath.find_last_of("/") != filepath.size()-1 )
-			filepath += "/";
-
-		return filepath;
-	}
-
-	string getFileNameByPath( const string &filepath ){
-		long folderIndex = filepath.find_last_of( '/', filepath.size() )+1;
-		return filepath.substr( folderIndex, filepath.size()-folderIndex );
-	}
-
-	string completePath( const string &path ){
-		if( !path.empty() && path[path.size()-1 ] != '/' ){
-			return path + "/";
-		}
-		return path;
-	}
-
-}  // namepsace : Universal
 
 
 /*
  * other function
  */
 namespace Universal{
-	void filterDuplicateValue( vector<string> &duplicateArray ){
-		vector<string> newArray;
-		bool isNewValue;
-		for( vector<string>::const_iterator citerDuplicate = duplicateArray.begin(); citerDuplicate != duplicateArray.end(); ++citerDuplicate ){
-			isNewValue = true;
-			for( vector<string>::const_iterator citerSingleValue = newArray.begin(); citerSingleValue != newArray.end(); ++citerSingleValue ){
-				if( *citerSingleValue == *citerDuplicate )
-					isNewValue = false;
-			}
-			if( isNewValue )
-				newArray.push_back( *citerDuplicate );
-		}
-		duplicateArray = newArray;
-	}
-
-
 	bool execShellCmd( const string &cmd ){
 		FILE* fp = NULL;
 		if( (fp=popen(cmd.c_str(), "r" ) ) != NULL ){

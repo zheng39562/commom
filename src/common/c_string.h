@@ -10,7 +10,7 @@
 #ifndef _StrUtil_H
 #define _StrUtil_H
 
-#include "common_define.h"
+#include "c_define.h"
 
 //
 // 字符和其他格式之间的转换。

@@ -11,7 +11,7 @@
 #ifndef _Timer_H
 #define _Timer_H
 
-#include "common/common_tool.h"
+#include "c_tool.h"
 
 //
 // 时间通用函数。

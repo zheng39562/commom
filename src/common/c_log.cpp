@@ -1,5 +1,5 @@
 /**********************************************************
- *  \!file common_log.cpp
+ *  \!file c_log.cpp
  *  \!brief
  *  \!note	注意事项： 
  * 			1,类中的成员函数中的同名参数的含义完全相同。仅会注释其中一个函数，其他函数则不再重复注释。重名的参数意义不同时，会独立注解。 
@@ -8,15 +8,15 @@
  * \!version 
  * * \!author zheng39562@163.com
 **********************************************************/
-#include "common_log.h"
+#include "c_log.h"
 
 #include <unistd.h>
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include "common_define.h"
-#include "common/common_file.h"
-#include "common/common_tool.h"
+#include "c_define.h"
+#include "c_file.h"
+#include "c_tool.h"
 
 using namespace std;
 using namespace Universal;
