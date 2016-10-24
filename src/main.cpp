@@ -10,8 +10,8 @@
 **********************************************************/
 #include <iostream>
 
-#include "common/c_string.h"
-#include "common/c_json.h"
+#include "fr_public/pub_string.h"
+#include "fr_public/pub_json.h"
 
 using namespace Universal;
 
