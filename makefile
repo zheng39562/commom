@@ -36,7 +36,7 @@ all: fr_public fr_sql fr_template fr_xls
 
 # 测试使用main 链接库根据测试调整。
 test:
-	g++ -DDEBUG -D__LINUX -g -std=c++11 -c ./src/main.cpp -o Main_64 -I./library/include/ -L./library/lib64/ -luuid -pthread -lrt -ldl
+	g++ -DDEBUG -D__LINUX -g -std=c++11 ./src/main.cpp -I./library/include/ -L./library/lib64/ -lfr_public -luuid -pthread -lrt -ldl -o Main_64 
 		
 .PHONY: fr_public fr_sql fr_template fr_xls
 

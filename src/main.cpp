@@ -30,13 +30,9 @@ int main( int agrc, char **argv ){
 		cout << "parameter error" << endl;
 	}
 	*/
+	InitABC();
 
-	string s = "{\"key\":1}";
-
-	Json::Value jsValue;
-	if(JsonTool::parseJs(s, jsValue)){
-		cout << jsValue.toStyledString() << endl;
-	}
+	DEBUG_D("123");
 
 	return 0;
 }

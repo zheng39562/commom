@@ -36,7 +36,7 @@ namespace Universal{
 		;
 	}
 
-	void LogServer::InitLog(const string &path, const string &fileName){
+	void LogServer::initLog(const string &path, const string &fileName){
 		m_FileName = fileName;
 		m_Path = completePath(path);
 

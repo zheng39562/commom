@@ -36,7 +36,7 @@ namespace Universal{
 			LogServer();
 			~LogServer();
 		public:
-			void InitLog(const std::string &path, const std::string &fileName);
+			void initLog(const std::string &path, const std::string &fileName);
 			void writeLog(const std::string &time, const eLogLevel &level, const std::string &fileName, const std::string &funcName, const long &line, const std::string &msg);
 		protected:
 			virtual void execute();
