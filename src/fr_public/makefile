@@ -13,8 +13,7 @@ LIB_LIB=-L${THIRDPART_PATH}/lib64 ${THIRDPART_LIB} -luuid -pthread -lrt -ldl
 #
 CXX=g++
 MACRO=-DDEBUG -D__LINUX
-LDFLAGS=-shared
-CFLAGS=-g -std=c++11 -fPIC
+CFLAGS=-g -std=c++11
 LINK_NONEEDED=-Wl,--no-as-needed
 
 PROJECT_PATH=../../out

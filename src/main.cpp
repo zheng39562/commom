@@ -30,8 +30,6 @@ int main( int agrc, char **argv ){
 		cout << "parameter error" << endl;
 	}
 	*/
-	InitABC();
-
 	DEBUG_D("123");
 
 	return 0;

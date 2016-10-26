@@ -36,7 +36,7 @@ all: fr_public fr_sql fr_template fr_xls
 
 # 测试使用main 链接库根据测试调整。
 test:
-	g++ -DDEBUG -D__LINUX -g -std=c++11 ./src/main.cpp -I./library/include/ -L./library/lib64/ -lfr_public -luuid -pthread -lrt -ldl -o Main_64 
+	g++ -DDEBUG -D__LINUX -g -std=c++11 ./src/main.cpp -I./library/include/ -L./library/lib64/ -lfr_public -lfr_xls -lfr_sql -lboost_regex -luuid -pthread -lrt -ldl -o Main_64 
 		
 .PHONY: fr_public fr_sql fr_template fr_xls
 
@@ -72,4 +72,8 @@ tags:
 	touch tags
 	find . -iname '*.cpp' -or -iname '*.c' -or -iname '*.h'-or -iname '*.hpp' | xargs ctags --c++-kinds=+p --fields=+iaS --extra=+q --langmap=c++:+.inl -a tags
 
+# 一些历史遗留。部分可能还会用到
+#CFLAGS=-g -std=c++11 -fPIC
+#LDFLAGS=-shared
+#$(CXX) $(LDFLAGS) -o ${THIRDPART_LIB_PATH}/${TARGET} ${PROJECT_OBJECTS} ${MAIN_OBJECT} ${LIB_LIB} ${LINK_NONEEDED}
 
