@@ -36,6 +36,10 @@ namespace Universal{
 
 			//! \brief	线程启动
 			bool start();
+			//! \brief	线程暂停
+			void pause();
+			//! \brief	线程恢复（针对暂停）
+			void resume();
 			//! \brief	线程关闭。
 			void stop();
 			//! \brief	等待线程退出。

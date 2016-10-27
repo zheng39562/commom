@@ -43,6 +43,14 @@ namespace Universal{
 		return iRet == 0;
 	}
 
+	void FCThread::pause(){
+		;
+	}
+
+	void FCThread::resume(){
+		;
+	}
+
 	void FCThread::stop(){
 		m_ThreadStatus = eThreadStatus_Exit;
 		m_Thread = -1;
