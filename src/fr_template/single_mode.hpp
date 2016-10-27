@@ -47,12 +47,12 @@ namespace DesignMode{
 			static Deleter						m_s_Deleter;
 		private:
 			static SingleMode<T>*					m_s_p_Instance;  // 
-			static Universal::PMutex				m_s_Mutex;
+			static Universal::FCMutex				m_s_Mutex;
 	
 			boost::shared_ptr<T>					m_p_Object;
 	};
 
-	template < typename T > Universal::PMutex		SingleMode<T>::m_s_Mutex = Universal::PMutex();
+	template < typename T > Universal::FCMutex		SingleMode<T>::m_s_Mutex = Universal::FCMutex();
 	template < typename T > SingleMode<T>*		SingleMode<T>::m_s_p_Instance = NULL;
 	
 	template < typename T >

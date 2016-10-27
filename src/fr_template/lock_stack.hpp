@@ -24,7 +24,7 @@ namespace Universal{
 			LockStack();
 			~LockStack();
 		private:
-			PMutex					m_Mutex;
+			FCMutex					m_Mutex;
 			std::stack<T>				m_Stack;
 		public:
 			//! \brief	推送数据进栈

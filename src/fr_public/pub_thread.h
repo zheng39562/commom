@@ -25,12 +25,12 @@ namespace Universal{
 	//!				...
 	//!			}
 	//! \todo	支持window
-	class PThread{
+	class FCThread{
 		public:
 			typedef pthread_t THREAD;
 		public:
-			PThread();
-			virtual ~PThread();
+			FCThread();
+			virtual ~FCThread();
 		public:
 			static void* threadProxy(void* args);
 
@@ -56,10 +56,10 @@ namespace Universal{
 namespace Universal{
 	//! \brief
 	//! \todo	需要按照pthread结构扩充类属性，按照pthead的属性先建立基本结构。
-	class PMutex{
+	class FCMutex{
 		public: 
-			PMutex(){ pthread_mutex_init( &mutex, NULL ); }	
-			~PMutex()=default;
+			FCMutex(){ pthread_mutex_init( &mutex, NULL ); }	
+			~FCMutex()=default;
 		private:
 			mutable pthread_mutex_t mutex; 
 		public:
@@ -70,7 +70,7 @@ namespace Universal{
 			inline int unlock(){ return pthread_mutex_unlock( &mutex); }
 	};
 	//! \brief	读写锁未完成
-	typedef PMutex RWMutex;
+	typedef FCMutex RWMutex;
 }
   
 #endif  

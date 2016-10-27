@@ -23,7 +23,7 @@ namespace Universal{
 			LockQueue();
 			~LockQueue();
 		private:
-			PMutex					m_Mutex;
+			FCMutex					m_Mutex;
 			std::queue<T>				m_Queue;
 		public:
 			void clear();

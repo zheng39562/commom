@@ -11,19 +11,19 @@
 #include "pub_thread.h"
 
 namespace Universal{
-	PThread::PThread()
+	FCThread::FCThread()
 		:m_Thread(-1),
 		 m_ThreadStatus(eThreadStatus_New)
 	{ ; }
 
-	PThread::~PThread() { 
+	FCThread::~FCThread() { 
 		if(m_Thread != -1){
 			pthread_exit(NULL); 
 		}
 	}
 
-	void* PThread::threadProxy(void* args){
-		PThread *pThread = static_cast<PThread*>(args);
+	void* FCThread::threadProxy(void* args){
+		FCThread *pThread = static_cast<FCThread*>(args);
 		pThread->execute();
 
 		pthread_exit(NULL);
@@ -31,8 +31,8 @@ namespace Universal{
 		return NULL;
 	}
 
-	bool PThread::start(){
-		int iRet = pthread_create(&m_Thread, NULL, PThread::threadProxy, this);
+	bool FCThread::start(){
+		int iRet = pthread_create(&m_Thread, NULL, FCThread::threadProxy, this);
 		if(iRet == 0){
 			m_Thread = pthread_self();
 			m_ThreadStatus = eThreadStatus_Run;
@@ -43,13 +43,13 @@ namespace Universal{
 		return iRet == 0;
 	}
 
-	void PThread::stop(){
+	void FCThread::stop(){
 		m_ThreadStatus = eThreadStatus_Exit;
 		m_Thread = -1;
 		pthread_exit(NULL);
 	}
 
-	void PThread::join(){
+	void FCThread::join(){
 		if (m_Thread > 0){  
 			pthread_join(m_Thread, NULL);  
 		}  

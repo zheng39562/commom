@@ -31,7 +31,7 @@ namespace Universal{
 	};
 	//! \brief	日志记录类。
 	//! \note	简略的提供分文件功能：100W条数据作为一个文件。
-	class LogServer : public PThread{
+	class LogServer : public FCThread{
 		public:
 			LogServer();
 			~LogServer();
@@ -45,7 +45,7 @@ namespace Universal{
 			std::string m_Path;
 			std::string m_FileName;
 			std::ostringstream m_Cache;
-			PMutex m_MCache;
+			FCMutex m_MCache;
 			size_t m_MaxLine; 
 			size_t m_CurLine; 
 	};
