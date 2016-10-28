@@ -1,9 +1,9 @@
 /**********************************************************
  *  \!file pub_log.cpp
  *  \!brief
- *  \!note	注意事项： 
- * 			1,类中的成员函数中的同名参数的含义完全相同。仅会注释其中一个函数，其他函数则不再重复注释。重名的参数意义不同时，会独立注解。 
- * 			2,第1条的规则同样适用于返回值的含义。 
+ *  \!note	×¢ÒâÊÂÏî£º 
+ * 			1,ÀàÖÐµÄ³ÉÔ±º¯ÊýÖÐµÄÍ¬Ãû²ÎÊýµÄº¬ÒåÍêÈ«ÏàÍ¬¡£½ö»á×¢ÊÍÆäÖÐÒ»¸öº¯Êý£¬ÆäËûº¯ÊýÔò²»ÔÙÖØ¸´×¢ÊÍ¡£ÖØÃûµÄ²ÎÊýÒâÒå²»Í¬Ê±£¬»á¶ÀÁ¢×¢½â¡£ 
+ * 			2,µÚ1ÌõµÄ¹æÔòÍ¬ÑùÊÊÓÃÓÚ·µ»ØÖµµÄº¬Òå¡£ 
  * 
  * \!version 
  * * \!author zheng39562@163.com
@@ -63,17 +63,17 @@ namespace Universal{
 	string LogServer::getLevelString(const eLogLevel &level){
 		switch(level){
 			case eLogLevel_Debug:
-				return "调试";
+				return "µ÷ÊÔ";
 			case eLogLevel_Info:
-				return "消息";
+				return "ÏûÏ¢";
 			case eLogLevel_Warning:
-				return "警告";
+				return "¾¯¸æ";
 			case eLogLevel_Error:
-				return "错误";
+				return "´íÎó";
 			case eLogLevel_Crash:
-				return "异常";
+				return "Òì³£";
 		}
-		return "未知";
+		return "Î´Öª";
 	}
 
 	void LogServer::execute(){

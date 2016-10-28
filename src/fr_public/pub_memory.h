@@ -1,9 +1,9 @@
 /**********************************************************
  *  \!file pub_memory.h
  *  \!brief
- *  \!note	注意事项： 
- * 			1,类中的成员函数中的同名参数的含义完全相同。仅会注释其中一个函数，其他函数则不再重复注释。重名的参数意义不同时，会独立注解。 
- * 			2,第1条的规则同样适用于返回值的含义。 
+ *  \!note	×¢ÒâÊÂÏî£º 
+ * 			1,ÀàÖÐµÄ³ÉÔ±º¯ÊýÖÐµÄÍ¬Ãû²ÎÊýµÄº¬ÒåÍêÈ«ÏàÍ¬¡£½ö»á×¢ÊÍÆäÖÐÒ»¸öº¯Êý£¬ÆäËûº¯ÊýÔò²»ÔÙÖØ¸´×¢ÊÍ¡£ÖØÃûµÄ²ÎÊýÒâÒå²»Í¬Ê±£¬»á¶ÀÁ¢×¢½â¡£ 
+ * 			2,µÚ1ÌõµÄ¹æÔòÍ¬ÑùÊÊÓÃÓÚ·µ»ØÖµµÄº¬Òå¡£ 
  * 
  * \!version 
  * * \!author zheng39562@163.com
@@ -14,7 +14,7 @@
 #include "pub_define.h"
 
 namespace Universal{
-	//! \brief	用于储存二进制流数据。并支持类似string的运算符操作。
+	//! \brief	ÓÃÓÚ´¢´æ¶þ½øÖÆÁ÷Êý¾Ý¡£²¢Ö§³ÖÀàËÆstringµÄÔËËã·û²Ù×÷¡£
 	//! \note
 	class BinaryMemory{
 		public:
@@ -28,22 +28,22 @@ namespace Universal{
 		public:
 			void addBuffer(const void* buffer, size_t size);
 			void setBuffer(const void* buffer, size_t size);
-			//! \brief	删除部分内容
-			//! \param[in] start 起始位置，如果大于当前最大尺寸则不删除任何内容。
-			//! \param[in] length 删除的字节数。如果超过当前保存内容，则只删除到末尾。
+			//! \brief	É¾³ý²¿·ÖÄÚÈÝ
+			//! \param[in] start ÆðÊ¼Î»ÖÃ£¬Èç¹û´óÓÚµ±Ç°×î´ó³ß´çÔò²»É¾³ýÈÎºÎÄÚÈÝ¡£
+			//! \param[in] length É¾³ýµÄ×Ö½ÚÊý¡£Èç¹û³¬¹ýµ±Ç°±£´æÄÚÈÝ£¬ÔòÖ»É¾³ýµ½Ä©Î²¡£
 			void delBuffer(size_t start, size_t length);
-			//! \brief	清空缓存，不释放内存。
+			//! \brief	Çå¿Õ»º´æ£¬²»ÊÍ·ÅÄÚ´æ¡£
 			void clearBuffer();
-			//! \brief	设置预留内存大小。
-			//! \note	如果大小超过不做任何操作，扩容时会保存原有数据
+			//! \brief	ÉèÖÃÔ¤ÁôÄÚ´æ´óÐ¡¡£
+			//! \note	Èç¹û´óÐ¡³¬¹ý²»×öÈÎºÎ²Ù×÷£¬À©ÈÝÊ±»á±£´æÔ­ÓÐÊý¾Ý
 			void reserve(size_t size);
-			//! \brief	重新设置内存尺寸（可能缩减，也可能增加）
-			//! \note	与reserve不同的，函数不会保留数据。
-			//! \note	没有对size大小作任何限制，所以需要注意如果申请超过预料的大小（例如100G），可能会导致程序异常。
+			//! \brief	ÖØÐÂÉèÖÃÄÚ´æ³ß´ç£¨¿ÉÄÜËõ¼õ£¬Ò²¿ÉÄÜÔö¼Ó£©
+			//! \note	Óëreserve²»Í¬µÄ£¬º¯Êý²»»á±£ÁôÊý¾Ý¡£
+			//! \note	Ã»ÓÐ¶Ôsize´óÐ¡×÷ÈÎºÎÏÞÖÆ£¬ËùÒÔÐèÒª×¢ÒâÈç¹ûÉêÇë³¬¹ýÔ¤ÁÏµÄ´óÐ¡£¨ÀýÈç100G£©£¬¿ÉÄÜ»áµ¼ÖÂ³ÌÐòÒì³£¡£
 			void setBufferSize(size_t size);
-			//! \brief	按字节打印数据。
-			//! \note	使用循环打印，效率不高。日志级别为D。
-			void print();
+			//! \brief	°´×Ö½Ú´òÓ¡Êý¾Ý¡£
+			//! \note	Ê¹ÓÃÑ­»·´òÓ¡£¬Ð§ÂÊ²»¸ß¡£ÈÕÖ¾¼¶±ðÎªD¡£
+			void print()const;
 
 			inline bool empty()const{ return m_CurBufferSize == 0; }
 			inline const void* getBuffer()const{ return m_Buffer; }
@@ -55,4 +55,5 @@ namespace Universal{
 	};
 }
 #endif 
+
 

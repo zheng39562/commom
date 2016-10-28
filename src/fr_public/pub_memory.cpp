@@ -1,9 +1,9 @@
 /**********************************************************
  *  \!file pub_memory.cpp
  *  \!brief
- *  \!note	注意事项： 
- * 			1,类中的成员函数中的同名参数的含义完全相同。仅会注释其中一个函数，其他函数则不再重复注释。重名的参数意义不同时，会独立注解。 
- * 			2,第1条的规则同样适用于返回值的含义。 
+ *  \!note	×¢ÒâÊÂÏî£º 
+ * 			1,ÀàÖÐµÄ³ÉÔ±º¯ÊýÖÐµÄÍ¬Ãû²ÎÊýµÄº¬ÒåÍêÈ«ÏàÍ¬¡£½ö»á×¢ÊÍÆäÖÐÒ»¸öº¯Êý£¬ÆäËûº¯ÊýÔò²»ÔÙÖØ¸´×¢ÊÍ¡£ÖØÃûµÄ²ÎÊýÒâÒå²»Í¬Ê±£¬»á¶ÀÁ¢×¢½â¡£ 
+ * 			2,µÚ1ÌõµÄ¹æÔòÍ¬ÑùÊÊÓÃÓÚ·µ»ØÖµµÄº¬Òå¡£ 
  * 
  * \!version 
  * * \!author zheng39562@163.com
@@ -163,20 +163,22 @@ namespace Universal{
 		m_MaxBufferSize = size;
 	}
 
-	void BinaryMemory::print(){
+	void BinaryMemory::print()const{
 		if(m_Buffer == NULL){
-			DEBUG_D("对象缓存未初始化。");
+			DEBUG_D("¶ÔÏó»º´æÎ´³õÊ¼»¯¡£");
 			return;
 		}
 
 		char* msg = (char*)m_Buffer;
-		long index(0);
+		size_t index(0);
+		ostringstream ostr;
+		ostr << "buffer is [";
 		while(index < m_CurBufferSize){
-			DEBUG_D("buffer[" << index << "]"
-				<<"C[" << msg[index] << "]"
-				<<"I[" << (unsigned)msg[index] << "]");
+			ostr << (unsigned char)msg[index] << "|";
 			++index;
 		}
+		ostr << "]";
+		DEBUG_D(ostr.str());
 	}
 
 }

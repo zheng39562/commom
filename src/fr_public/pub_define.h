@@ -1,26 +1,45 @@
 /**********************************************************
- *  \file pub_define.h
- *  \note	公共的define。基本所有项目公用。
+ *  \!file pub_define.h
+ *  \!brief
+ *  \!note	×¢ÒâÊÂÏî£º 
+ * 			1,ÀàÖÐµÄ³ÉÔ±º¯ÊýÖÐµÄÍ¬Ãû²ÎÊýµÄº¬ÒåÍêÈ«ÏàÍ¬¡£½ö»á×¢ÊÍÆäÖÐÒ»¸öº¯Êý£¬ÆäËûº¯ÊýÔò²»ÔÙÖØ¸´×¢ÊÍ¡£ÖØÃûµÄ²ÎÊýÒâÒå²»Í¬Ê±£¬»á¶ÀÁ¢×¢½â¡£ 
+ * 			2,µÚ1ÌõµÄ¹æÔòÍ¬ÑùÊÊÓÃÓÚ·µ»ØÖµµÄº¬Òå¡£ 
  * 
- * \version 
- * * \author zheng39562@163.com
+ * \!version 
+ * * \!author zheng39562@163.com
 **********************************************************/
 #ifndef _pub_define_H
 #define _pub_define_H
 
-//! \note	string list map vector 常用的stl直接通过define包含。
+//! \note	string list map vector ³£ÓÃµÄstlÖ±½ÓÍ¨¹ýdefine°üº¬¡£
 #include <string>
 #include <vector>
 #include <list>
 #include <map>
 #include <set>
 #include <sstream>
-#include "fr_public/pub_log.h"
+#include <iostream>
+//#include "fr_public/pub_log.h"
 
 using namespace std;
+
+typedef unsigned char Byte;
 typedef string Name;
 typedef string Path;
-typedef unsigned char Byte;
+
+
+/*
+#define DEBUG_D(msg)  cout << msg;
+#define DEBUG_I(msg)  cout << msg;
+#define DEBUG_W(msg)  cout << msg;
+#define DEBUG_C(msg)  cout << msg;
+#define DEBUG_E(msg)  cout << msg;
+*/
+#define DEBUG_D(msg)  cout << msg << endl;
+#define DEBUG_I(msg)  cout << msg << endl;
+#define DEBUG_W(msg)  cout << msg << endl;
+#define DEBUG_C(msg)  cout << msg << endl;
+#define DEBUG_E(msg)  cout << msg << endl;
 
 /// *******************************************************************************************************
 

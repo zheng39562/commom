@@ -10,56 +10,57 @@
 **********************************************************/
 #include "pub_thread.h"
 
+#include "boost/bind.hpp"
+#include <boost/thread/condition.hpp>
+#include <boost/thread/detail/thread.hpp>
+#include <boost/thread/thread_time.hpp>
+
+using namespace boost;
+
 namespace Universal{
-	FCThread::FCThread()
-		:m_Thread(-1),
+	FrThread::FrThread()
+		:m_pThread(NULL),
 		 m_ThreadStatus(eThreadStatus_New)
+		 m_Cond(),
+		 m_Mutex()
 	{ ; }
 
-	FCThread::~FCThread() { 
-		if(m_Thread != -1){
-			pthread_exit(NULL); 
+	FrThread::~FrThread() { 
+		if(m_pThread != NULL){
+			m_pThread->join();
+			delete m_pThread;
 		}
 	}
 
-	void* FCThread::threadProxy(void* args){
-		FCThread *pThread = static_cast<FCThread*>(args);
-		pThread->execute();
 
-		pthread_exit(NULL);
-
-		return NULL;
+	void FrThread::threadProxy(){
+		this->execute();
 	}
 
-	bool FCThread::start(){
-		int iRet = pthread_create(&m_Thread, NULL, FCThread::threadProxy, this);
-		if(iRet == 0){
-			m_Thread = pthread_self();
-			m_ThreadStatus = eThreadStatus_Run;
-		}
-		else{
-			//DEBUG_E("create thread failed. error no [" << iRet << "]");
-		}
-		return iRet == 0;
+	void FrThread::start(){
+		function0<void> func = bind(&FrThread::threadProxy, this);
+		m_pThread = new thread(func);
+		m_ThreadStatus = eThreadStatus_Run;
 	}
 
-	void FCThread::pause(){
-		;
-	}
-
-	void FCThread::resume(){
-		;
-	}
-
-	void FCThread::stop(){
+	void FrThread::stop(){
 		m_ThreadStatus = eThreadStatus_Exit;
-		m_Thread = -1;
-		pthread_exit(NULL);
+		join();
 	}
 
-	void FCThread::join(){
-		if (m_Thread > 0){  
-			pthread_join(m_Thread, NULL);  
+	void pause(){
+		mutex::scoped_lock localLock(m_Mutex);
+		m_Cond.wait(localLock);
+	}
+
+	void resume(){
+		mutex::scoped_lock localLock(m_Mutex);
+		m_Cond.notify_all();
+	}
+
+	void FrThread::join(){
+		if (m_pThread != 0){  
+			m_pThread->join();
 		}  
 	}
 

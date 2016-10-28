@@ -1,9 +1,9 @@
 /**********************************************************
  *  \!file pub_log.h
  *  \!brief
- *  \!note	注意事项： 
- * 			1,类中的成员函数中的同名参数的含义完全相同。仅会注释其中一个函数，其他函数则不再重复注释。重名的参数意义不同时，会独立注解。 
- * 			2,第1条的规则同样适用于返回值的含义。 
+ *  \!note	×¢ÒâÊÂÏî£º 
+ * 			1,ÀàÖÐµÄ³ÉÔ±º¯ÊýÖÐµÄÍ¬Ãû²ÎÊýµÄº¬ÒåÍêÈ«ÏàÍ¬¡£½ö»á×¢ÊÍÆäÖÐÒ»¸öº¯Êý£¬ÆäËûº¯ÊýÔò²»ÔÙÖØ¸´×¢ÊÍ¡£ÖØÃûµÄ²ÎÊýÒâÒå²»Í¬Ê±£¬»á¶ÀÁ¢×¢½â¡£ 
+ * 			2,µÚ1ÌõµÄ¹æÔòÍ¬ÑùÊÊÓÃÓÚ·µ»ØÖµµÄº¬Òå¡£ 
  * 
  * \!version 
  * * \!author zheng39562@163.com
@@ -29,9 +29,9 @@ namespace Universal{
 		eLogLevel_Error,
 		eLogLevel_Crash
 	};
-	//! \brief	日志记录类。
-	//! \note	简略的提供分文件功能：100W条数据作为一个文件。
-	class LogServer : public FCThread{
+	//! \brief	ÈÕÖ¾¼ÇÂ¼Àà¡£
+	//! \note	¼òÂÔµÄÌá¹©·ÖÎÄ¼þ¹¦ÄÜ£º100WÌõÊý¾Ý×÷ÎªÒ»¸öÎÄ¼þ¡£
+	class LogServer : public FrThread{
 		public:
 			LogServer();
 			~LogServer();
@@ -45,7 +45,7 @@ namespace Universal{
 			std::string m_Path;
 			std::string m_FileName;
 			std::ostringstream m_Cache;
-			FCMutex m_MCache;
+			PMutex m_MCache;
 			size_t m_MaxLine; 
 			size_t m_CurLine; 
 	};
