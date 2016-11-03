@@ -1,9 +1,6 @@
 /**********************************************************
  *  \!file pub_memory.cpp
  *  \!brief
- *  \!note	×¢ÒâÊÂÏî£º 
- * 			1,ÀàÖÐµÄ³ÉÔ±º¯ÊýÖÐµÄÍ¬Ãû²ÎÊýµÄº¬ÒåÍêÈ«ÏàÍ¬¡£½ö»á×¢ÊÍÆäÖÐÒ»¸öº¯Êý£¬ÆäËûº¯ÊýÔò²»ÔÙÖØ¸´×¢ÊÍ¡£ÖØÃûµÄ²ÎÊýÒâÒå²»Í¬Ê±£¬»á¶ÀÁ¢×¢½â¡£ 
- * 			2,µÚ1ÌõµÄ¹æÔòÍ¬ÑùÊÊÓÃÓÚ·µ»ØÖµµÄº¬Òå¡£ 
  * 
  * \!version 
  * * \!author zheng39562@163.com
@@ -11,6 +8,8 @@
 #include "pub_memory.h"
 
 #include <string.h>
+
+using namespace std;
 
 namespace Universal{
 	BinaryMemory::BinaryMemory()
@@ -152,20 +151,10 @@ namespace Universal{
 			}
 		}
 	}
-	void BinaryMemory::setBufferSize(size_t size){
-		if(m_Buffer != NULL){
-			free(m_Buffer);
-			m_Buffer = NULL;
-		}
-
-		m_Buffer = malloc(size);
-		m_CurBufferSize = 0;
-		m_MaxBufferSize = size;
-	}
 
 	void BinaryMemory::print()const{
 		if(m_Buffer == NULL){
-			DEBUG_D("¶ÔÏó»º´æÎ´³õÊ¼»¯¡£");
+			DEBUG_D("11");
 			return;
 		}
 

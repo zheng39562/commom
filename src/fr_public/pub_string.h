@@ -107,6 +107,7 @@ namespace Universal{
 	//! \note	不处理中间空格，但会删除所有的制表符和换行符。
 	std::string trimRight( const std::string &str );
 	std::string trimLeft( const std::string &str );
+	std::string trim( const std::string &str );
 }  // namespace : Universal
 
 

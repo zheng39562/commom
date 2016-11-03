@@ -18,13 +18,14 @@
 namespace Universal{
 	//! \brief	自实现的栈操作。
 	//! \note	拥有自己的互斥锁。互斥锁仅对单对象做出限制：多个不同的对象没有影响。
+	//! \note	存在瑕疵：empty之后再进行pop 再多线程并发时有极小的一段时间处于解锁状态。
 	template<typename T>
 	class LockStack {
 		public:
 			LockStack();
 			~LockStack();
 		private:
-			FCMutex					m_Mutex;
+			FrMutex					m_Mutex;
 			std::stack<T>				m_Stack;
 		public:
 			//! \brief	推送数据进栈
@@ -45,47 +46,42 @@ namespace Universal{
 	template<typename T> LockStack<T>::~LockStack(){ ; }
 
 	template<typename T> void LockStack<T>::push( const T &data ){
-		m_Mutex.lock();
+		mutex::scoped_lock localLock(m_Mutex);
 		m_Stack.push( data );
-		m_Mutex.unlock();
 	}
 
 
 	template<typename T> T LockStack<T>::pop(){
-		m_Mutex.lock();
+		mutex::scoped_lock localLock(m_Mutex);
 		T dataTmp;
 		if(!m_Stack.empty()){
 			dateTmp = m_Stack.top();
 			m_Stack.pop();
 		}
-		m_Mutex.unlock();
 
 		return dateTmp;
 	}
 
 
 	template<typename T> T LockStack<T>::top(){
-		m_Mutex.lock();
+		mutex::scoped_lock localLock(m_Mutex);
 		T dataTmp = m_Stack.top();
-		m_Mutex.unlock();
 
 		return dateTmp;
 	}
 
 
 	template<typename T> bool LockStack<T>::empty(){
-		m_Mutex.lock();
+		mutex::scoped_lock localLock(m_Mutex);
 		bool empty = m_Stack.empty();
-		m_Mutex.unlock();
 
 		return empty;
 	}
 
 
 	template<typename T> long LockStack<T>::size(){
-		m_Mutex.lock();
+		mutex::scoped_lock localLock(m_Mutex);
 		long size = m_Stack.size();
-		m_Mutex.unlock();
 
 		return size;
 	}

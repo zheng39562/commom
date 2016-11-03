@@ -8,16 +8,18 @@
 **********************************************************/
 #include "pub_file.h"
 
+#include <fstream>
 #include "boost/regex.hpp"
-#include "boost/fielsystem.hpp"
+#include "boost/filesystem.hpp"
 #include "pub_tool.h"
 
-namespace boost;
-namespace boost::filesystem;
+using namespace std;
+using namespace boost;
+using namespace boost::filesystem;
 
 namespace Universal{
 	string readFile(const string &path){
-		ifstream infile;
+		std::ifstream infile;
 		infile.open(path.c_str());
 		if(infile){
 			ostringstream ostr;
@@ -57,12 +59,12 @@ namespace Universal{
 		}
 	}
 
-	bool createFolder(string path, mode_t mode){
-		return create_directory(path(path));
+	bool createDir(string filePath){
+		return create_directory(path(filePath));
 	}
 
 
-	bool clearFolder(string path){
+	bool clearDir(string filePath){
 		return remove_all(path(filePath));
 	}
 
@@ -71,16 +73,16 @@ namespace Universal{
 		return remove(path(filePath));
 	}
 
-	bool findFileFromDir(string path, vector<string> &fileNames, string filePattern){
-		path pPath(path);
-		if(is_directory(path)){
+	bool findFileFromDir(string filePath, vector<string> &fileNames, string filePattern){
+		path pPath(filePath);
+		if (is_directory(pPath)){
 			directory_iterator end;
-			for(directory_iterator citer(path); citer != end; ++citer){
+			for (directory_iterator citer(pPath); citer != end; ++citer){
 				if(!is_directory(*citer)){
-					fileName = citer->string();
+					string fileName = citer->path().string();
 					if(!filePattern.empty()){
 						boost::regex reg(filePattern);
-						if(!boost::regex_match(*iterFile, reg)){ 
+						if (!boost::regex_match(fileName, reg)){
 							continue;
 						}
 					}
@@ -93,7 +95,7 @@ namespace Universal{
 	}
 
 	string getAbsPath(string filepath){
-		return system_complete(path).string();
+		return system_complete(path(filepath)).string();
 	}
 
 	string getFileNameByPath(const string &filepath){

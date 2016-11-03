@@ -14,9 +14,9 @@
 #include "pub_file.h"
 #include "pub_string.h"
 
-namespace Universal{
-	using namespace std;
+using namespace std;
 
+namespace Universal{
 	IniCfg::IniCfg()
 		:m_IniInfo()
 	{
@@ -25,7 +25,7 @@ namespace Universal{
 
 	IniCfg::~IniCfg(){ ; }
 
-	bool IniCfg::InitFile(const string &filePath){
+	bool IniCfg::initFile(const string &filePath){
 		vector<string> lines;
 		if(splitString(readFile(filePath), "\n", lines)){
 			map<string, string>* pKeyValueMap(NULL);
@@ -33,19 +33,23 @@ namespace Universal{
 				if(isNewSection(*citerLine)){
 					pKeyValueMap = NULL;
 					string section = citerLine->substr(1, citerLine->size()-2);
-					m_IniInfo.insert(pair<string, map<string, string> >(section, map<string, string>()));
-					pKeyValueMap = &(m_IniInfo.find(section)->second);
+					if(m_IniInfo.find(section) == m_IniInfo.end()){
+						m_IniInfo.insert(pair<string, map<string, string> >(section, map<string, string>()));
+						pKeyValueMap = &(m_IniInfo.find(section)->second);
+					}
 				}
 				else{
-					 size_t pos = citerLine->find('=');
-					 if(pKeyValueMap == NULL || pos == string::npos || pos == 0){
-						 DEBUG_E("ini文件格式错误。");
-						 return false;
-					 }
-					 pKeyValueMap->insert(pair<string, string>(
-								 citerLine->substr(0, pos), 
-								 citerLine->substr(pos+1, citerLine->size() - pos - 1)
-								 ));
+					if(citerLine->empty()){ continue; }
+
+					size_t pos = citerLine->find('=');
+					if(pKeyValueMap == NULL || pos == string::npos || pos == 0){
+						DEBUG_E("ini文件格式错误。");
+						return false;
+					}
+					pKeyValueMap->insert(pair<string, string>(
+							trim(citerLine->substr(0, pos)), 
+							trim(citerLine->substr(pos+1, citerLine->size() - pos - 1))
+							));
 				}
 			}
 		}

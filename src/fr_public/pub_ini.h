@@ -15,22 +15,29 @@
 #include "fr_template/single_mode.hpp"
 
 namespace Universal{
-
-	using namespace std;
+	//! \brief 读取，解析ini的类
 	class IniCfg{
 		public:
 			IniCfg();
 			~IniCfg();
 		public:
-			bool InitFile(const string &filePath);
+			//! \brief	读取ini文件，并且解析对应的文件。
+			//! \note	自动过滤key/value前后的空格对应的空格,不会对数据中间的空格做处理。
+			//! \note	section没有做任何处理
+			//! \attetion	sction名称不能存在重复。第二个section无法被解析，其中的key=value会被自行增加到前一个section中。
+			bool initFile(const std::string &filePath);
 
-			string getString(const string &section, const string &key, string defaultValue = "");
-			int getInt(const string &section, const string &key, int defaultValue = 0);
-			double getDouble(const string &section, const string &key, double defaultValue = 0.0);
+			//! \brief	获取字符串数据。
+			std::string getString(const std::string &section, const std::string &key, std::string defaultValue = "");
+			//! \brief	获取int数据：需要自己保证可转换。否则行为未定义
+			int getInt(const std::string &section, const std::string &key, int defaultValue = 0);
+			//! \brief	获取double数据：需要自己保证可转换。否则行为未定义
+			double getDouble(const std::string &section, const std::string &key, double defaultValue = 0.0);
 		private:
-			bool isNewSection(const string &section);
+			//! \brief	 该行是否是一个妞section
+			bool isNewSection(const std::string &section);
 		private:
-			map<string, map<string, string> > m_IniInfo;
+			std::map<std::string, std::map<std::string, std::string> > m_IniInfo;	//! 
 	};
 	typedef DesignMode::SingleMode<IniCfg> SingleIniCfg;
 }

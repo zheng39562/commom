@@ -12,7 +12,6 @@
 #define _CommonTool_H
 
 #include <stdio.h>
-#include <sys/time.h>
 #include <algorithm>
 
 #include "pub_define.h"
@@ -28,8 +27,10 @@ namespace Universal{
 #define _PTHONETYPE_UNICOM					"LT"
 #define _PTHONETYPE_CDMA					"DX"
 #define _PTHONETYPE_QT						"QT"
+#ifndef WIN32
 	//! \brief	执行shell指令/脚本
 	bool execShellCmd( const string &cmd );
+#endif
 	//! \brief	获取手机的运营商。
 	string getMobileType( const string &mobile );
 
@@ -54,8 +55,15 @@ namespace Universal{
 
 }  // namespace : Universal
 
-
-
+namespace Universal{
+	//! \brief	线程休眠，单位ms
+	void frSleep(unsigned long time);
+#ifndef WIN32
+	//! \brief	线程休眠，单位us
+	//! \note	window不支持该函数。
+	void frUSleep(unsigned long time);
+#endif
+}
 
 #endif
 

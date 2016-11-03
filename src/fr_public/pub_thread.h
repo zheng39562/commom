@@ -12,16 +12,18 @@
 #include "boost/thread.hpp"
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/locks.hpp>
+#include <boost/thread/condition.hpp>
 
 namespace Universal{
 	enum eThreadStatus{
 		eThreadStatus_New,
 		eThreadStatus_Run,
+		eThreadStatus_Pause,
 		eThreadStatus_Exit
 	};
 
 	typedef boost::mutex FrMutex;
-	typedef FrThread RWMutex;
+	typedef FrMutex RWMutex;
 
 	//! \brief	线程类。
 	//! \note	使用方法：实现execute函数即可。
@@ -46,7 +48,7 @@ namespace Universal{
 			//! \brief	等待线程退出。
 			void join();
 
-			//inline boost::native_handle_type getThreadID(){ return m_pThread->native_handle(); }
+			inline boost::thread::native_handle_type getThreadID(){ return m_pThread->native_handle(); }
 			inline eThreadStatus getStatus(){ return m_ThreadStatus; }
 		protected:
 			//! \brief	
@@ -57,7 +59,7 @@ namespace Universal{
 			void pause();
 		private:
 			boost::thread* m_pThread;
-			boost::cond_variable m_Cond;
+			boost::condition_variable m_Cond;
 			FrMutex m_Mutex;
 			eThreadStatus m_ThreadStatus; //! 线程是否在运行
 	};

@@ -1,27 +1,28 @@
 /**********************************************************
  *  \!file pub_log.cpp
  *  \!brief
- *  \!note	×¢ÒâÊÂÏî£º 
- * 			1,ÀàÖÐµÄ³ÉÔ±º¯ÊýÖÐµÄÍ¬Ãû²ÎÊýµÄº¬ÒåÍêÈ«ÏàÍ¬¡£½ö»á×¢ÊÍÆäÖÐÒ»¸öº¯Êý£¬ÆäËûº¯ÊýÔò²»ÔÙÖØ¸´×¢ÊÍ¡£ÖØÃûµÄ²ÎÊýÒâÒå²»Í¬Ê±£¬»á¶ÀÁ¢×¢½â¡£ 
- * 			2,µÚ1ÌõµÄ¹æÔòÍ¬ÑùÊÊÓÃÓÚ·µ»ØÖµµÄº¬Òå¡£ 
+ *  \!note	注意事项： 
+ * 			1,类中的成员函数中的同名参数的含义完全相同。仅会注释其中一个函数，其他函数则不再重复注释。重名的参数意义不同时，会独立注解。 
+ * 			2,第1条的规则同样适用于返回值的含义。 
  * 
  * \!version 
  * * \!author zheng39562@163.com
 **********************************************************/
 #include "pub_log.h"
 
-#include <unistd.h>
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include "pub_define.h"
 #include "pub_file.h"
 #include "pub_tool.h"
+#include "pub_timer.h"
 
 using namespace std;
 using namespace Universal;
-namespace Universal{
 
+namespace Universal{
+	using namespace std;
 	LogServer::LogServer()
 		:m_Path(),
 		 m_FileName(),
@@ -40,18 +41,14 @@ namespace Universal{
 		m_FileName = fileName;
 		m_Path = completePath(path);
 
-		if(createFolder(m_Path)){
-			start();
-		}
-		else{
-			throw string("create folder failed.path is [") + path + "]";
-		}
+		createDir(m_Path);
+		start();
 	}
 
 	void LogServer::writeLog(const string &time, const eLogLevel &level, const std::string &fileName, const string &funcName, const long &line, const string &msg){
 		m_MCache.lock();
 		m_Cache << "[" << time << "]"
-			<< "[" << pthread_self() << "]"
+			<< "[" << getThreadID() << "]"
 			<< "[" << getLevelString(level) << "]"
 			<< "[" << fileName << "]"
 			<< "[" << funcName << ":"<< line << "]"
@@ -63,17 +60,17 @@ namespace Universal{
 	string LogServer::getLevelString(const eLogLevel &level){
 		switch(level){
 			case eLogLevel_Debug:
-				return "µ÷ÊÔ";
+				return "调试";
 			case eLogLevel_Info:
-				return "ÏûÏ¢";
+				return "消息";
 			case eLogLevel_Warning:
-				return "¾¯¸æ";
+				return "警告";
 			case eLogLevel_Error:
-				return "´íÎó";
+				return "错误";
 			case eLogLevel_Crash:
-				return "Òì³£";
+				return "异常";
 		}
-		return "Î´Öª";
+		return "未知";
 	}
 
 	void LogServer::execute(){
@@ -82,7 +79,7 @@ namespace Universal{
 		string curDate;
 		ofstream outfile;
 		while(1){
-			usleep(10 * 1000); // 10ms
+			frSleep(10); // 10ms
 
 			if(!m_FileName.empty() && !m_Path.empty()){
 				if(curDate.empty() || curDate != getLocalTime("%Y%m%d") || m_CurLine >= m_MaxLine){
@@ -90,7 +87,6 @@ namespace Universal{
 					curDate = getLocalTime("%Y%m%d");
 					outfile.close();
 					outfile.open(string(m_Path + m_FileName + "_" + curDate + "_" + intToStr(++fileIndex) + ".log").c_str(), ios::app);
-					//outfile.open(string(m_Path + m_FileName + "_" + curDate  + ".log").c_str(), ios::app);
 				}
 
 				m_MCache.lock();

@@ -298,30 +298,24 @@ namespace Universal{
 
 	string trimRight( const string &str ){
 		string trimStr = str.substr( 0, str.find_last_not_of(" ")+1 );
-		trimStr = str.substr( 0, str.find_last_not_of("　")+1 );
-		trimStr = str.substr( 0, str.find_last_not_of("\t")+1 );
-		if( !trimStr.empty() ){
-			if( trimStr.at( trimStr.length() - 1 ) == '\n' ){
-				trimStr = trimStr.substr( 0, trimStr.length() - 1 );
-				if( trimStr.at( trimStr.length() - 1 ) == '\r' ){
-					trimStr = trimStr.substr( 0, trimStr.length() - 1 );
-				}
-			}
-		}
-
+		trimStr = trimStr.substr( 0, trimStr.find_last_not_of("\t")+1 );
+		trimStr = trimStr.substr( 0, trimStr.find_last_not_of("\r\n")+1 );
+		trimStr = trimStr.substr( 0, trimStr.find_last_not_of("\n")+1 );
 		return trimStr;
 	}
 
 
 	string trimLeft( const string &str ){
 		string trimStr = str.substr( str.find_first_not_of(" ") );
-		trimStr = str.substr( str.find_first_not_of("　") );
-		trimStr = str.substr( str.find_first_not_of("\t") );
-		trimStr = str.substr( str.find_first_not_of("\r\n") );
-		trimStr = str.substr( str.find_first_not_of("\n") );
+		trimStr = trimStr.substr( trimStr.find_first_not_of("\t") );
+		trimStr = trimStr.substr( trimStr.find_first_not_of("\r\n") );
+		trimStr = trimStr.substr( trimStr.find_first_not_of("\n") );
 		return trimStr;
 	}
 
+	string trim(const string &str){
+		return trimRight(trimLeft(str));
+	}
 
 }  // namepsace : Universal
 

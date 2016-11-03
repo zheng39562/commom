@@ -1,85 +1,132 @@
 /**********************************************************
  * \file logic/tool/Timer.cpp
  * \brief 
- * \note	注意事项：
- *			1,类中的成员函数中的同名参数的含义完全相同。仅会注释其中一个函数，其他函数则不再重复注释。重名的参数意义不同时，会独立注解。
- *			2,第1条的规则同样适用于返回值的含义。
+ * \note	对时间进行
  * 
  * \version 
  * \author zheng39562@163.com
 **********************************************************/
 #include "pub_timer.h"
 
+#include <time.h>
+#include <sstream>
+
 #include "pub_define.h"
 #include "pub_string.h"
+#include "boost/timer.hpp"
+#include "boost/date_time.hpp"
+#include "boost/progress.hpp"
+
+using namespace std;
+using namespace boost;
+using namespace boost::gregorian;
+using namespace boost::posix_time;
 
 namespace Universal{
-	string parseDateFormat(const string &date){
-		// check
-		if(date.size() < 8)  return _STRINGFALSE;
+	time_t dateToTime(const string &date, string dateFormat){
+		ptime pTime;
+		ptime pBaseTime = time_from_string("1970-01-01 00:00:00");
+		time_input_facet facet(dateFormat, 1);
 
-		string keyOfSplit = date.substr(4, 1);
-		if(checkNumber(keyOfSplit)){
-			return "%Y%m%d";
+		stringstream dateStream(date);
+		dateStream.imbue(std::locale(dateStream.getloc(), &facet));
+		dateStream >> pTime;
+
+		time_duration ft = pTime - pBaseTime;
+		return ft.total_seconds();
+	}
+
+	string formatDateTime(const time_t &second, string dateFormat){
+		ptime pTime(from_time_t(second));
+		string sTime(to_iso_string(pTime));
+
+		string sYear(sTime.substr(0,4));
+		string sMonth(sTime.substr(4,2));
+		string sDay(sTime.substr(6,2));
+		string sHour(sTime.substr(9,2));
+		string sMin(sTime.substr(11,2));
+		string sSecond(sTime.substr(13,2));
+
+		bool bYear(false), bMonth(false), bDay(false), bHour(false), bMin(false), bSecond(false);
+		string dateSplit("");
+		string timeSplit("");
+		string midSplit("");
+		
+		//! year month day 
+		bYear = dateFormat.find("%Y") != string::npos;
+		bMonth = dateFormat.find("%m") != string::npos;
+		bDay = dateFormat.find("%d") != string::npos;;
+		if(bYear || bMonth){
+			string::size_type pos = dateFormat.find(bYear ? "%Y" : "%m");
+			if(pos != string::npos && dateFormat.size() > pos+2 && dateFormat[pos+2] != '%'){
+				dateSplit = dateFormat[pos+2];
+			}
 		}
-		if((keyOfSplit[0] > 'a' && keyOfSplit[0] < 'z') || (keyOfSplit[0] > 'A' && keyOfSplit[0] < 'Z')){
-			return _STRINGFALSE;
+
+		// middle split char
+		string::size_type midSplitPos(0);
+		if(bDay){
+			midSplitPos = dateFormat.find("%d") + 2;
 		}
-		return "%Y" + keyOfSplit + "%m" + keyOfSplit + "%d";
+		else if(bMonth){
+			midSplitPos = dateFormat.find("%m") + 2;
+		}
+		else if(bYear){
+			midSplitPos = dateFormat.find("%Y") + 2;
+		}
+		if(midSplitPos != 0 && dateFormat.size() > midSplitPos && dateFormat[midSplitPos] != '%'){
+			midSplit = dateFormat[midSplitPos];
+		}
+
+		// hour min second
+		bHour = dateFormat.find("%H") != string::npos;;
+		bMin = dateFormat.find("%M") != string::npos;;
+		bSecond = dateFormat.find("%S") != string::npos;;
+		if(bHour || bMin){
+			string::size_type pos = dateFormat.find(bHour ? "%H" : "%M");
+			if(pos != string::npos && dateFormat.size() > pos+2 && dateFormat[pos+2] != '%'){
+				timeSplit = dateFormat[pos + 2];
+			}
+		}
+
+		// merge
+		sTime.clear();
+		sTime += bYear ? sYear + dateSplit : "";
+		sTime += bMonth ? sMonth + dateSplit : "";
+		sTime += bDay ? sDay : "";
+		sTime += !sTime.empty() && (bHour || bMin || bSecond) ? midSplit : "";
+		sTime += bHour ? sHour + timeSplit : "";
+		sTime += bMin ? sMin + timeSplit : "";
+		sTime += bSecond ? sSecond : "";
+		return sTime;
 	}
-
-
-	time_t dateToTime(const string date, string dateFormat){
-		struct tm local_tm;
-		local_tm.tm_year = 0;
-		local_tm.tm_mon = 0;
-		local_tm.tm_mday = 0;
-		local_tm.tm_min = 0;
-		local_tm.tm_hour = 0;
-		local_tm.tm_sec = 0;
-
-		strptime(date.c_str(), dateFormat.c_str(), &local_tm) ;
-		time_t ft = mktime(&local_tm);
-		return ft;
-	}
-
-
-	string formatdateTime(const time_t &second, string dateFormat){
-		struct tm local_tm;
-		localtime_r(&second, &local_tm);
-		char buf[128] = {0};
-		strftime(buf, 64, dateFormat.c_str(), &local_tm);
-		return string(buf);
-	}
-
-
-	string getDateStr(const time_t &second, const string &dateFormat){
-		return formatdateTime(second, dateFormat);
-	}
-
 
 	time_t getLocalTime(){
-		struct timeval time;
-		gettimeofday(&time, NULL);
-		return time.tv_sec;
+		ptime pTime(second_clock::universal_time());
+		ptime pBaseTime = time_from_string("1970-01-01 00:00:00");
+		time_duration ft = pTime - pBaseTime;
+		return ft.total_seconds();
 	}
 	
 	time_t getLocalTimeU(){
-		struct timeval time;
-		gettimeofday(&time, NULL);
-		return time.tv_sec * 1000000 + time.tv_usec;
+		ptime pTime(microsec_clock::universal_time());
+		ptime pBaseTime = time_from_string("1970-01-01 00:00:00.000000");
+		time_duration ft = pTime - pBaseTime;
+		return ft.total_microseconds();
 	}
 
 	string getLocalTime(const string &dateFormat){
-		struct timeval time;
-		gettimeofday(&time, NULL);
-		return formatdateTime(time.tv_sec, dateFormat);
+		ptime pTime(second_clock::local_time());
+		ptime pBaseTime = time_from_string("1970-01-01 00:00:00");
+		time_duration ft = pTime - pBaseTime;
+		return formatDateTime(ft.total_seconds(), dateFormat);
 	}
 
 	string getLocalTimeU(const string &dateFormat){
-		struct timeval time;
-		gettimeofday(&time, NULL);
-		return formatdateTime(time.tv_sec, dateFormat) + "." + intToStr(time.tv_usec);
+		ptime pTime(microsec_clock::local_time());
+		ptime pBaseTime = time_from_string("1970-01-01 00:00:00.000000");
+		time_duration ft = pTime - pBaseTime;
+		return formatDateTime(ft.total_seconds(), dateFormat) + "." + intToStr(ft.total_microseconds() % _TIMECONVERSION_SECTOUS);
 	}
 
 	time_t supplementTime(const string &strtime, bool useMaxNum){
@@ -166,11 +213,8 @@ namespace Universal{
 				}
 			}
 		}
-		// return strTodateTime(supplementTime);
-		return 0;
+		return dateToTime(supplementTime);
 	}
-
-
 }  // namepsace : Universal
 
 
@@ -178,53 +222,57 @@ namespace Universal{
  * TimeCounter
  */
 namespace Universal{
-	TimeCounter::TimeCounter(){
-		start();
-		string directory = "./mylog";
-		createFolder(directory);
-		m_LogPath = directory + "time_date" + getLocalTime("%Y%m%d") + ".log";
-	}
-	TimeCounter::TimeCounter(const string &_logFolder){
-		start();
-		createFolder(_logFolder);
-		m_LogPath = _logFolder + "time_date" + getLocalTime("%Y%m%d") + ".log";
+	TimeCounter::TimeCounter()
+		:m_FileName(""),
+		 m_Dir("")
+	{ ; }
+	TimeCounter::TimeCounter(const string &_logDir)
+		:m_FileName("time"),
+		 m_Dir("")
+	{
+		setDirectory(_logDir);
 	}
 	TimeCounter::~TimeCounter(){
 	}
 
-	void TimeCounter::start(){ gettimeofday(&m_TvStart, NULL); }
-
-
-	void TimeCounter::stop(){ gettimeofday(&m_TvStop, NULL); }
-
-
-	long TimeCounter::getSecTime(){ return (long)getSecTimeD(); }
-
-
-	double TimeCounter::getSecTimeD(){
-		return (m_TvStop.tv_sec - m_TvStart.tv_sec) + (m_TvStop.tv_usec - m_TvStart.tv_usec) / (_TIMECONVERSION_SECTOMS * _TIMECONVERSION_MSTOUS);
+	void TimeCounter::start(){ 
+		m_Start = std::clock();
 	}
 
+	void TimeCounter::stop(string file, long line){ 
+		m_Stop = std::clock();
+		time_t microSecond = (m_Stop - m_Start) * (_TIMECONVERSION_SECTOUS / CLOCKS_PER_SEC);
+		time_t second = microSecond / _TIMECONVERSION_SECTOUS;
+		microSecond %= _TIMECONVERSION_SECTOUS;
 
-	long TimeCounter::getMsTime(){ return (long)getMsTimeD(); }
-
-
-	double TimeCounter::getMsTimeD(){
-		return (m_TvStop.tv_sec - m_TvStart.tv_sec) * _TIMECONVERSION_SECTOMS + (m_TvStop.tv_usec - m_TvStart.tv_usec) / _TIMECONVERSION_MSTOUS;
+		if(m_FileName.empty()){
+			DEBUG_D("[" << file << ":" << line << "] 运行时间 [" << second << "." << microSecond << "]");
+		}
+		else{
+			std::ostringstream osTmp;
+			osTmp << "[" << file << ":" << line << "] 运行时间 [" << second << "." << microSecond << "]";
+			addContentToFile(m_Dir + "time" + getLocalTime("%Y%m%d") + ".log", osTmp.str());
+		}
 	}
 
-	long TimeCounter::getUsTime(){ return (long)getUsTimeD(); }
-
-	double TimeCounter::getUsTimeD(){
-		return (m_TvStop.tv_sec - m_TvStart.tv_sec) * _TIMECONVERSION_SECTOMS * _TIMECONVERSION_MSTOUS + (m_TvStop.tv_usec - m_TvStart.tv_usec);
+	time_t TimeCounter::getUsTime(){ 
+		m_Stop = std::clock();
+		return (std::clock() - m_Start) * (_TIMECONVERSION_SECTOUS / CLOCKS_PER_SEC);
 	}
 
-
-	void TimeCounter::setLogPath(){ m_LogPath = ""; }
-
-
-	void TimeCounter::writeToLog(string preStr, string addStr){
-//		AddContentToFile(m_LogPath, preStr + "[ " + intToStr(getMsTime()) + " ] " + addStr + "  (ms)\n");
+	void TimeCounter::setDirectory(const string &dir){
+		if(!dir.empty()){
+			m_Dir = completePath(dir);
+			createDir(m_Dir);
+		}
+		else{
+			m_Dir = "./";
+		}
 	}
+
+	void TimeCounter::setFileName(const string &fileName){
+		m_FileName = fileName;
+	}
+
 }  // namespace : Universal
 

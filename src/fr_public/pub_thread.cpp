@@ -11,7 +11,6 @@
 #include "pub_thread.h"
 
 #include "boost/bind.hpp"
-#include <boost/thread/condition.hpp>
 #include <boost/thread/detail/thread.hpp>
 #include <boost/thread/thread_time.hpp>
 
@@ -20,7 +19,7 @@ using namespace boost;
 namespace Universal{
 	FrThread::FrThread()
 		:m_pThread(NULL),
-		 m_ThreadStatus(eThreadStatus_New)
+		 m_ThreadStatus(eThreadStatus_New),
 		 m_Cond(),
 		 m_Mutex()
 	{ ; }
@@ -48,12 +47,13 @@ namespace Universal{
 		join();
 	}
 
-	void pause(){
+	void FrThread::pause(){
+		m_ThreadStatus = eThreadStatus_Pause;
 		mutex::scoped_lock localLock(m_Mutex);
 		m_Cond.wait(localLock);
 	}
 
-	void resume(){
+	void FrThread::resume(){
 		mutex::scoped_lock localLock(m_Mutex);
 		m_Cond.notify_all();
 	}
@@ -65,5 +65,3 @@ namespace Universal{
 	}
 
 }
-  
-  

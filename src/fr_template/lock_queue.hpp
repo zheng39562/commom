@@ -17,14 +17,15 @@
 namespace Universal{
 	//! \brief	自实现的队列操作：队列使用先进先出模式（堆）。
 	//! \note	拥有自己的互斥锁。互斥锁仅对单对象做出限制：多个不同的对象没有影响。
+	//! \note	存在瑕疵：empty之后再进行pop 再多线程并发时有极小的一段时间处于解锁状态。
 	template < typename T >
 	class LockQueue {
 		public:
 			LockQueue();
 			~LockQueue();
 		private:
-			FCMutex					m_Mutex;
-			std::queue<T>				m_Queue;
+			FrMutex m_Mutex;
+			std::queue<T> m_Queue;
 		public:
 			void clear();
 			//! \brief	推送数据进栈
@@ -37,6 +38,8 @@ namespace Universal{
 			bool empty();
 			//! \brief	
 			long size();
+			//! \brief	
+			bool swap(std::queue<T> &TQueue);
 	};
 	template < typename T > LockQueue<T>::LockQueue()
 		:m_Mutex(),
@@ -45,60 +48,52 @@ namespace Universal{
 	template < typename T > LockQueue<T>::~LockQueue(){ ; }
 
 	template < typename T > void LockQueue<T>::clear(){
-		m_Mutex.lock();
+		mutex::scoped_lock localLock(m_Mutex);
 		while( !m_Queue.empty() ){
 			m_Queue.pop();
 		}
-		m_Mutex.unlock();
 	}
-
 
 	template < typename T > void LockQueue<T>::push( const T &data ){
-		m_Mutex.lock();
+		mutex::scoped_lock localLock(m_Mutex);
 		m_Queue.push( data );
-		m_Mutex.unlock();
 	}
 
-
 	template < typename T > T LockQueue<T>::pop(){
-		m_Mutex.lock();
+		mutex::scoped_lock localLock(m_Mutex);
 		T dataTmp;
 		if(!m_Queue.empty()){
 			dataTmp = m_Queue.front();
 			m_Queue.pop();
 		}
-		m_Mutex.unlock();
 
 		return dataTmp;
 	}
-
 
 	template < typename T > T LockQueue<T>::top(){
-		m_Mutex.lock();
+		mutex::scoped_lock localLock(m_Mutex);
 		T dataTmp = m_Queue.front();
-		m_Mutex.unlock();
 
 		return dataTmp;
 	}
 
-
 	template < typename T > bool LockQueue<T>::empty(){
-		m_Mutex.lock();
+		mutex::scoped_lock localLock(m_Mutex);
 		bool empty = m_Queue.empty();
-		m_Mutex.unlock();
 
 		return empty;
 	}
 
-
 	template < typename T > long LockQueue<T>::size(){
-		m_Mutex.lock();
+		mutex::scoped_lock localLock(m_Mutex);
 		long size = m_Queue.size();
-		m_Mutex.unlock();
 
 		return size;
 	}
 
+	template < typename T > long LockQueue<T>::swap(std::queue<T> &TQueue){
+		;
+	}
 
 }
 

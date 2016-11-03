@@ -1,9 +1,6 @@
 /**********************************************************
  *  \!file pub_memory.h
  *  \!brief
- *  \!note	×¢ÒâÊÂÏî£º 
- * 			1,ÀàÖÐµÄ³ÉÔ±º¯ÊýÖÐµÄÍ¬Ãû²ÎÊýµÄº¬ÒåÍêÈ«ÏàÍ¬¡£½ö»á×¢ÊÍÆäÖÐÒ»¸öº¯Êý£¬ÆäËûº¯ÊýÔò²»ÔÙÖØ¸´×¢ÊÍ¡£ÖØÃûµÄ²ÎÊýÒâÒå²»Í¬Ê±£¬»á¶ÀÁ¢×¢½â¡£ 
- * 			2,µÚ1ÌõµÄ¹æÔòÍ¬ÑùÊÊÓÃÓÚ·µ»ØÖµµÄº¬Òå¡£ 
  * 
  * \!version 
  * * \!author zheng39562@163.com
@@ -11,11 +8,29 @@
 #ifndef _pub_memory_H
 #define _pub_memory_H
 
+#include "boost/shared_ptr.hpp"
+// 前端使用。
+#ifndef _CLIENT
 #include "pub_define.h"
+#else
+#include "common/Common.h"
+#include <string>
+#include <vector>
+#include <list>
+#include <map>
+#include <set>
+#include <sstream>
+#include <iostream>
+#endif
 
 namespace Universal{
-	//! \brief	ÓÃÓÚ´¢´æ¶þ½øÖÆÁ÷Êý¾Ý¡£²¢Ö§³ÖÀàËÆstringµÄÔËËã·û²Ù×÷¡£
-	//! \note
+	//! \brief	
+	//! \note	请勿在外界直接操作内存。这会导致行为未定义。
+	//! \note	创建和使用：
+	//				* 主要提供内存的封装概念。
+	//				* 该类会独立的管理内存，从外界复制的数据为深复制。所以，频繁的构建该类会有大量内存的malloc和free。
+	//! \todo	考虑重载 <<。接受各类基础类型转换为字节流的方式。
+	//! \todo	获取外界new指针，避免重复的内存new/malloc
 	class BinaryMemory{
 		public:
 			BinaryMemory();
@@ -28,24 +43,17 @@ namespace Universal{
 		public:
 			void addBuffer(const void* buffer, size_t size);
 			void setBuffer(const void* buffer, size_t size);
-			//! \brief	É¾³ý²¿·ÖÄÚÈÝ
-			//! \param[in] start ÆðÊ¼Î»ÖÃ£¬Èç¹û´óÓÚµ±Ç°×î´ó³ß´çÔò²»É¾³ýÈÎºÎÄÚÈÝ¡£
-			//! \param[in] length É¾³ýµÄ×Ö½ÚÊý¡£Èç¹û³¬¹ýµ±Ç°±£´æÄÚÈÝ£¬ÔòÖ»É¾³ýµ½Ä©Î²¡£
+			//! \brief	删除buffer内容:不更改内存大小。
 			void delBuffer(size_t start, size_t length);
-			//! \brief	Çå¿Õ»º´æ£¬²»ÊÍ·ÅÄÚ´æ¡£
 			void clearBuffer();
-			//! \brief	ÉèÖÃÔ¤ÁôÄÚ´æ´óÐ¡¡£
-			//! \note	Èç¹û´óÐ¡³¬¹ý²»×öÈÎºÎ²Ù×÷£¬À©ÈÝÊ±»á±£´æÔ­ÓÐÊý¾Ý
+			//! \brief	扩展内存大小。
+			//! \note	如果已满足扩展大小则不做操作。
+			//! \note	扩展不会影响已有的数据。
 			void reserve(size_t size);
-			//! \brief	ÖØÐÂÉèÖÃÄÚ´æ³ß´ç£¨¿ÉÄÜËõ¼õ£¬Ò²¿ÉÄÜÔö¼Ó£©
-			//! \note	Óëreserve²»Í¬µÄ£¬º¯Êý²»»á±£ÁôÊý¾Ý¡£
-			//! \note	Ã»ÓÐ¶Ôsize´óÐ¡×÷ÈÎºÎÏÞÖÆ£¬ËùÒÔÐèÒª×¢ÒâÈç¹ûÉêÇë³¬¹ýÔ¤ÁÏµÄ´óÐ¡£¨ÀýÈç100G£©£¬¿ÉÄÜ»áµ¼ÖÂ³ÌÐòÒì³£¡£
-			void setBufferSize(size_t size);
-			//! \brief	°´×Ö½Ú´òÓ¡Êý¾Ý¡£
-			//! \note	Ê¹ÓÃÑ­»·´òÓ¡£¬Ð§ÂÊ²»¸ß¡£ÈÕÖ¾¼¶±ðÎªD¡£
 			void print()const;
 
 			inline bool empty()const{ return m_CurBufferSize == 0; }
+			//! \note	请勿在外界直接操作内存。这会导致行为未定义。
 			inline const void* getBuffer()const{ return m_Buffer; }
 			inline size_t getBufferSize()const{ return m_CurBufferSize; }
 		private:
@@ -53,6 +61,7 @@ namespace Universal{
 			size_t m_CurBufferSize;
 			size_t m_MaxBufferSize;
 	};
+	typedef boost::shared_ptr<BinaryMemory> BinaryMemoryPtr;
 }
 #endif 
 

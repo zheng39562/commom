@@ -11,14 +11,20 @@
 #include "pub_string.h"
 #include "boost/regex.hpp"
 
+#ifdef WIN32
+#include <windows.h>
+#else
+#include <unistd.h>
+#endif
+
+
 using namespace boost;
-
-
 
 /*
  * other function
  */
 namespace Universal{
+#ifndef WIN32
 	bool execShellCmd( const string &cmd ){
 		FILE* fp = NULL;
 		if( (fp=popen(cmd.c_str(), "r" ) ) != NULL ){
@@ -27,7 +33,7 @@ namespace Universal{
 		}
 		return false;
 	}
-
+#endif
 
 	string getMobileType( const string &mobile ){
 		string head1 = mobile.substr( 0, 1 );
@@ -88,7 +94,6 @@ namespace Universal{
 	bool checkDate( const string &date ){
 		regex reg("^(?<year>(1[8-9]\\d{2})|([2-9]\\d{3}))(-|/|.|)(((?<month>10|12|0?[13578])(-|/|.|)(?<day> 3[01]|[12][0-9]|0?[1-9]))|((?<month>11|0?[469])(-|/|.|)(?<day>30|[12][0-9]|0?[1-9]))|((?<month>0?[2])(-|/|.|)(?<day>0[1-9]|1[0-9]|2[0-8])))(\\s((?<hour>(0[1-9])|([1-9])|(1[0-2]))\\:(?<min>[0-5][0-9])((\\:)(?<sec>[0-5][0-9]))?(\\s[AM|PM|am|pm]{2,2})?))?$");
 		return regex_match( date, reg );
-		//	"^(?<year>(1[8-9]\d{2})|([2-9]\d{3}))(-|/|.|)(((?<month>10|12|0?[13578])(-|/|.|)(?<day> 3[01]|[12][0-9]|0?[1-9]))|((?<month>11|0?[469])(-|/|.|)(?<day>30|[12][0-9]|0?[1-9]))|((?<month>0?[2])(-|/|.|)(?<day>0[1-9]|1[0-9]|2[0-8])))(\s((?<hour>(0[1-9])|([1-9])|(1[0-2]))\:(?<min>[0-5][0-9])((\:)(?<sec>[0-5][0-9]))?(\s[AM|PM|am|pm]{2,2})?))?$"
 	}
 
 
@@ -111,5 +116,23 @@ namespace Universal{
 	}
 
 }  // namespace : Universal
+
+namespace Universal{
+	void frSleep(unsigned long time){
+#ifdef WIN32
+		Sleep(time);
+#else
+		usleep(time * 1000);
+#endif
+	}
+
+	void frUSleep(unsigned long time){
+#ifdef WIN32
+#else
+		usleep(time * 1000);
+#endif
+	}
+}  // namespace : Universal
+
 
 
