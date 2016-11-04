@@ -10,6 +10,7 @@
 #define _pub_define_H
 
 #include <string>
+#include <queue>
 #include <vector>
 #include <list>
 #include <map>

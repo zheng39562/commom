@@ -154,16 +154,15 @@ namespace Universal{
 
 	void BinaryMemory::print()const{
 		if(m_Buffer == NULL){
-			DEBUG_D("11");
 			return;
 		}
 
-		char* msg = (char*)m_Buffer;
+		Byte* msg = (Byte*)m_Buffer;
 		size_t index(0);
 		ostringstream ostr;
 		ostr << "buffer is [";
 		while(index < m_CurBufferSize){
-			ostr << (unsigned char)msg[index] << "|";
+			ostr << (uint16)(unsigned char)msg[index] << "|";
 			++index;
 		}
 		ostr << "]";

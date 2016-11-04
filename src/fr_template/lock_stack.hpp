@@ -46,13 +46,13 @@ namespace Universal{
 	template<typename T> LockStack<T>::~LockStack(){ ; }
 
 	template<typename T> void LockStack<T>::push( const T &data ){
-		mutex::scoped_lock localLock(m_Mutex);
+		boost::mutex::scoped_lock localLock(m_Mutex);
 		m_Stack.push( data );
 	}
 
 
 	template<typename T> T LockStack<T>::pop(){
-		mutex::scoped_lock localLock(m_Mutex);
+		boost::mutex::scoped_lock localLock(m_Mutex);
 		T dataTmp;
 		if(!m_Stack.empty()){
 			dateTmp = m_Stack.top();
@@ -64,7 +64,7 @@ namespace Universal{
 
 
 	template<typename T> T LockStack<T>::top(){
-		mutex::scoped_lock localLock(m_Mutex);
+		boost::mutex::scoped_lock localLock(m_Mutex);
 		T dataTmp = m_Stack.top();
 
 		return dateTmp;
@@ -72,7 +72,7 @@ namespace Universal{
 
 
 	template<typename T> bool LockStack<T>::empty(){
-		mutex::scoped_lock localLock(m_Mutex);
+		boost::mutex::scoped_lock localLock(m_Mutex);
 		bool empty = m_Stack.empty();
 
 		return empty;
@@ -80,7 +80,7 @@ namespace Universal{
 
 
 	template<typename T> long LockStack<T>::size(){
-		mutex::scoped_lock localLock(m_Mutex);
+		boost::mutex::scoped_lock localLock(m_Mutex);
 		long size = m_Stack.size();
 
 		return size;

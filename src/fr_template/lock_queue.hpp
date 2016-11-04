@@ -48,19 +48,19 @@ namespace Universal{
 	template < typename T > LockQueue<T>::~LockQueue(){ ; }
 
 	template < typename T > void LockQueue<T>::clear(){
-		mutex::scoped_lock localLock(m_Mutex);
+		boost::mutex::scoped_lock localLock(m_Mutex);
 		while( !m_Queue.empty() ){
 			m_Queue.pop();
 		}
 	}
 
 	template < typename T > void LockQueue<T>::push( const T &data ){
-		mutex::scoped_lock localLock(m_Mutex);
+		boost::mutex::scoped_lock localLock(m_Mutex);
 		m_Queue.push( data );
 	}
 
 	template < typename T > T LockQueue<T>::pop(){
-		mutex::scoped_lock localLock(m_Mutex);
+		boost::mutex::scoped_lock localLock(m_Mutex);
 		T dataTmp;
 		if(!m_Queue.empty()){
 			dataTmp = m_Queue.front();
@@ -71,28 +71,29 @@ namespace Universal{
 	}
 
 	template < typename T > T LockQueue<T>::top(){
-		mutex::scoped_lock localLock(m_Mutex);
+		boost::mutex::scoped_lock localLock(m_Mutex);
 		T dataTmp = m_Queue.front();
 
 		return dataTmp;
 	}
 
 	template < typename T > bool LockQueue<T>::empty(){
-		mutex::scoped_lock localLock(m_Mutex);
+		boost::mutex::scoped_lock localLock(m_Mutex);
 		bool empty = m_Queue.empty();
 
 		return empty;
 	}
 
 	template < typename T > long LockQueue<T>::size(){
-		mutex::scoped_lock localLock(m_Mutex);
+		boost::mutex::scoped_lock localLock(m_Mutex);
 		long size = m_Queue.size();
 
 		return size;
 	}
 
-	template < typename T > long LockQueue<T>::swap(std::queue<T> &TQueue){
-		;
+	template < typename T > bool LockQueue<T>::swap(std::queue<T> &TQueue){
+		m_Queue.swap(TQueue);
+		return true;
 	}
 
 }

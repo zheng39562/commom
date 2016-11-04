@@ -54,6 +54,7 @@ namespace Universal{
 
 			inline bool empty()const{ return m_CurBufferSize == 0; }
 			//! \note	请勿在外界直接操作内存。这会导致行为未定义。
+			inline void* getBuffer(){ return m_Buffer; }
 			inline const void* getBuffer()const{ return m_Buffer; }
 			inline size_t getBufferSize()const{ return m_CurBufferSize; }
 		private:
