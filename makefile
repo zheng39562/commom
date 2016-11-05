@@ -38,7 +38,7 @@ all: fr_public fr_sql fr_template fr_xls
 test:
 	g++ -DDEBUG -D__LINUX -g -std=c++11 ./src/main.cpp -I./library/include/ -L./library/lib64/ -lfr_public -lfr_xls -lfr_sql -lboost_regex -luuid -pthread -lrt -ldl -o Main_64 
 		
-.PHONY: fr_public fr_sql fr_template fr_xls
+.PHONY: fr_public fr_sql fr_template fr_xls help
 
 fr_public:
 #$(shell cp ./lib/* .)
@@ -66,6 +66,11 @@ fr_xls_clean:
 	$(call make_xls, clean)
 
 clean: fr_pub_clean fr_sql_clean fr_template_clean fr_xls_clean 
+
+help:
+	echo "makefile parameter : fr_public fr_sql fr_template fr_xls"
+	echo "clear parameter : fr_pub_clean fr_sql_clean fr_template_clean fr_xls_clean"
+	echo "if you want clean all. you can input make clean"
 
 tags:
 	rm -rf tags

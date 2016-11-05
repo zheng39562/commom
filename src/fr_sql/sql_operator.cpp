@@ -19,6 +19,7 @@
 #include "fr_public/pub_string.h"
 
 
+using namespace std;
 using namespace boost;
 using namespace sql;
 using namespace Universal;

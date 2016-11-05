@@ -31,7 +31,7 @@ namespace Universal{
 			//! \param[in] type 配置的数据存储方式。
 			bool readCfg(const std::string &param, const eCfgDataType &type);
 
-			//! \brief
+			//! \brief	
 			std::string getCfg(const std::string &section, const std::string &key);
 	};
 }

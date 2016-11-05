@@ -16,7 +16,7 @@
 #include "sql_operator.h"
 
 namespace SqlSpace{
-	typedef vector< boost::shared_ptr<SqlOperator> > SqlOprtPool;
+	typedef std::vector< boost::shared_ptr<SqlOperator> > SqlOprtPool;
 	//! \brief	数据库的管理器：获取数据库操作指针。
 	//! \note	采用线程池方案。
 	//! \note	 
@@ -28,7 +28,7 @@ namespace SqlSpace{
 
 		public:
 			boost::shared_ptr<SqlOperator> getSqlOprtPtr();
-			boost::shared_ptr<SqlOperator> getSqlOprtPtr( const string &sqlHandle );
+			boost::shared_ptr<SqlOperator> getSqlOprtPtr( const std::string &sqlHandle );
 	};
 } // namespace Universal{
 

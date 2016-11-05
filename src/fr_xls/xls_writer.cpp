@@ -31,7 +31,7 @@ namespace Universal{
 
 	bool XlsWriter::writeToFile( const string &filePath, const XlsBookStruct &xlsBook ){
 		string folderPath = filePath.substr( 0, filePath.find_last_of('/', filePath.size() )+1 );
-		if( !createFolder( folderPath ) )  return false;
+		if( !createDir( folderPath ) )  return false;
 	
 		workbook wb;
 		worksheet *ws;
@@ -55,7 +55,7 @@ namespace Universal{
 	}
 	bool XlsWriter::writeToFile( const string &filePath, const XlsSheetStruct &xlsSheet, SheetFormat sheetFormat ){
 		string folderPath = filePath.substr( 0, filePath.find_last_of('/', filePath.size() )+1 );
-		if( !createFolder( folderPath ) )  return false;
+		if( !createDir( folderPath ) )  return false;
 	
 		workbook wb;
 		worksheet *ws;

@@ -52,18 +52,16 @@ namespace DesignMode{
 			boost::shared_ptr<T>					m_p_Object;
 	};
 
-	template < typename T > Universal::FrMutex	SingleMode<T>::m_s_Mutex = Universal::FrMutex();
 	template < typename T > SingleMode<T>*		SingleMode<T>::m_s_p_Instance = NULL;
 	
 	template < typename T >
 	boost::shared_ptr<T> SingleMode<T>::getInstance(){
 		if( m_s_p_Instance == NULL ){
-			m_s_Mutex.lock();
+			Universal::FrMutex::scoped_lock(m_s_Mutex);
 			if( m_s_p_Instance == NULL ){
 				m_s_p_Instance = new SingleMode();
 				return m_s_p_Instance->m_p_Object;
 			}
-			m_s_Mutex.unlock();
 		}
 		return m_s_p_Instance->m_p_Object;
 	}
