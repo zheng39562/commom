@@ -10,6 +10,7 @@
 
 #include "pub_string.h"
 #include "boost/regex.hpp"
+#include "pub_md5.h"
 
 #ifdef WIN32
 #include <windows.h>
@@ -17,7 +18,7 @@
 #include <unistd.h>
 #endif
 
-
+using namespace std;
 using namespace boost;
 
 /*
@@ -68,6 +69,14 @@ namespace Universal{
 			return mapData.find(key)->second;
 		}
 		return _STRINGFALSE;
+	}
+
+	string md5(const std::string str){
+		return MD5(str).md5();
+	}
+
+	string md5_16(const std::string str){
+		return MD5(str).md5().substr(8,16);
 	}
 }  // namespace : Universal
 

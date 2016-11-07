@@ -21,10 +21,10 @@ using namespace TestSpace;
 using namespace Universal;
 
 void doPublicTest(std::string arg0, std::string arg1, std::string arg2, std::string arg3, std::string arg4){
-	doTimeTest(arg0, arg1, arg2, arg3, arg4);
-	doThreadTest(arg0, arg1, arg2, arg3, arg4);
+//	doTimeTest(arg0, arg1, arg2, arg3, arg4);
+//	doThreadTest(arg0, arg1, arg2, arg3, arg4);
 //	doLogTest(arg0, arg1, arg2, arg3, arg4);
-	doIniTest(arg0, arg1, arg2, arg3, arg4);
+//	doIniTest(arg0, arg1, arg2, arg3, arg4);
 }
 
 //! \brief	pub_timer

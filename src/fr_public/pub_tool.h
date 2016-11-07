@@ -36,6 +36,12 @@ namespace Universal{
 
 	//! \brief	从map中查询key对应的数据。如果查询不到则返回 宏[_STRINGFALSE] 定义的字符串。
 	string findDataFromMap( const map<string, string> &mapData, const string &key );
+
+	//! \brief	生成MD5
+	//! \note	默认为32位的.如果需要使用16位。可以调用md5_16
+	string md5(const std::string str);
+	//! \brief	生成MD5(16位)
+	string md5_16(const std::string str);
 }  // namespace : Universal
 
 
