@@ -60,17 +60,17 @@ namespace Universal{
 	}
 
 	bool createDir(string filePath){
-		return create_directory(path(filePath));
+		return (bool)create_directory(path(filePath));
 	}
 
 
 	bool clearDir(string filePath){
-		return remove_all(path(filePath));
+		return (bool)remove_all(path(filePath));
 	}
 
 
 	bool deleteFile(const string &filePath){
-		return remove(path(filePath));
+		return (bool)remove(path(filePath));
 	}
 
 	bool findFileFromDir(string filePath, vector<string> &fileNames, string filePattern){

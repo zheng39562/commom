@@ -10,6 +10,7 @@
 #define _pub_cfg_H
 
 #include "pub_define.h"
+#include "fr_template/single_mode.hpp"
 
 namespace Universal{
 	enum eCfgDataType{
@@ -42,6 +43,8 @@ namespace Universal{
 			void* m_pCfg;	//! 根据配置(eCfgDataType)保存不同的文件指针。
 			eCfgDataType m_CfgType;	//! 
 	};
+	typedef DesignMode::SingleMode<Configurator> SingleConfigurator;
+	
 }
 
 #endif 

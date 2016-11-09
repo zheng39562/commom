@@ -30,6 +30,8 @@ namespace Universal{
 		if(splitString(readFile(filePath), "\n", lines)){
 			map<string, string>* pKeyValueMap(NULL);
 			for(vector<string>::const_iterator citerLine = lines.begin(); citerLine != lines.end(); ++citerLine){
+				if(isNote(*citerLine)){ continue; }
+
 				if(isNewSection(*citerLine)){
 					pKeyValueMap = NULL;
 					string section = citerLine->substr(1, citerLine->size()-2);
@@ -39,16 +41,15 @@ namespace Universal{
 					}
 				}
 				else{
-					if(citerLine->empty()){ continue; }
-
-					size_t pos = citerLine->find('=');
+					string str = citerLine->substr(0, citerLine->find('#'));
+					size_t pos = str.find('=');
 					if(pKeyValueMap == NULL || pos == string::npos || pos == 0){
 						DEBUG_E("ini文件格式错误。");
 						return false;
 					}
 					pKeyValueMap->insert(pair<string, string>(
-							trim(citerLine->substr(0, pos)), 
-							trim(citerLine->substr(pos+1, citerLine->size() - pos - 1))
+							trim(str.substr(0, pos)), 
+							trim(str.substr(pos+1, str.size() - pos - 1))
 							));
 				}
 			}
@@ -92,6 +93,10 @@ namespace Universal{
 			return false;
 		}
 		return true;
+	}
+
+	bool IniCfg::isNote(const std::string &str){
+		return str.empty() || trim(str)[0] == '#';
 	}
 
 }

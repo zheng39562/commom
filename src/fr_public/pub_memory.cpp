@@ -24,6 +24,34 @@ namespace Universal{
 	{ 
 		setBuffer(_buffer, _size);
 	}
+	BinaryMemory::BinaryMemory(const Byte *_buffer, size_t _size)
+		:m_Buffer(NULL),
+		 m_CurBufferSize(0),
+		 m_MaxBufferSize(_size)
+	{
+		setBuffer((void*)_buffer, _size * sizeof(Byte) / 8);
+	}
+	BinaryMemory::BinaryMemory(const char *_buffer, size_t _size)
+		:m_Buffer(NULL),
+		 m_CurBufferSize(0),
+		 m_MaxBufferSize(_size)
+	{
+		setBuffer((void*)_buffer, _size * sizeof(char) / 8);
+	}
+	BinaryMemory::BinaryMemory(const uint16 *_buffer, size_t _size)
+		:m_Buffer(NULL),
+		 m_CurBufferSize(0),
+		 m_MaxBufferSize(_size)
+	{
+		setBuffer((void*)_buffer, _size * sizeof(uint16) / 8);
+	}
+	BinaryMemory::BinaryMemory(const uint32 *_buffer, size_t _size)
+		:m_Buffer(NULL),
+		 m_CurBufferSize(0),
+		 m_MaxBufferSize(_size)
+	{
+		setBuffer((void*)_buffer, _size * sizeof(uint32) / 8);
+	}
 
 	BinaryMemory::~BinaryMemory(){
 		if(m_Buffer){
@@ -152,7 +180,7 @@ namespace Universal{
 		}
 	}
 
-	void BinaryMemory::print()const{
+	void BinaryMemory::print(string expand)const{
 		if(m_Buffer == NULL){
 			return;
 		}
@@ -160,7 +188,7 @@ namespace Universal{
 		Byte* msg = (Byte*)m_Buffer;
 		size_t index(0);
 		ostringstream ostr;
-		ostr << "buffer is [";
+		ostr << expand << " buffer is [";
 		while(index < m_CurBufferSize){
 			ostr << (uint16)(unsigned char)msg[index] << "|";
 			++index;

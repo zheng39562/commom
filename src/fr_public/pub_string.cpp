@@ -22,7 +22,7 @@ using namespace Universal;
 //
 namespace Universal{
 
-	long strToInt( const string &number ){
+	long strToInt(const string &number){
 		stringstream strStream;
 		strStream << number;
 
@@ -31,20 +31,20 @@ namespace Universal{
 		return numberTmp;
 	}
 
-	std::string intToStr( const long &number ){
+	std::string intToStr(const long &number){
 		stringstream strStream;
 		strStream << number;
 		return strStream.str();
 	}
 
-	string doubleToStr( const double &number ){
+	string doubleToStr(const double &number){
 		stringstream strStream;
 		strStream << number;
 		return strStream.str();
 	}
 	
 
-	double strToDouble( const string &number ){
+	double strToDouble(const string &number){
 		stringstream strStream;
 		strStream << number;
 
@@ -53,53 +53,53 @@ namespace Universal{
 		return numberTmp;
 	}
 
-	string strToXmlStr( string content ){
+	string strToXmlStr(string content){
 		// & -> &amp;
-		strReplaceAll( content, "&", "&amp;" );
+		strReplaceAll(content, "&", "&amp;");
 		// < -> &lt;
-		strReplaceAll( content, "<", "&lt;" );
+		strReplaceAll(content, "<", "&lt;");
 		// > -> &gt;
-		strReplaceAll( content, ">", "&gt;" );
+		strReplaceAll(content, ">", "&gt;");
 		// ' -> &apos;
-		strReplaceAll( content, "'", "&apos;" );
+		strReplaceAll(content, "'", "&apos;");
 		// " -> &quot;
-		strReplaceAll( content, "\"", "quot;" );
+		strReplaceAll(content, "\"", "quot;");
 
 		return content;
 	}
 	
 
-	string xmlStrToStr( string content ){
+	string xmlStrToStr(string content){
 		// & -> &amp;
-		strReplaceAll( content, "&amp;", "&" );
+		strReplaceAll(content, "&amp;", "&");
 		// < -> &lt;
-		strReplaceAll( content, "&lt;", "<" );
+		strReplaceAll(content, "&lt;", "<");
 		// > -> &gt;
-		strReplaceAll( content, "&gt;", ">" );
+		strReplaceAll(content, "&gt;", ">");
 		// ' -> &apos;
-		strReplaceAll( content, "&apos;", "'" );
+		strReplaceAll(content, "&apos;", "'");
 		// " -> &quot;
-		strReplaceAll( content, "quot;", "\"" );
+		strReplaceAll(content, "quot;", "\"");
 
 		return content;
 	}
 	
-	string strToJsonStr( string content ){
-		strReplaceAll( content, "\"", "\\\"" );
+	string strToJsonStr(string content){
+		strReplaceAll(content, "\"", "\\\"");
 		return content;
 	}
 
-	string jsonStrToStr( string content ){
-		strReplaceAll( content, "\\\"", "\"" );
+	string jsonStrToStr(string content){
+		strReplaceAll(content, "\\\"", "\"");
 		return content;
 	}
 
 
-	string ConvertUnicodeToUtf8( int &unicode ){
+	string ConvertUnicodeToUtf8(int &unicode){
 		// unciode to utf8
-		int partHigh = ( unicode & 0x0000F000 ) >> 12;  // XX XX 11110000 XX
-		int partMiddle = ( unicode & 0x00000FC0 ) >> 6; // XX XX X1111 1100X
-		int partLow = ( unicode & 0x0000003F ) ; // XX XX XX 00111111
+		int partHigh = (unicode & 0x0000F000) >> 12;  // XX XX 11110000 XX
+		int partMiddle = (unicode & 0x00000FC0) >> 6; // XX XX X1111 1100X
+		int partLow = (unicode & 0x0000003F) ; // XX XX XX 00111111
 		partHigh += 0xE0;
 		partMiddle += 0x80;
 		partLow += 0x80;
@@ -113,11 +113,11 @@ namespace Universal{
 	}
 
 
-	void ConvertToUtf8( string &str, const eCharacterEncoding &originalEncoding ){ ; }
+	void ConvertToUtf8(string &str, const eCharacterEncoding &originalEncoding){ ; }
 
 
-	void convertFullToHalf( string &str, eCharacterEncoding encoding ){
-		ConvertToUtf8( str, encoding );
+	void convertFullToHalf(string &str, eCharacterEncoding encoding){
+		ConvertToUtf8(str, encoding);
 
 	    std::string temp; 
 		for (size_t i = 0; i < str.size(); i++) {
@@ -146,20 +146,20 @@ namespace Universal{
 	}
 
 
-	void convertHalfToFull( string &str, eCharacterEncoding encoding ){
-		ConvertToUtf8( str, encoding );
+	void convertHalfToFull(string &str, eCharacterEncoding encoding){
+		ConvertToUtf8(str, encoding);
 
 		string temp;
 		int new_char;
-		for (size_t i = 0; i < str.size(); ++i ) {
+		for (size_t i = 0; i < str.size(); ++i) {
 			new_char = str[i];
-			if( str[i] >= 0x21 && str[i] <= 0x7E ){
+			if(str[i] >= 0x21 && str[i] <= 0x7E){
 				new_char += 0xFEE0;
-				temp += ConvertUnicodeToUtf8( new_char );
+				temp += ConvertUnicodeToUtf8(new_char);
 			}
-			else if( str[i] == 0x20 ){
+			else if(str[i] == 0x20){
 				new_char = 0x3000;
-				temp += ConvertUnicodeToUtf8( new_char );
+				temp += ConvertUnicodeToUtf8(new_char);
 			}
 			else{
 				temp += str[i];
@@ -169,17 +169,17 @@ namespace Universal{
 	}
 
 
-	size_t getStrSize( const string &str, eCharacterEncoding encoding ){
-		if( !str.empty() ){
+	size_t getStrSize(const string &str, eCharacterEncoding encoding){
+		if(!str.empty()){
 			size_t size = 0;
 
 			size_t currentPos = 0;
-			while( currentPos < str.size() ){
-				if( (str[currentPos] & 0xFE) == 0xFC ){ currentPos += 6; } 
-				else if( ( str[currentPos] & 0xFC ) == 0xF8 ){ currentPos += 5; } 
-				else if( ( str[currentPos] & 0xF8 ) == 0xF0 ){ currentPos += 4; } 
-				else if( ( str[currentPos] & 0xF0 ) == 0xE0 ){ currentPos += 3; } 
-				else if( ( str[currentPos] & 0xE0) == 0xC0 ){ currentPos += 2; } 
+			while(currentPos < str.size()){
+				if((str[currentPos] & 0xFE) == 0xFC){ currentPos += 6; } 
+				else if((str[currentPos] & 0xFC) == 0xF8){ currentPos += 5; } 
+				else if((str[currentPos] & 0xF8) == 0xF0){ currentPos += 4; } 
+				else if((str[currentPos] & 0xF0) == 0xE0){ currentPos += 3; } 
+				else if((str[currentPos] & 0xE0) == 0xC0){ currentPos += 2; } 
 				else{ currentPos += 1; }
 
 				++size;
@@ -196,16 +196,16 @@ namespace Universal{
 // 字符本身的转换。
 //
 namespace Universal{
-	string strToUpper( const string &str ){
+	string strToUpper(const string &str){
 		string strTmp = str;
-		transform( strTmp.begin(), strTmp.end(), strTmp.begin(), (int (*)(int))toupper );
+		transform(strTmp.begin(), strTmp.end(), strTmp.begin(), (int (*)(int))toupper);
 		return strTmp;
 	}
 
 
-	string strToLower( const string &str ){
+	string strToLower(const string &str){
 		string strTmp = str;
-		transform( strTmp.begin(), strTmp.end(), strTmp.begin(), (int (*)(int))tolower );
+		transform(strTmp.begin(), strTmp.end(), strTmp.begin(), (int (*)(int))tolower);
 		return strTmp;
 	}
 
@@ -217,21 +217,21 @@ namespace Universal{
 // 字符操作：合并，分割，替换。。。
 //
 namespace Universal{
-	bool strReplaceAll( string &content, const string &replace, const string &dest ){
+	bool strReplaceAll(string &content, const string &replace, const string &dest){
 		string::size_type pos = 0;
 		string::size_type replaceSize = replace.size();
 		string::size_type destSize = dest.size();
-		while( (pos = content.find(replace, pos) ) != string::npos ){
-			content.replace( pos, replaceSize, dest );
+		while((pos = content.find(replace, pos)) != string::npos){
+			content.replace(pos, replaceSize, dest);
 			pos+=destSize;
 		}
 
 		return true;
 	}
-	bool splitString( const string &strValue, const string &splittingKey, vector<string> &result ){
+	bool splitString(const string &strValue, const string &splittingKey, vector<string> &result){
 		result.clear();
 		
-		if( strValue.empty() ){  
+		if(strValue.empty()){  
 			result.push_back("");
 			return true;  
 		}
@@ -239,17 +239,17 @@ namespace Universal{
 		int count = 0;
 		string::size_type curindex = 0;
 		string::size_type preindex = 0;
-		while( 1){
-			if( ++count > strValue.size() )  break;
+		while(1){
+			if(++count > strValue.size())  break;
 			
-			curindex = strValue.find_first_of( splittingKey, preindex );
-			if( curindex == string::npos ){
-				if( preindex != string::npos )
-					result.push_back( strValue.substr(preindex) );
+			curindex = strValue.find_first_of(splittingKey, preindex);
+			if(curindex == string::npos){
+				if(preindex != string::npos)
+					result.push_back(strValue.substr(preindex));
 				return true;
 			}
-			if( preindex != curindex ){
-				result.push_back( strValue.substr(preindex, curindex-preindex ) );
+			if(preindex != curindex){
+				result.push_back(strValue.substr(preindex, curindex-preindex));
 			}
 			else{
 				result.push_back("");
@@ -258,10 +258,10 @@ namespace Universal{
 		}	
 		return false;
 	}
-	bool splitString( const string &strValue, const string &splittingKey, list<string> &result ){
+	bool splitString(const string &strValue, const string &splittingKey, list<string> &result){
 		result.clear();
 		
-		if( strValue.empty() ){  
+		if(strValue.empty()){  
 			result.push_back("");
 			return true;  
 		}
@@ -269,52 +269,52 @@ namespace Universal{
 		int count = 0;
 		string::size_type curindex = 0;
 		string::size_type preindex = 0;
-		while( 1){
-			if( ++count > strValue.size() )  break;
+		while(1){
+			if(++count > strValue.size())  break;
 			
-			curindex =	strValue.find_first_of( splittingKey, preindex);
-			if( curindex == string::npos ){
-				if( preindex != string::npos )
-					result.push_back( strValue.substr(preindex) );
+			curindex =	strValue.find_first_of(splittingKey, preindex);
+			if(curindex == string::npos){
+				if(preindex != string::npos)
+					result.push_back(strValue.substr(preindex));
 				return true;
 			}
-			if( preindex != curindex ){
-				result.push_back( strValue.substr(preindex, curindex-preindex ) );
+			if(preindex != curindex){
+				result.push_back(strValue.substr(preindex, curindex-preindex));
 			}
 			preindex = curindex + splittingKey.size();
 		}	
 		return false;
 	}
-	string mergeString( const vector<string> &strings, const string &mergerKey ){
+	string mergeString(const vector<string> &strings, const string &mergerKey){
 		string strTmp;
-		for( vector<string>::const_iterator citer = strings.begin(); citer != strings.end();){
+		for(vector<string>::const_iterator citer = strings.begin(); citer != strings.end();){
 			strTmp += *citer;
-			if( ++citer != strings.end() )
+			if(++citer != strings.end())
 				 strTmp += mergerKey;
 		}
 		return strTmp;
 	}
 
 
-	string trimRight( const string &str ){
-		string trimStr = str.substr( 0, str.find_last_not_of(" ")+1 );
-		trimStr = trimStr.substr( 0, trimStr.find_last_not_of("\t")+1 );
-		trimStr = trimStr.substr( 0, trimStr.find_last_not_of("\r\n")+1 );
-		trimStr = trimStr.substr( 0, trimStr.find_last_not_of("\n")+1 );
+	string trimRight(const string &str){
+		string trimStr = str.substr(0, str.find_last_not_of(" ")+1);
+		trimStr = trimStr.substr(0, trimStr.find_last_not_of("\t")+1);
+		trimStr = trimStr.substr(0, trimStr.find_last_not_of("\r\n")+1);
+		trimStr = trimStr.substr(0, trimStr.find_last_not_of("\n")+1);
 		return trimStr;
 	}
 
 
-	string trimLeft( const string &str ){
-		string trimStr = str.substr( str.find_first_not_of(" ") );
-		trimStr = trimStr.substr( trimStr.find_first_not_of("\t") );
-		trimStr = trimStr.substr( trimStr.find_first_not_of("\r\n") );
-		trimStr = trimStr.substr( trimStr.find_first_not_of("\n") );
+	string trimLeft(const string &str){
+		string trimStr = str.substr(str.find_first_not_of(" ") == string::npos ? str.size()-1 : str.find_first_not_of(" "));
+		trimStr = trimStr.substr(trimStr.find_first_not_of("\t") == string::npos ? str.size()-1 : trimStr.find_first_not_of("\t"));
+		trimStr = trimStr.substr(trimStr.find_first_not_of("\r\n") == string::npos ? str.size()-1 : trimStr.find_first_not_of("\r\n"));
+		trimStr = trimStr.substr(trimStr.find_first_not_of("\n") == string::npos ? str.size()-1 : trimStr.find_first_not_of("\n"));
 		return trimStr;
 	}
 
 	string trim(const string &str){
-		return trimRight(trimLeft(str));
+		return str.empty() ? str : trimRight(trimLeft(str));
 	}
 
 }  // namepsace : Universal

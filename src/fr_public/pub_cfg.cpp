@@ -27,7 +27,7 @@ namespace Universal{
 		switch (m_CfgType){
 		case eCfgDataType_Ini:
 			if (m_pCfg != NULL){
-				delete (IniCfg*)m_pCfg; m_pCfg == NULL;
+				delete (IniCfg*)m_pCfg; m_pCfg = NULL;
 			}
 
 			m_pCfg = new IniCfg();

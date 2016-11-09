@@ -35,6 +35,10 @@ namespace Universal{
 		public:
 			BinaryMemory();
 			BinaryMemory(const void *_buffer, size_t _size);
+			BinaryMemory(const Byte *_buffer, size_t _size);
+			BinaryMemory(const char *_buffer, size_t _size);
+			BinaryMemory(const uint16 *_buffer, size_t _size);
+			BinaryMemory(const uint32 *_buffer, size_t _size);
 			BinaryMemory(const BinaryMemory &ref);
 			~BinaryMemory();
 		public:
@@ -50,7 +54,7 @@ namespace Universal{
 			//! \note	如果已满足扩展大小则不做操作。
 			//! \note	扩展不会影响已有的数据。
 			void reserve(size_t size);
-			void print()const;
+			void print(std::string expand = "")const;
 
 			inline bool empty()const{ return m_CurBufferSize == 0; }
 			//! \note	请勿在外界直接操作内存。这会导致行为未定义。

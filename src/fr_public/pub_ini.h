@@ -15,7 +15,8 @@
 #include "fr_template/single_mode.hpp"
 
 namespace Universal{
-	//! \brief 读取，解析ini的类
+	//! \brief	读取，解析ini的类
+	//! \todo	支持行内注释。
 	class IniCfg{
 		public:
 			IniCfg();
@@ -34,8 +35,10 @@ namespace Universal{
 			//! \brief	获取double数据：需要自己保证可转换。否则行为未定义
 			double getDouble(const std::string &section, const std::string &key, double defaultValue = 0.0);
 		private:
-			//! \brief	 该行是否是一个妞section
+			//! \brief	该行是否是一个妞section
 			bool isNewSection(const std::string &section);
+			//! \brief	是否是注释行。
+			bool isNote(const std::string &str);
 		private:
 			std::map<std::string, std::map<std::string, std::string> > m_IniInfo;	//! 
 	};
