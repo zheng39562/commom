@@ -20,37 +20,38 @@ namespace Universal{
 	BinaryMemory::BinaryMemory(const void *_buffer, size_t _size)
 		:m_Buffer(NULL),
 		 m_CurBufferSize(0),
-		 m_MaxBufferSize(_size)
+		 m_MaxBufferSize(0)
 	{ 
 		setBuffer(_buffer, _size);
 	}
 	BinaryMemory::BinaryMemory(const Byte *_buffer, size_t _size)
 		:m_Buffer(NULL),
 		 m_CurBufferSize(0),
-		 m_MaxBufferSize(_size)
+		 m_MaxBufferSize(0)
 	{
-		setBuffer((void*)_buffer, _size * sizeof(Byte) / 8);
+		int i = sizeof(Byte);
+		setBuffer((void*)_buffer, _size * sizeof(Byte));
 	}
 	BinaryMemory::BinaryMemory(const char *_buffer, size_t _size)
 		:m_Buffer(NULL),
 		 m_CurBufferSize(0),
-		 m_MaxBufferSize(_size)
+		 m_MaxBufferSize(0)
 	{
-		setBuffer((void*)_buffer, _size * sizeof(char) / 8);
+		setBuffer((void*)_buffer, _size * sizeof(char));
 	}
 	BinaryMemory::BinaryMemory(const uint16 *_buffer, size_t _size)
 		:m_Buffer(NULL),
 		 m_CurBufferSize(0),
-		 m_MaxBufferSize(_size)
+		 m_MaxBufferSize(0)
 	{
-		setBuffer((void*)_buffer, _size * sizeof(uint16) / 8);
+		setBuffer((void*)_buffer, _size * sizeof(uint16));
 	}
 	BinaryMemory::BinaryMemory(const uint32 *_buffer, size_t _size)
 		:m_Buffer(NULL),
 		 m_CurBufferSize(0),
-		 m_MaxBufferSize(_size)
+		 m_MaxBufferSize(0)
 	{
-		setBuffer((void*)_buffer, _size * sizeof(uint32) / 8);
+		setBuffer((void*)_buffer, _size * sizeof(uint32));
 	}
 
 	BinaryMemory::~BinaryMemory(){

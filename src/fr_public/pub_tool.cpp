@@ -11,6 +11,7 @@
 #include "pub_string.h"
 #include "boost/regex.hpp"
 #include "pub_md5.h"
+#include "pub_rc4.h"
 
 #ifdef WIN32
 #include <windows.h>
@@ -77,6 +78,26 @@ namespace Universal{
 
 	string md5_16(const std::string str){
 		return MD5(str).md5().substr(8,16);
+	}
+
+	bool rc4_encrypt(string &content, const string &sKey){
+		return rc4_encrypt((Byte*)const_cast<char*>(content.c_str()), content.size(), sKey);
+	}
+	bool rc4_encrypt(Byte* content, uint32 size, const string &sKey){
+		RC4_KEY key;
+		RC4Init(sKey.c_str(), sKey.size(), &key);
+		RC4Works(content, size, &key);
+		return true;
+	}
+
+	bool rc4_decrypt(string &content, const string &sKey){
+		return rc4_decrypt((Byte*)const_cast<char*>(content.c_str()), content.size(), sKey);
+	}
+	bool rc4_decrypt(Byte* content, uint32 size, const string &sKey){
+		RC4_KEY key;
+		RC4Init(sKey.c_str(), sKey.size(), &key);
+		RC4Works(content, size, &key);
+		return true;
 	}
 }  // namespace : Universal
 

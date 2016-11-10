@@ -21,6 +21,12 @@ using namespace TestSpace;
 using namespace Universal;
 
 void doPublicTest(std::string arg0, std::string arg1, std::string arg2, std::string arg3, std::string arg4){
+	string content("zbcdefg123456");
+	DEBUG_D("原数据 : " << content);
+	rc4_encrypt(content, "123");
+	DEBUG_D("加密数据 : " << content);
+	rc4_decrypt(content, "123");
+	DEBUG_D("解密数据 : " << content);
 //	doTimeTest(arg0, arg1, arg2, arg3, arg4);
 //	doThreadTest(arg0, arg1, arg2, arg3, arg4);
 //	doLogTest(arg0, arg1, arg2, arg3, arg4);

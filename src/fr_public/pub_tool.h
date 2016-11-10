@@ -42,6 +42,11 @@ namespace Universal{
 	string md5(const std::string str);
 	//! \brief	生成MD5(16位)
 	string md5_16(const std::string str);
+
+	bool rc4_encrypt(string &content, const string &sKey);
+	bool rc4_encrypt(Byte* content, uint32 size, const string &sKey);
+	bool rc4_decrypt(string &content, const string &sKey);
+	bool rc4_decrypt(Byte* content, uint32 size, const string &sKey);
 }  // namespace : Universal
 
 

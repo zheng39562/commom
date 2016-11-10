@@ -29,6 +29,8 @@ namespace Universal{
 	//! \note	创建和使用：
 	//				* 主要提供内存的封装概念。
 	//				* 该类会独立的管理内存，从外界复制的数据为深复制。所以，频繁的构建该类会有大量内存的malloc和free。
+	//! \note	注意点和缺陷：
+	//				* 没有提供内存修改的函数体系。如修改数据需要直接调用指针。然而直接调用指针无法对增删代码进行响应。
 	//! \todo	考虑重载 <<。接受各类基础类型转换为字节流的方式。
 	//! \todo	获取外界new指针，避免重复的内存new/malloc
 	class BinaryMemory{
@@ -57,7 +59,8 @@ namespace Universal{
 			void print(std::string expand = "")const;
 
 			inline bool empty()const{ return m_CurBufferSize == 0; }
-			//! \note	请勿在外界直接操作内存。这会导致行为未定义。
+			//! \note	直接操作内存.仅用于内容修改。：如有需要可以使用，但请慎重使用。
+			//! \note	对内存的增删没有意义:因size不会改变。如做内存增删,请使用delBuffer函数。
 			inline void* getBuffer(){ return m_Buffer; }
 			inline const void* getBuffer()const{ return m_Buffer; }
 			inline size_t getBufferSize()const{ return m_CurBufferSize; }
