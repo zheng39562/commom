@@ -47,6 +47,7 @@ namespace Universal{
 			BinaryMemory& operator=(const BinaryMemory &ref);
 			BinaryMemory& operator+(const BinaryMemory &ref);
 		public:
+			void addBuffer(const BinaryMemory &ref);
 			void addBuffer(const void* buffer, size_t size);
 			void setBuffer(const void* buffer, size_t size);
 			//! \brief	删除buffer内容:不更改内存大小。

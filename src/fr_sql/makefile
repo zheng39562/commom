@@ -12,7 +12,7 @@ THIRDPART_LIB=-lmysqlcppconn
 LIB_LIB=-L${THIRDPART_PATH}/lib64 ${THIRDPART_LIB} -luuid -pthread -lrt -ldl
 #
 CXX=g++
-MACRO=-DDEBUG -D__LINUX
+MACRO=-D__LINUX
 CFLAGS=-g -std=c++11
 LINK_NONEEDED=-Wl,--no-as-needed
 

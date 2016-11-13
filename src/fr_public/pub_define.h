@@ -28,6 +28,9 @@ typedef unsigned long uint64;
 typedef short sint16;
 typedef int sint32;
 typedef long sint64;
+typedef sint16 int16;
+typedef sint32 int32;
+typedef sint64 int64;
 
 /*
 #define DEBUG_D(msg)  cout << msg;

@@ -6,6 +6,7 @@ PUB_MOD=fr_public
 SQL_MOD=fr_sql
 TEMPLATE_MOD=fr_template
 XLS_MOD=fr_xls
+TCP_MOD=fr_tcp
 
 # 编译函数定义
 define make_pub
@@ -32,11 +33,17 @@ define make_xls
 	done;
 endef
 
-all: fr_public fr_sql fr_template fr_xls
+define make_tcp
+	@for sub in $(TCP_MOD); do \
+		(cd ${SRC_PATH}/$$sub && make $1) \
+	done;
+endef
+
+all: fr_public fr_sql fr_template fr_xls fr_tcp
 
 # 测试使用main 链接库根据测试调整。
 test:
-	g++ -DDEBUG -D__LINUX -g -std=c++11 ./src/main.cpp -I./library/include/ -L./library/lib64/ -lfr_public -lfr_xls -lfr_sql -lboost_regex -luuid -pthread -lrt -ldl -o Main_64 
+	g++ -DDEBUG -D__LINUX -g -std=c++11 ./src/main.cpp -I./library/include/ -L./library/lib64/ -lfr_public -lfr_xls -lfr_sql -lboost_regex -lboost_system -lboost_filesystem -lboost_thread -lboost_date_time -luuid -pthread -lrt -ldl -o Main_64 
 		
 .PHONY: fr_public fr_sql fr_template fr_xls help
 
@@ -53,6 +60,9 @@ fr_template:
 fr_xls:
 	$(call make_xls, all)
 
+fr_tcp:
+	$(call make_tcp, all)
+
 fr_pub_clean:
 	$(call make_pub, clean)
 
@@ -65,10 +75,13 @@ fr_template_clean:
 fr_xls_clean:
 	$(call make_xls, clean)
 
-clean: fr_pub_clean fr_sql_clean fr_template_clean fr_xls_clean 
+fr_tcp_clean:
+	$(call make_tcp, clean)
+
+clean: fr_pub_clean fr_sql_clean fr_template_clean fr_xls_clean fr_tcp_clean 
 
 help:
-	echo "makefile parameter : fr_public fr_sql fr_template fr_xls"
+	echo "makefile parameter : fr_public fr_sql fr_template fr_xls fr_tcp"
 	echo "clear parameter : fr_pub_clean fr_sql_clean fr_template_clean fr_xls_clean"
 	echo "if you want clean all. you can input make clean"
 

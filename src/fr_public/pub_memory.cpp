@@ -101,6 +101,9 @@ namespace Universal{
 		memcpy(m_Buffer, buffer, m_CurBufferSize);
 	}
 
+	void BinaryMemory::addBuffer(const BinaryMemory &ref){
+		addBuffer(ref.getBuffer(), ref.getBufferSize());
+	}
 	void BinaryMemory::addBuffer(const void *buffer, size_t size){
 		if(buffer == NULL || size == 0 || m_Buffer == buffer){
 			return;
@@ -156,8 +159,8 @@ namespace Universal{
 	}
 
 	void BinaryMemory::clearBuffer(){
+		memset(m_Buffer, 0, m_CurBufferSize);
 		m_CurBufferSize = 0;
-		memset(m_Buffer, 0, m_MaxBufferSize);
 	}
 
 	void BinaryMemory::reserve(size_t size){

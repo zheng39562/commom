@@ -57,7 +57,7 @@ namespace DesignMode{
 	template < typename T >
 	boost::shared_ptr<T> SingleMode<T>::getInstance(){
 		if( m_s_p_Instance == NULL ){
-			Universal::FrMutex::scoped_lock(m_s_Mutex);
+			boost::mutex::scoped_lock(m_s_Mutex);
 			if( m_s_p_Instance == NULL ){
 				m_s_p_Instance = new SingleMode();
 				return m_s_p_Instance->m_p_Object;

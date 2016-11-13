@@ -10,27 +10,37 @@
 **********************************************************/
 #include <iostream>
 
+#include "fr_public/pub_define.h"
 #include "fr_public/pub_string.h"
+#include "fr_public/pub_tool.h"
 #include "fr_public/pub_json.h"
+#include "fr_public/pub_thread.h"
 
+using namespace std;
 using namespace Universal;
 
+class ThreadA : public FrThread{
+	public:
+		ThreadA():bS(true){}
+		virtual ~ThreadA(){
+			bS = false;
+		}
+	private:
+		virtual void execute(){
+			while(bS){
+				cout << " start sleep" << endl;
+				frSleep(1000);
+			}
+		}
+		bool bS;
+};
+
 int main( int agrc, char **argv ){
-	/*
-	for(int i =0; i<agrc; ++i){
-		cout << argv[i] << endl;
-	}
-	if(agrc = 3){
-		NetworkTest::doTest(argv[1], argv[2]);
-	}
-	if(agrc = 4){
-		NetworkTest::doTest(argv[1], argv[2], argv[3]);
-	}
-	else{
-		cout << "parameter error" << endl;
-	}
-	*/
-	DEBUG_D("123");
+	ThreadA thread1;
+	thread1.start();
+	frSleep(5 * 1000);
+
+	cout << "123" << endl;
 
 	return 0;
 }
