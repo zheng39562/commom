@@ -25,10 +25,18 @@ class LockCache{
 		LockCache(const LockCache &ref);
 		~LockCache()=default;
 	public:
+		/*
+		void writeToReadCache();
+		void recvFromReadCache();
+		void writeToWriteCache();
+		void recvFromWriteCache();
+		*/
+	public:
 		Universal::FrMutex mutexRead;
 		Universal::FrMutex mutexWrite;
 		Universal::BinaryMemory bufferRead;
 		Universal::BinaryMemory bufferWrite;
+		//uint32 usedCount;
 };
 
 typedef std::map<Socket, LockCache> TcpCache;

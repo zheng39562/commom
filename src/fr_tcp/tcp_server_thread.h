@@ -59,7 +59,6 @@ class FrTcpServerThread : public Universal::FrThread, public FrTcpLinker{
 		Socket m_CurSocket;
 		eSocketEventType m_eSocketEventType;
 		bool m_Ready;
-
 };
 
 #endif 

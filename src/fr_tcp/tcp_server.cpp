@@ -27,6 +27,27 @@ using namespace std;
 using namespace boost;
 using namespace Universal;
 
+void server_send_cb(Socket socket, void* etc){
+	FrTcpServer* pServer = (FrTcpServer*)etc;
+	//eEventResult result = pServer->onSend(socket);
+	// 后续可以根据result来报错。
+}
+void server_recv_cb(Socket socket, const Universal::BinaryMemoryPtr &pBinary, void* etc){
+	FrTcpServer* pServer = (FrTcpServer*)etc;
+	//FrTcpServer* pServer = static_cast<FrTcpServer>(etc);
+	eEventResult result = pServer->onReceive(socket, pBinary);
+}
+void server_connect_cb(Socket socket, void* etc){
+	FrTcpServer* pServer = (FrTcpServer*)etc;
+	//FrTcpServer* pServer = static_cast<FrTcpServer>(etc);
+	eEventResult result = pServer->onConnect(socket);
+}
+void server_disconnect_cb(Socket socket, void* etc){
+	FrTcpServer* pServer = (FrTcpServer*)etc;
+	//FrTcpServer* pServer = static_cast<FrTcpServer>(etc);
+	eEventResult result = pServer->onDisconnect(socket);
+}
+
 FrTcpServer::FrTcpServer(uint32 threadNum)
 	:m_SocketMutex(),
 	 m_TcpCache(),
@@ -35,7 +56,9 @@ FrTcpServer::FrTcpServer(uint32 threadNum)
 	 m_ListenSocket(SOCKET_UN_INIT_VALUE)
 { 
 	while(threadNum--){
-		m_ServerThreads.push_back(new FrTcpServerThread(&m_TcpCache, &m_SocketMutex));
+		FrTcpServerThread* pThread = new FrTcpServerThread(&m_TcpCache, &m_SocketMutex);
+		pThread->setCallBack(server_connect_cb, server_disconnect_cb, server_send_cb, server_recv_cb, this);
+		m_ServerThreads.push_back(pThread);
 	}
 }
 
@@ -46,6 +69,11 @@ FrTcpServer::~FrTcpServer(){
 		};
 	}
 }
+
+eEventResult FrTcpServer::onSend(Socket socket){ return eEventResult_OK; }
+eEventResult FrTcpServer::onReceive(Socket socket, BinaryMemoryPtr pBinary){ return eEventResult_OK; }
+eEventResult FrTcpServer::onConnect(Socket socket){ return eEventResult_OK; }
+eEventResult FrTcpServer::onDisconnect(Socket socket){ return eEventResult_OK; }
 
 bool FrTcpServer::listen(const string &ip, unsigned int port, size_t maxListenNum){
 	if(m_EpollSocket > 0){
@@ -75,6 +103,7 @@ bool FrTcpServer::listen(const string &ip, unsigned int port, size_t maxListenNu
 			DEBUG_E("errno " << errno); 
 			return false;
 		}
+		
 		// listen 30 :TCP模块允许的已完成三次握手过程(TCP模块完成)但还没来得及被应用程序accept的最大链接数.
 		ret = ::listen(m_ListenSocket, 30);
 		if(ret == -1){ 
@@ -148,7 +177,7 @@ bool FrTcpServer::sendToGroup(const vector<Socket> &sockets, const BinaryMemory 
 	proto_size size = binary.getBufferSize();
 
 	bool bRet(true);
-	mutex::scoped_lock lock(m_SocketMutex);
+	//mutex::scoped_lock lock(m_SocketMutex);
 	for(auto citerSocket = sockets.end(); citerSocket != sockets.end(); ++citerSocket){
 		auto iterCache = m_TcpCache.find(*citerSocket);
 		if(iterCache != m_TcpCache.end()){
@@ -179,12 +208,6 @@ bool FrTcpServer::sendAll(const Universal::BinaryMemory &binary){
 	return true;
 }
 
-void FrTcpServer::setCallBack(fp_connect_cb connect_cb, fp_disconnect_cb disconn_cb, fp_send_cb send_cb, fp_receive_cb receive_cb, void* etc){
-	for(auto iterThread = m_ServerThreads.begin(); iterThread != m_ServerThreads.end(); ++iterThread){
-		(*iterThread)->setCallBack(connect_cb, disconn_cb, send_cb, receive_cb, etc);
-	}
-}
-
 void FrTcpServer::execute(){
 	uint32 maxEvent;
 	epoll_event* events = (epoll_event*)calloc(maxEvent, sizeof(epoll_event));
@@ -195,6 +218,7 @@ void FrTcpServer::execute(){
 			socketEventType = eSocketEventType_Invalid;
 			// error and disconnect
 			if((events[eventNum].events & EPOLLHUP) || (events[eventNum].events & EPOLLERR)){
+				// 注意增加 socket的 close函数 和 epoll的 delete操作。
 				dealDisconnectReq(events[eventNum].data.fd);
 				socketEventType = eSocketEventType_Disconnect;
 			}

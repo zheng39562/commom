@@ -9,3 +9,21 @@
  * * \!author zheng39562@163.com
 **********************************************************/
 #include "tcp_interface.h"
+
+using namespace std;
+
+bool tcp_listen(const char* ip, uint32 port){
+	SingleFrTcpServer::getInstance()->listen(string(ip), port);
+	return true;
+}
+
+bool tcp_server_close(){
+	SingleFrTcpServer::getInstance()->stop();
+	return true;
+}
+
+bool tcp_server_cb(fp_connect_cb connect_cb, fp_disconnect_cb disconn_cb, fp_send_cb send_cb, fp_receive_cb receive_cb, void* etc){
+	SingleFrTcpServer::getInstance()->setCallBack(connect_cb, disconn_cb, send_cb, receive_cb, etc);
+	return true;
+}
+
