@@ -16,30 +16,29 @@
 
 #include "tcp_define.h"
 
-extern const Socket SOCKET_UN_INIT_VALUE;
+extern const Socket SOCKET_UNKNOW_VALUE;
 
-//! \brief	给内存带上锁。
-class LockCache{
+//! \brief	缓存类。
+//! \note	包含缓存，缓存锁，连接状态，引用计数。
+//! \note	考虑过封装为函数行为，因时间问题没有封。
+class FrTcpCache{
 	public:
-		LockCache();
-		LockCache(const LockCache &ref);
-		~LockCache()=default;
+		FrTcpCache();
+		FrTcpCache(const FrTcpCache &ref)=delete;
+		FrTcpCache operator=(const FrTcpCache &ref)=delete;
+		~FrTcpCache()=default;
 	public:
-		/*
-		void writeToReadCache();
-		void recvFromReadCache();
-		void writeToWriteCache();
-		void recvFromWriteCache();
-		*/
-	public:
-		Universal::FrMutex mutexRead;
+		Socket socket;
+		bool writeActive; // 写是否已经激活。
+		bool connect;
 		Universal::FrMutex mutexWrite;
+		Universal::FrMutex mutexRead;
 		Universal::BinaryMemory bufferRead;
+		Universal::BinaryMemory bufferTmp;
 		Universal::BinaryMemory bufferWrite;
-		//uint32 usedCount;
 };
-
-typedef std::map<Socket, LockCache> TcpCache;
+typedef boost::shared_ptr<FrTcpCache> FrTcpCachePtr;
+typedef std::map<Socket, FrTcpCachePtr> TcpCacheTree;
 
 enum eSocketEventType{
 	eSocketEventType_Invalid,

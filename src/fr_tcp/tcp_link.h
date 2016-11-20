@@ -13,15 +13,7 @@
 
 #include "tcp_define.h"
 #include "fr_public/pub_memory.h"
-
-//! \brief	连接成功的回调函数指针
-typedef void (*fp_connect_cb)(Socket socket, void* etc);
-//! \brief	发送数据成功。
-typedef void (*fp_disconnect_cb)(Socket socket, void* etc);
-//! \brief	发送数据成功。
-typedef void (*fp_send_cb)(Socket socket, void* etc);
-//! \brief	连接数据的回调函数指针
-typedef void (*fp_receive_cb)(Socket socket, const Universal::BinaryMemoryPtr &pBinary, void* etc);
+#include "tcp_server_thread.h"
 
 //! \brief	tcp连接基类。
 //! \note	使用：该类为抽象类无法直接使用。
@@ -32,25 +24,37 @@ typedef void (*fp_receive_cb)(Socket socket, const Universal::BinaryMemoryPtr &p
 //					* 考虑过作为静态类。但这导致所有的继承类都用公共的回调。对应client和server的公共继承将无法实现。
 class FrTcpLinker{
 	public:
-		FrTcpLinker();
-		virtual ~FrTcpLinker()=default;
+		FrTcpLinker(uint32 threadNum, uint32 _writeBufferSize, uint32 _readBufferSize);
+		virtual ~FrTcpLinker();
 	public:
-		//! \brief	回调函数以及对应的公共数据指针。
-		//! \note	已有：具体回调参考typedef的解释。 
-		//! \param[in] etc 公共数据指针。
-		void setCallBack(fp_connect_cb connect_cb, fp_disconnect_cb disconn_cb, fp_send_cb send_cb, fp_receive_cb receive_cb, void* etc);
+		//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+		// 回调函数。由派生类自行实现。
+		//
+		//! \brief	发送成功回调
+		virtual eEventResult onSend(Socket socket);
+		//! \brief	接收回调
+		//! \note	返回数据指针。避免数据的反复copy
+		virtual eEventResult onReceive(Socket socket, Universal::BinaryMemoryPtr pBinary);
+		//! \brief	链接成功回调(成功)
+		virtual eEventResult onConnect(Socket socket);
+		//! \brief	链接断开回调(成功)
+		virtual eEventResult onDisconnect(Socket socket);
+		//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+		//! \brief	发送数据。
+		//! \note	组播和广播有大致实现相同，不服用send是为了减少锁开销。
+		bool send(Socket socket, const Universal::BinaryMemoryPtr &pBuffer);
 	protected:
-		void execConnectCB(Socket socket);
-		void execDisconnectCB(Socket socket);
-		void execSendCB(Socket socket);
-		void execReceiveCB(Socket socket, const Universal::BinaryMemoryPtr &pBinary);
+		//! \brief	获取空闲线程。
+		FrTcpServerThread* getReadyThread();
 	protected:
-	private:
-		void* m_pETC;
-		fp_connect_cb m_pConnectCB;
-		fp_disconnect_cb m_pDisconnectCB;
-		fp_send_cb m_pSendCB;
-		fp_receive_cb m_pReceiveCB;
+		Socket m_EpollSocket;
+		Socket m_RunSocket;
+		LockQueue<PushMsg> m_MsgQueue;  // 外界发送的消息队列。
+		FrTcpMsgProcess m_TcpMsgProcess;
+		uint32 m_WriteBufferSize;
+		uint32 m_ReadBufferSize;
+		std::list<FrTcpServerThread*> m_ServerThreads;
 };
 
 

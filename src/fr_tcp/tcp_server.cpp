@@ -34,46 +34,26 @@ void server_send_cb(Socket socket, void* etc){
 }
 void server_recv_cb(Socket socket, const Universal::BinaryMemoryPtr &pBinary, void* etc){
 	FrTcpServer* pServer = (FrTcpServer*)etc;
-	//FrTcpServer* pServer = static_cast<FrTcpServer>(etc);
 	eEventResult result = pServer->onReceive(socket, pBinary);
 }
 void server_connect_cb(Socket socket, void* etc){
 	FrTcpServer* pServer = (FrTcpServer*)etc;
-	//FrTcpServer* pServer = static_cast<FrTcpServer>(etc);
 	eEventResult result = pServer->onConnect(socket);
 }
 void server_disconnect_cb(Socket socket, void* etc){
 	FrTcpServer* pServer = (FrTcpServer*)etc;
-	//FrTcpServer* pServer = static_cast<FrTcpServer>(etc);
 	eEventResult result = pServer->onDisconnect(socket);
 }
 
-FrTcpServer::FrTcpServer(uint32 threadNum)
-	:m_SocketMutex(),
-	 m_TcpCache(),
+FrTcpServer::FrTcpServer(uint32 threadNum, uint32 _writeBufferSize, uint32 _readBufferSize)
+	:FrTcpLinker(_writeBufferSize, _readBufferSize),
 	 m_ServerThreads(),
-	 m_EpollSocket(SOCKET_UN_INIT_VALUE),
-	 m_ListenSocket(SOCKET_UN_INIT_VALUE)
+	 m_TcpCacheTree()
 { 
-	while(threadNum--){
-		FrTcpServerThread* pThread = new FrTcpServerThread(&m_TcpCache, &m_SocketMutex);
-		pThread->setCallBack(server_connect_cb, server_disconnect_cb, server_send_cb, server_recv_cb, this);
-		m_ServerThreads.push_back(pThread);
-	}
+	m_TcpMsgProcess.setCallBack(server_connect_cb, server_disconnect_cb, server_send_cb, server_recv_cb, this);
 }
 
-FrTcpServer::~FrTcpServer(){ 
-	for(auto iterThread = m_ServerThreads.begin(); iterThread != m_ServerThreads.end(); ++iterThread){
-		if(*iterThread != NULL){
-			delete *iterThread; *iterThread = NULL;
-		};
-	}
-}
-
-eEventResult FrTcpServer::onSend(Socket socket){ return eEventResult_OK; }
-eEventResult FrTcpServer::onReceive(Socket socket, BinaryMemoryPtr pBinary){ return eEventResult_OK; }
-eEventResult FrTcpServer::onConnect(Socket socket){ return eEventResult_OK; }
-eEventResult FrTcpServer::onDisconnect(Socket socket){ return eEventResult_OK; }
+FrTcpServer::~FrTcpServer(){ ; }
 
 bool FrTcpServer::listen(const string &ip, unsigned int port, size_t maxListenNum){
 	if(m_EpollSocket > 0){
@@ -89,32 +69,32 @@ bool FrTcpServer::listen(const string &ip, unsigned int port, size_t maxListenNu
 		inet_pton(AF_INET, ip.c_str(), &address.sin_addr);
 		address.sin_port = htons(port);
 
-		m_ListenSocket = socket(PF_INET, SOCK_STREAM, 0);
-		if(m_ListenSocket < 0){ return false; }
+		m_RunSocket = socket(PF_INET, SOCK_STREAM, 0);
+		if(m_RunSocket < 0){ return false; }
 
 		int on(1);
-		setsockopt(m_ListenSocket,SOL_SOCKET,SO_REUSEADDR,&on,sizeof(on));
+		setsockopt(m_RunSocket,SOL_SOCKET,SO_REUSEADDR,&on,sizeof(on));
 
-		int flags = fcntl(m_ListenSocket,F_GETFL,0);
-		fcntl(m_ListenSocket, F_SETFL, flags|O_NONBLOCK);
+		int flags = fcntl(m_RunSocket,F_GETFL,0);
+		fcntl(m_RunSocket, F_SETFL, flags|O_NONBLOCK);
 
-		int ret = ::bind(m_ListenSocket, (struct sockaddr*)&address, sizeof(address)); 
+		int ret = ::bind(m_RunSocket, (struct sockaddr*)&address, sizeof(address)); 
 		if(ret == -1){ 
 			DEBUG_E("errno " << errno); 
 			return false;
 		}
 		
 		// listen 30 :TCP模块允许的已完成三次握手过程(TCP模块完成)但还没来得及被应用程序accept的最大链接数.
-		ret = ::listen(m_ListenSocket, 30);
+		ret = ::listen(m_RunSocket, 30);
 		if(ret == -1){ 
 			DEBUG_E("errno " << errno); 
 			return false;
 		}
 
 		epoll_event event;
-		event.data.fd = m_ListenSocket;
+		event.data.fd = m_RunSocket;
 		event.events = EPOLLIN | EPOLLET;
-		if(epoll_ctl(m_EpollSocket, EPOLL_CTL_ADD, m_ListenSocket, &event) == -1){
+		if(epoll_ctl(m_EpollSocket, EPOLL_CTL_ADD, m_RunSocket, &event) == -1){
 			DEBUG_E("监听端口增加epoll触发失败。");
 			return false;
 		}
@@ -133,78 +113,22 @@ bool FrTcpServer::stop(){
 		(*iterThread)->stop();
 	}
 
-	{
-		mutex::scoped_lock lock(m_SocketMutex);
-		for(auto iterCache = m_TcpCache.begin(); iterCache != m_TcpCache.end(); ++iterCache){
-			close(iterCache->first);
-
-		}
-		// 停止所有线程后，可以保证缓存区没有任何人操作。所以可以进行清空行为。
-		m_TcpCache.clear();
+	for(auto iterCache = m_TcpCache.begin(); iterCache != m_TcpCache.end(); ++iterCache){
+		close(iterCache->first);
 	}
+	// 停止所有线程后，可以保证缓存区没有任何人操作。所以可以进行清空行为。
+	m_TcpCacheTree.clear();
 
 	close(m_EpollSocket);
-	close(m_ListenSocket);
+	close(m_RunSocket);
 	m_EpollSocket = SOCKET_UN_INIT_VALUE;
-	m_ListenSocket = SOCKET_UN_INIT_VALUE;
+	m_RunSocket = SOCKET_UN_INIT_VALUE;
 
 	return true;
 }
 
 bool FrTcpServer::disconnect(Socket socket){
-	return true;
-}
-
-bool FrTcpServer::send(Socket socket, const BinaryMemory &binary){
-	mutex::scoped_lock lock(m_SocketMutex);
-	auto iterCache = m_TcpCache.find(socket);
-	if(iterCache != m_TcpCache.end()){
-		proto_size size = binary.getBufferSize();
-		mutex::scoped_lock(iterCache->second.mutexWrite);
-		iterCache->second.bufferWrite.addBuffer((Byte*)&size, sizeof(proto_size));
-		iterCache->second.bufferWrite.addBuffer(binary);
-		return true;
-	}
-	else{
-		DEBUG_E("该binary连接不存在或已断开，无法发送数据");
-	}
-	return false;
-}
-
-bool FrTcpServer::sendToGroup(const vector<Socket> &sockets, const BinaryMemory &binary){
-	if(binary.getBufferSize() == 0){ return true; }
-
-	proto_size size = binary.getBufferSize();
-
-	bool bRet(true);
-	//mutex::scoped_lock lock(m_SocketMutex);
-	for(auto citerSocket = sockets.end(); citerSocket != sockets.end(); ++citerSocket){
-		auto iterCache = m_TcpCache.find(*citerSocket);
-		if(iterCache != m_TcpCache.end()){
-			mutex::scoped_lock(iterCache->second.mutexWrite);
-			iterCache->second.bufferWrite.addBuffer((Byte*)&size, sizeof(proto_size));
-			iterCache->second.bufferWrite.addBuffer(binary);
-		}
-		else{
-			DEBUG_E("该binary连接不存在或已断开，无法发送数据");
-			bRet = false;
-		}
-	}
-	return bRet;
-}
-
-bool FrTcpServer::sendAll(const Universal::BinaryMemory &binary){
-	if(binary.getBufferSize() == 0){ return true; }
-
-	proto_size size = binary.getBufferSize();
-
-	bool bRet(true);
-	mutex::scoped_lock lock(m_SocketMutex);
-	for(auto iterCache = m_TcpCache.begin(); iterCache != m_TcpCache.end(); ++iterCache){
-		mutex::scoped_lock(iterCache->second.mutexWrite);
-		iterCache->second.bufferWrite.addBuffer((Byte*)&size, sizeof(proto_size));
-		iterCache->second.bufferWrite.addBuffer(binary);
-	}
+	close(socket);
 	return true;
 }
 
@@ -212,45 +136,43 @@ void FrTcpServer::execute(){
 	uint32 maxEvent;
 	epoll_event* events = (epoll_event*)calloc(maxEvent, sizeof(epoll_event));
 	eSocketEventType socketEventType(eSocketEventType_Invalid);
+
+	queue<PushMsg> msgQueue;
 	while(m_Running){
-		uint32 eventNum = epoll_wait(m_EpollSocket, events, maxEvent, -1);
-		while(eventNum--){
+		// 待发送的队列处理。
+		if(!msgQueue.empty() || m_MsgQueue.swap(msgQueue)){
+			while(!msgQueue.empty()){
+				PushMsg pushMsg = msgQueue.front();
+				dealEvent(pushMsg.first, eSocketEventType_Push, pushMsg.second);
+				msgQueue.pop();
+			}
+		}
+
+		uint32 eventNum = epoll_wait(m_EpollSocket, events, maxEvent, 50); // 50ms timeout
+		for(uint32 index = 0; index < eventNum; ++idnex){
+			Socket socket = events[index].data.fd;
 			socketEventType = eSocketEventType_Invalid;
 			// error and disconnect
-			if((events[eventNum].events & EPOLLHUP) || (events[eventNum].events & EPOLLERR)){
+			if((events[index].events & EPOLLHUP) || (events[index].events & EPOLLERR)){
 				// 注意增加 socket的 close函数 和 epoll的 delete操作。
-				dealDisconnectReq(events[eventNum].data.fd);
-				socketEventType = eSocketEventType_Disconnect;
+				dealDisconnectReq(socket);
+				dealEvent(socket, eSocketEventType_Disconnect);
 			}
-			// read
-			else if(events[eventNum].events & EPOLLIN){ 
-				if(m_ListenSocket == events[eventNum].data.fd){
-					dealConnectReq();
-					socketEventType = eSocketEventType_Connect;
+			// read : 普通数据和带外数据事件一致（暂时）
+			if((events[index].events & EPOLLIN) || (events[index].events & EPOLLPRI)){ 
+				if(m_RunSocket == socket){
+					socket = dealConnectReq();
+					if(m_TcpMsgProcess.addSocket(socket)){
+						dealEvent(socket, eSocketEventType_Connect);
+					}
 				}
 				else{
-					socketEventType = eSocketEventType_Recv;
+					dealEvent(socket, eSocketEventType_Recv);
 				}
 			}
 			// write
-			else if(events[eventNum].events & EPOLLOUT){
-				socketEventType = eSocketEventType_Send;
-			}
-			// read : out of data
-			else if(events[eventNum].events & EPOLLPRI){
-				// 对带外数据暂不涉及。
-				socketEventType = eSocketEventType_Recv;
-			}
-
-			uint32 sleepTime(0);
-			FrTcpServerThread* pServerThreadTmp(NULL);
-			while(pServerThreadTmp == NULL){
-				pServerThreadTmp = getReadyThread();
-				frSleep(++sleepTime);
-			}
-			
-			if(!pServerThreadTmp->active(events[eventNum].data.fd, socketEventType)){
-				DEBUG_E("处理时间失败：激活处理线程失败。");
+			if(events[index].events & EPOLLOUT){
+				dealEvent(socket, eSocketEventType_Send);
 			}
 		}
 	}
@@ -265,35 +187,51 @@ FrTcpServerThread* FrTcpServer::getReadyThread(){
 	return NULL;
 }
 
-void FrTcpServer::dealConnectReq(){
+Socket FrTcpServer::dealConnectReq(){
 	struct sockaddr_in address;
 	socklen_t len = sizeof(address);
 	bzero(&address, sizeof(address));
-	Socket socket = accept(m_ListenSocket, (sockaddr*)&address, &len);
+	Socket socket = accept(m_RunSocket, (sockaddr*)&address, &len);
 	if(socket > 0){
 		epoll_event event;
 		event.data.fd = socket;
 		event.events = EPOLLIN | EPOLLET | EPOLLOUT;
 		epoll_ctl(m_EpollSocket, EPOLL_CTL_ADD, socket, &event);
-	}
 
-	{
-		mutex::scoped_lock lock(m_SocketMutex);
-		m_TcpCache.insert(make_pair(socket, LockCache()));
+		FrTcpCachePtr pCache(new TcpCacheTree());
+		pCache->socket = socket;
+		pCache->connect = true;
+		pCache->bufferTmp.reserve(m_MaxBufferSize);
+		pCache->bufferTmp.setMaxLimit(m_MaxBufferSize);
+		pCache->bufferWrite.setMaxLimit(m_MaxBufferSize);
+		pCache->bufferRead.setMaxLimit(m_MaxBufferSize);
+		m_TcpCacheTree.insert(make_pair(socket, pCache));
 	}
+	return socket;
 }
 
 void FrTcpServer::dealDisconnectReq(Socket socket){
-	close(socket);
-	{
-		mutex::scoped_lock lock(m_SocketMutex);
-		auto iterCache = m_TcpCache.find(socket);
-		if(iterCache != m_TcpCache.end()){
-			m_TcpCache.erase(iterCache);
-		}
-	}
+	epoll_ctl(m_EpollSocket, EPOLL_CTL_DEL, socket, NULL);
+	m_TcpCacheTree.erase(socket);
 }
 
-
+void FrTcpServer::dealEvent(Socket socket, eSocketEventType eEventType, BinaryMemoryPtr pPacket){
+	auto iterCache = m_TcpCacheTree.find(socket);
+	if(iterCache != m_TcpCacheTree.end()){
+		uint32 sleepTime(0);
+		FrTcpServerThread* pServerThreadTmp(NULL);
+		while(pServerThreadTmp == NULL){
+			pServerThreadTmp = getReadyThread();
+			frSleep(++sleepTime);
+		}
+		
+		if(!pServerThreadTmp->active(iterCache->second, socketEventType, pPacket)){
+			DEBUG_E("处理事件失败：激活处理线程失败。");
+		}
+	}
+	else{
+		DEBUG_I("该链接不存在 或 已断开。");
+	}
+}
 
 

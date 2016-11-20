@@ -14,11 +14,13 @@ using namespace std;
 namespace Universal{
 	BinaryMemory::BinaryMemory()
 		:m_Buffer(NULL),
+		 m_MaxLimit(0xFFFFFFFF),
 		 m_CurBufferSize(0),
 		 m_MaxBufferSize(0)
 	{ ; }
 	BinaryMemory::BinaryMemory(const void *_buffer, size_t _size)
 		:m_Buffer(NULL),
+		 m_MaxLimit(0xFFFFFFFF),
 		 m_CurBufferSize(0),
 		 m_MaxBufferSize(0)
 	{ 
@@ -26,6 +28,7 @@ namespace Universal{
 	}
 	BinaryMemory::BinaryMemory(const Byte *_buffer, size_t _size)
 		:m_Buffer(NULL),
+		 m_MaxLimit(0xFFFFFFFF),
 		 m_CurBufferSize(0),
 		 m_MaxBufferSize(0)
 	{
@@ -34,6 +37,7 @@ namespace Universal{
 	}
 	BinaryMemory::BinaryMemory(const char *_buffer, size_t _size)
 		:m_Buffer(NULL),
+		 m_MaxLimit(0xFFFFFFFF),
 		 m_CurBufferSize(0),
 		 m_MaxBufferSize(0)
 	{
@@ -41,6 +45,7 @@ namespace Universal{
 	}
 	BinaryMemory::BinaryMemory(const uint16 *_buffer, size_t _size)
 		:m_Buffer(NULL),
+		 m_MaxLimit(0xFFFFFFFF),
 		 m_CurBufferSize(0),
 		 m_MaxBufferSize(0)
 	{
@@ -48,6 +53,7 @@ namespace Universal{
 	}
 	BinaryMemory::BinaryMemory(const uint32 *_buffer, size_t _size)
 		:m_Buffer(NULL),
+		 m_MaxLimit(0xFFFFFFFF),
 		 m_CurBufferSize(0),
 		 m_MaxBufferSize(0)
 	{
@@ -81,7 +87,7 @@ namespace Universal{
 	}
 
 	void BinaryMemory::setBuffer(const void *buffer, size_t size){
-		if(buffer == NULL || size == 0 || m_Buffer == buffer){
+		if(buffer == NULL || size == 0 || m_Buffer == buffer || size > m_MaxLimit){
 			return;
 		}
 		m_CurBufferSize = size;
@@ -105,7 +111,7 @@ namespace Universal{
 		addBuffer(ref.getBuffer(), ref.getBufferSize());
 	}
 	void BinaryMemory::addBuffer(const void *buffer, size_t size){
-		if(buffer == NULL || size == 0 || m_Buffer == buffer){
+		if(buffer == NULL || size == 0 || m_Buffer == buffer || size + m_CurBufferSize > m_MaxLimit){
 			return;
 		}
 
@@ -164,7 +170,7 @@ namespace Universal{
 	}
 
 	void BinaryMemory::reserve(size_t size){
-		if(m_MaxBufferSize < size){
+		if(m_MaxBufferSize < size &&  size <= m_MaxLimit){
 			void* pSaveBuffer(NULL);
 			if(m_CurBufferSize != 0){
 				pSaveBuffer= (void*)malloc(m_CurBufferSize);
@@ -176,6 +182,7 @@ namespace Universal{
 
 			m_Buffer = malloc(size);
 			m_MaxBufferSize = size;
+			memset(m_Buffer, 0, m_MaxBufferSize);
 
 			if(pSaveBuffer != NULL && m_Buffer != NULL){
 				memcpy(m_Buffer, pSaveBuffer, m_CurBufferSize);

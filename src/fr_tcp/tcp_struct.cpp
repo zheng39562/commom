@@ -14,17 +14,15 @@ using namespace Universal;
 
 const Socket SOCKET_UN_INIT_VALUE = -1;
 
-LockCache::LockCache()
-	:bufferWrite(),
+FrTcpCache::FrTcpCache()
+	:socket(SOCKET_UN_INIT_VALUE),
+	 connect(true),
+	 writeActive(false),
+	 bufferWrite(),
 	 bufferRead(),
+	 bufferTmp(),
 	 mutexRead(),
-	 mutexWrite()
-{
-	;
-}
-
-LockCache::LockCache(const LockCache &ref){
-	this->bufferWrite = ref.bufferWrite;
-	this->bufferRead = ref.bufferRead;
-}
+	 mutexWrite(),
+	 connect(false)
+{ ; }
 

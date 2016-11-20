@@ -20,45 +20,45 @@ using namespace std;
 using namespace boost;
 using namespace Universal;
 
-FrTcpLinker::FrTcpLinker()
-	:m_pETC(NULL),
-	 m_pConnectCB(NULL),
-	 m_pDisconnectCB(NULL),
-	 m_pSendCB(NULL),
-	 m_pReceiveCB(NULL)
+FrTcpLinker::FrTcpLinker(uint32 _writeBufferSize, uint32 _readBufferSize)
+	:m_TcpMsgProcess(),
+	 m_MsgQueue(),
+	 m_WriteBufferSize(_writeBufferSize),
+	 m_WriteBufferSize(_readBufferSize),
+	 m_EpollSocket(SOCKET_UN_INIT_VALUE),
+	 m_ListenSocket(SOCKET_UN_INIT_VALUE),
+	 m_ServerThreads()
 {
-	;
-}
-
-void FrTcpLinker::execConnectCB(Socket socket){
-	if(m_pConnectCB != NULL){
-		(*m_pConnectCB)(socket, m_pETC);
+	while(threadNum--){
+		FrTcpServerThread* pThread = new FrTcpServerThread(&m_TcpMsgProcess);
+		m_ServerThreads.push_back(pThread);
 	}
 }
 
-void FrTcpLinker::execDisconnectCB(Socket socket){
-	if(m_pDisconnectCB != NULL){
-		(*m_pDisconnectCB)(socket, m_pETC);
+FrTcpLinker::~FrTcpLinker(){
+	for(auto iterThread = m_ServerThreads.begin(); iterThread != m_ServerThreads.end(); ++iterThread){
+		if(*iterThread != NULL){
+			delete *iterThread; *iterThread = NULL;
+		};
 	}
 }
 
-void FrTcpLinker::execSendCB(Socket socket){
-	if(m_pSendCB != NULL){
-		(*m_pSendCB)(socket, m_pETC);
-	}
+eEventResult FrTcpLinker::onSend(Socket socket){ return eEventResult_OK; }
+eEventResult FrTcpLinker::onReceive(Socket socket, BinaryMemoryPtr pBinary){ return eEventResult_OK; }
+eEventResult FrTcpLinker::onConnect(Socket socket){ return eEventResult_OK; }
+eEventResult FrTcpLinker::onDisconnect(Socket socket){ return eEventResult_OK; }
+
+bool FrTcpLinker::send(Socket socket, const BinaryMemoryPtr &pBinary){
+	m_MsgQueue.push(PushMsg(socket, pBinary));
+	return true;
 }
 
-void FrTcpLinker::execReceiveCB(Socket socket, const Universal::BinaryMemoryPtr &pBinary){
-	if(m_pReceiveCB != NULL){
-		(*m_pReceiveCB)(socket, pBinary, m_pETC);
+FrTcpServerThread* FrTcpLinker::getReadyThread(){
+	for(auto iterThread = m_ServerThreads.begin(); iterThread != m_ServerThreads.end(); ++iterThread){
+		if((*iterThread)->ready()){
+			return *iterThread;
+		}
 	}
-}
-
-void FrTcpLinker::setCallBack(fp_connect_cb connect_cb, fp_disconnect_cb disconn_cb, fp_send_cb send_cb, fp_receive_cb receive_cb, void* etc){
-	m_pConnectCB = connect_cb;
-	m_pDisconnectCB = disconn_cb;
-	m_pSendCB = send_cb;
-	m_pReceiveCB = receive_cb;
-	m_pETC = etc;
+	return NULL;
 }
 
