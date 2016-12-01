@@ -24,7 +24,7 @@ FrTcpServerThread::FrTcpServerThread(FrTcpMsgProcess* _pTcpMsgProcess)
 	 m_pCurCache(0),
 	 m_eSocketEventType(eSocketEventType_Invalid),
 	 m_pCurPacket(),
-	 m_Ready(false),
+	 m_Ready(false)
 {
 	FrThread::start();
 }
@@ -36,7 +36,7 @@ FrTcpServerThread::~FrTcpServerThread(){
 bool FrTcpServerThread::active(FrTcpCachePtr pCache, eSocketEventType eventType, BinaryMemoryPtr pPacket){
 	if(m_pTcpMsgProcess != NULL && m_Ready){
 		m_Ready = false;
-		m_pCurCache = socket;
+		m_pCurCache = pCache;
 		m_pCurPacket = pPacket;
 		m_eSocketEventType = eventType;
 		resume();
@@ -51,7 +51,7 @@ void FrTcpServerThread::execute(){
 		if(m_pTcpMsgProcess != NULL){
 			switch(m_eSocketEventType){
 				case eSocketEventType_Push:
-					m_pTcpMsgProcess->send(m_pCurCache, m_pCurPacket);
+					m_pTcpMsgProcess->push(m_pCurCache, m_pCurPacket);
 					break;
 				case eSocketEventType_Recv:
 					m_pTcpMsgProcess->send(m_pCurCache);

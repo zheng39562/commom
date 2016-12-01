@@ -23,7 +23,7 @@ FrTcpMsgProcess::FrTcpMsgProcess(Socket _epollSocket)
 {
 }
 
-FrTcpMsgProcess::FrTcpMsgProcess(const LockCache &ref){ ; }
+FrTcpMsgProcess::FrTcpMsgProcess(const FrTcpMsgProcess &ref){ ; }
 
 FrTcpMsgProcess::~FrTcpMsgProcess(){ ; }
 
@@ -90,7 +90,7 @@ void FrTcpMsgProcess::connect(FrTcpCachePtr pTcpCache){
 }
 
 void FrTcpMsgProcess::disconnect(FrTcpCachePtr pTcpCache){
-	execDisconnectCB(socket);
+	execDisconnectCB(pTcpCache->socket);
 }
 
 void FrTcpMsgProcess::execConnectCB(Socket socket){

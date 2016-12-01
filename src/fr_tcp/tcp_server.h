@@ -31,10 +31,6 @@
 #include "tcp_server_thread.h"
 #include "fr_template/single_mode.hpp"
 
-//! \brief	回调事件的返回值。
-enum eEventResult{
-	eEventResult_OK
-};
 //! \brief	tcp	服务类
 //! \note	使用
 //				1 继承此类，重载相应的回调函数。
@@ -60,39 +56,27 @@ enum eEventResult{
 //					* send暂时没有失败的方式。因为缓存大小判断是到执行线程判断的。
 //! \note	使用epoll做触发回调，后期会考虑增加window的IOCP(可能性不大)
 //! \todo	处理队列轮训查找空闲线程，此处的效率"可能"存在问题。
-class FrTcpServer : public Universal::FrThread, public FrTcpLinker{
-	private:
-		typedef pair<Socket, Universal::BinaryMemoryPtr> PushMsg;
+class FrTcpServer : public FrTcpLinker{
 	public:
-		FrTcpServer(uint32 threadNum = 100, uint32 _writeBufferSize = 0xFFFF, uint32 _readBufferSize = 0xFFFF);
+		FrTcpServer(uint32 threadNum = 100, uint32 _maxBufferSize = 0xFFFF);
 		~FrTcpServer();
 	public:
 		//! \brief	监听端口
 		//! \note	不能监听多端口。如果要重新监听，需要stop再listen，
-		bool listen(const std::string &ip, unsigned int port, size_t maxListenNum = 10000);
-		//! \brief	关闭所有端口。
-		//! \note	将会关闭所有已连接的端口。
-		bool stop();
+		virtual bool run(const std::string &ip, unsigned int port);
 
 		//! \brief	断开某个连接。
 		//! \todo	简单版本。后续视情况增加。
 		bool disconnect(Socket socket);
 	private:
-		//! \ntoe	 断开和错误暂时不细分。
-		//! \attetion	程序关闭时，没有依次关闭所有连接。不确定底层是否会自动关闭。需要测试。
-		//				但从实际使用上，这类问题应该不太大。后续如果有这类问题，再解决。
-		virtual void execute();
-	private:
-		//! \brief	获取空闲的处理线程。
-		FrTcpServerThread* getReadyThread();
 		//! \biref	处理断开/错误请求。
-		Socket dealConnectReq();
+		virtual void dealConnect(Socket socket);
 		//! \biref	处理断开/错误请求。
-		void dealDisconnectReq(Socket socket);
-		//! \brief	处理事件。
-		void dealEvent(Socket socket, eSocketEventType eEventType, Universal::BinaryMemoryPtr pPacket = Universal::BinaryMemoryPtr());
+		virtual void dealDisconnect(Socket socket);
+		//! \brief	
+		virtual void dealRecv(Socket socket);
 	private:
-		TcpCacheTree m_TcpCacheTree;
+		Socket m_ListenSocket;
 };
 typedef DesignMode::SingleMode<FrTcpServer> SingleFrTcpServer;
 

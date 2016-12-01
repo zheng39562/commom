@@ -16,13 +16,12 @@ const Socket SOCKET_UN_INIT_VALUE = -1;
 
 FrTcpCache::FrTcpCache()
 	:socket(SOCKET_UN_INIT_VALUE),
-	 connect(true),
+	 connect(false),
 	 writeActive(false),
 	 bufferWrite(),
 	 bufferRead(),
 	 bufferTmp(),
 	 mutexRead(),
-	 mutexWrite(),
-	 connect(false)
+	 mutexWrite()
 { ; }
 

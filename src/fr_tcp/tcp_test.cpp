@@ -31,7 +31,7 @@ class FrTestServer : FrTcpServer{
 			DEBUG_D("接受到消息。");
 			return eEventResult_OK;
 		}
-}
+};
 
 void doTcpTest(string arg0, string arg1, string arg2, string arg3, string arg4){
 	// 测试客户端和服务端消息的连通性。

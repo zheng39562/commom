@@ -13,6 +13,8 @@
 typedef int32 Socket;
 typedef unsigned short proto_size;
 
+#define SOCKET_UNKNOW_VALUE  0
+
 
 #endif 
 

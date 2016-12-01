@@ -11,7 +11,7 @@
 #include "fr_public/pub_thread.h"
 #include "tcp_define.h"
 #include "tcp_struct.h"
-#include "tcp_link.h"
+#include "tcp_msg_process.h"
 
 //! \brief	TCPServer的处理线程。
 //! \note	职责
@@ -28,7 +28,7 @@ class FrTcpServerThread : public Universal::FrThread{
 		//! \brief	唤醒线程执行操作。
 		//! \note	保证该线程已执行完才可以再次唤醒。
 		//! \retval false 表示唤醒失败，基本可以视为该线程还有操作正在执行。
-		bool active(FrTcpCachePtr pCache, eSocketEventType eventType, BinaryMemoryPtr pPacket = BinaryMemoryPtr());
+		bool active(FrTcpCachePtr pCache, eSocketEventType eventType, Universal::BinaryMemoryPtr pPacket = Universal::BinaryMemoryPtr());
 
 		//! \brief	该线程是否就绪(休眠)。
 		//! \note	考虑过加锁，但感觉没有必要。

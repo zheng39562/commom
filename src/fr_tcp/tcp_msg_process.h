@@ -13,8 +13,6 @@
 #include "tcp_define.h"
 #include "tcp_struct.h"
 
-
-
 //! \brief	连接成功的回调函数指针
 typedef void (*fp_connect_cb)(Socket socket, void* etc);
 //! \brief	发送数据成功。
@@ -35,7 +33,7 @@ typedef void (*fp_receive_cb)(Socket socket, const Universal::BinaryMemoryPtr &p
 class FrTcpMsgProcess{
 	public:
 		FrTcpMsgProcess(Socket _epollSocket);
-		FrTcpMsgProcess(const LockCache &ref);
+		FrTcpMsgProcess(const FrTcpMsgProcess &ref);
 		virtual ~FrTcpMsgProcess();
 	public:
 		//! \brief	推送消息包到队列中等待处理.
@@ -48,7 +46,7 @@ class FrTcpMsgProcess{
 		//! \brief	新连接处理。
 		void connect(FrTcpCachePtr pTcpCache);
 		//! \brief	链接断开。
-		void disconnect();
+		void disconnect(FrTcpCachePtr pTcpCache);
 		//! \brief	回调函数以及对应的公共数据指针。
 		//! \note	已有：具体回调参考typedef的解释。 
 		//! \param[in] etc 公共数据指针。

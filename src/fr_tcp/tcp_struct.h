@@ -16,8 +16,6 @@
 
 #include "tcp_define.h"
 
-extern const Socket SOCKET_UNKNOW_VALUE;
-
 //! \brief	缓存类。
 //! \note	包含缓存，缓存锁，连接状态，引用计数。
 //! \note	考虑过封装为函数行为，因时间问题没有封。
@@ -45,7 +43,8 @@ enum eSocketEventType{
 	eSocketEventType_Recv,
 	eSocketEventType_Send,
 	eSocketEventType_Connect,
-	eSocketEventType_Disconnect
+	eSocketEventType_Disconnect,
+	eSocketEventType_Push
 };
 
 #endif 
