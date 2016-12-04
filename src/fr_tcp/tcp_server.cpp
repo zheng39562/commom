@@ -66,7 +66,7 @@ bool FrTcpServer::run(const string &ip, unsigned int port){
 			return false;
 		}
 
-		dealConnect(m_ListenSocket);
+		addSocketToEpoll(m_ListenSocket);
 		return true;
 	}
 

@@ -47,7 +47,9 @@ bool FrTcpServerThread::active(FrTcpCachePtr pCache, eSocketEventType eventType,
 
 void FrTcpServerThread::execute(){
 	while(m_Running){
+		m_Ready = true;
 		pause();
+		m_Ready = false;
 		if(m_pTcpMsgProcess != NULL){
 			switch(m_eSocketEventType){
 				case eSocketEventType_Push:
@@ -70,7 +72,6 @@ void FrTcpServerThread::execute(){
 					break;
 			}
 		}
-		m_Ready = true;
 	}
 }
 

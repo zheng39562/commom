@@ -73,11 +73,12 @@ void FrTcpMsgProcess::send(FrTcpCachePtr pTcpCache){
 void FrTcpMsgProcess::recv(FrTcpCachePtr pTcpCache){
 	FrTcpCache& refTcpCache = *pTcpCache;
 	mutex::scoped_lock scopedLock(refTcpCache.mutexRead);
-	size_t recvSize(0);
+	int recvSize(0);
 	size_t maxRecvSize = refTcpCache.bufferRead.maxLimit() - refTcpCache.bufferRead.curSize();
 	refTcpCache.bufferTmp.reserve(maxRecvSize);
 	while((recvSize = ::recv(pTcpCache->socket, refTcpCache.bufferTmp.buffer(), maxRecvSize, MSG_DONTWAIT)) > 0){
 		refTcpCache.bufferRead.add(refTcpCache.bufferTmp.buffer(), recvSize);
+		DEBUG_D("接受到字节流 [" << recvSize << "] 接受后缓存大小 [" << refTcpCache.bufferRead.curSize() << "]");
 		recvPackets(pTcpCache->socket, refTcpCache.bufferRead);
 
 		maxRecvSize = refTcpCache.bufferRead.maxLimit() - refTcpCache.bufferRead.curSize();
@@ -136,10 +137,13 @@ void FrTcpMsgProcess::updateEpollStatus(Socket socket){
 
 void FrTcpMsgProcess::recvPackets(Socket socket, Universal::BinaryMemory &binary){
 	proto_size size(0);
-	while((size = *(proto_size*)binary.buffer()) <= (proto_size)binary.curSize()){
+	DEBUG_D("包内容大小 [" << *(proto_size*)binary.buffer() << "] cur buffer size [" << binary.curSize() << "]" );
+	while((size = *(proto_size*)binary.buffer()) <= (proto_size)binary.curSize() && size > 0){
 		// 直接裁剪掉包头
-		BinaryMemoryPtr pBinary(new BinaryMemory((Byte*)binary.buffer() + sizeof(proto_size), size - sizeof(proto_size)));
-		binary.del(0, size);
+		BinaryMemoryPtr pBinary(new BinaryMemory((Byte*)binary.buffer() + sizeof(proto_size), size));
+		DEBUG_D("包内容大小 [" << *(proto_size*)binary.buffer() << "] cur buffer size [" << binary.curSize() << "]" );
+		binary.del(0, size + sizeof(proto_size));
+		DEBUG_D("得到的包内容[" << string((char*)pBinary->buffer(), pBinary->curSize())<< "] 删除后的cur buffer size [" << binary.curSize() << "]" );
 		execReceiveCB(socket, pBinary);
 	}
 }

@@ -66,6 +66,9 @@ class FrTcpLinker : public Universal::FrThread {
 		virtual void dealDisconnect(Socket socket);
 		virtual void dealSend(Socket socket);
 		virtual void dealRecv(Socket socket);
+
+		//! \brief	添加socket到epoll中
+		void addSocketToEpoll(Socket socket);
 	private:
 		//! \brief	获取空闲线程。
 		FrTcpServerThread* getReadyThread();

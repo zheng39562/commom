@@ -51,7 +51,7 @@ void doTcpTest(string arg0, string arg1, string arg2, string arg3, string arg4){
 	// 封数据包进程：64B 1K 63K 测试服务功能。 单进行50线程  开10个进程。
 	FrTestServer* pTcpServer = new FrTestServer();
 	uint32 port = 5555;
-	if(pTcpServer->run("0.0.0.0", port)){
+	if(pTcpServer->run("192.168.2.104", port)){
 		DEBUG_D("开始监听端口" << port);
 		while(1){
 			frSleep(1000);
@@ -62,7 +62,4 @@ void doTcpTest(string arg0, string arg1, string arg2, string arg3, string arg4){
 	DEBUG_D("等待输入任意字符后结束.");
 	int i; cin >> i;
 }
-
-
-
 

@@ -103,7 +103,7 @@ bool FrTcpLinker::send(Socket socket, const BinaryMemoryPtr &pBinary){
 }
 
 void FrTcpLinker::execute(){
-	uint32 maxEvent;
+	uint32 maxEvent(30);
 	epoll_event* events = (epoll_event*)calloc(maxEvent, sizeof(epoll_event));
 	eSocketEventType socketEventType(eSocketEventType_Invalid);
 
@@ -136,14 +136,14 @@ void FrTcpLinker::execute(){
 				dealSend(socket);
 			}
 		}
+
+		frSleep(500);
 	}
 }
 
 void FrTcpLinker::dealConnect(Socket socket){
-	epoll_event event;
-	event.data.fd = socket;
-	event.events = EPOLLIN | EPOLLET | EPOLLOUT;
-	epoll_ctl(m_EpollSocket, EPOLL_CTL_ADD, socket, &event);
+	DEBUG_D("1");
+	addSocketToEpoll(socket);
 
 	FrTcpCachePtr pCache(new FrTcpCache());
 	pCache->socket = socket;
@@ -156,6 +156,7 @@ void FrTcpLinker::dealConnect(Socket socket){
 }
 
 void FrTcpLinker::dealDisconnect(Socket socket){
+	DEBUG_D("1");
 	epoll_ctl(m_EpollSocket, EPOLL_CTL_DEL, socket, NULL);
 	m_TcpCacheTree.erase(socket);
 	close(socket);
@@ -163,11 +164,21 @@ void FrTcpLinker::dealDisconnect(Socket socket){
 }
 
 void FrTcpLinker::dealSend(Socket socket){
+	DEBUG_D("1");
 	dealEvent(socket, eSocketEventType_Send);
 }
 
 void FrTcpLinker::dealRecv(Socket socket){
+	DEBUG_D("1");
 	dealEvent(socket, eSocketEventType_Recv);
+}
+
+void FrTcpLinker::addSocketToEpoll(Socket socket){
+	DEBUG_D("1");
+	epoll_event event;
+	event.data.fd = socket;
+	event.events = EPOLLIN | EPOLLET | EPOLLOUT;
+	epoll_ctl(m_EpollSocket, EPOLL_CTL_ADD, socket, &event);
 }
 
 FrTcpServerThread* FrTcpLinker::getReadyThread(){
