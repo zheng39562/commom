@@ -27,6 +27,10 @@ class FrTcpClient : public FrTcpLinker {
 		virtual ~FrTcpClient();
 	public:
 		virtual bool run(const std::string &ip, uint32 port);
+
+		bool send(const Universal::BinaryMemoryPtr &pBuffer);
+	private:
+		Socket m_ConnectSocket;
 };
 
 #endif 

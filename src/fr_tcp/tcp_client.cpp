@@ -29,7 +29,8 @@ using namespace std;
 using namespace Universal;
 
 FrTcpClient::FrTcpClient(uint32 threadNum, uint32 _maxBufferSize)
-	:FrTcpLinker(threadNum, _maxBufferSize)
+	:FrTcpLinker(threadNum, _maxBufferSize),
+	 m_ConnectSocket(SOCKET_UNKNOW_VALUE)
 { ; }
 
 FrTcpClient::~FrTcpClient(){ ; }
@@ -41,14 +42,18 @@ bool FrTcpClient::run(const std::string &ip, uint32 port){
 	inet_pton(AF_INET, ip.c_str(), &address.sin_addr);
 	address.sin_port = htons(port);
 
-	Socket sock = socket(PF_INET, SOCK_STREAM, 0);
-	if(::connect(sock, (struct sockaddr *)&address, sizeof(address)) == 0){
-		dealConnect(sock);
+	m_ConnectSocket = socket(PF_INET, SOCK_STREAM, 0);
+	if(::connect(m_ConnectSocket, (struct sockaddr *)&address, sizeof(address)) == 0){
+		dealConnect(m_ConnectSocket);
 	}
 	else{
 		DEBUG_E("链接失败。");
 	}
 
 	return true;
+}
+
+bool FrTcpClient::send(const Universal::BinaryMemoryPtr &pBuffer){
+	return FrTcpLinker::send(m_ConnectSocket, pBuffer);
 }
 
