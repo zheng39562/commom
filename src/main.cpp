@@ -10,11 +10,8 @@
 **********************************************************/
 #include <iostream>
 
-#include "fr_public/pub_define.h"
-#include "fr_public/pub_string.h"
-#include "fr_public/pub_tool.h"
-#include "fr_public/pub_json.h"
-#include "fr_public/pub_thread.h"
+#include "fr_public/pub_test.h"
+#include "fr_tcp/tcp_test.h"
 
 using namespace std;
 using namespace Universal;
@@ -36,11 +33,7 @@ class ThreadA : public FrThread{
 };
 
 int main( int agrc, char **argv ){
-	ThreadA thread1;
-	thread1.start();
-	frSleep(5 * 1000);
-
-	cout << "123" << endl;
+	doTcpTest();
 
 	return 0;
 }

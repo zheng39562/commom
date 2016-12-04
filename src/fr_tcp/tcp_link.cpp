@@ -158,6 +158,7 @@ void FrTcpLinker::dealConnect(Socket socket){
 void FrTcpLinker::dealDisconnect(Socket socket){
 	epoll_ctl(m_EpollSocket, EPOLL_CTL_DEL, socket, NULL);
 	m_TcpCacheTree.erase(socket);
+	close(socket);
 	dealEvent(socket, eSocketEventType_Disconnect);
 }
 

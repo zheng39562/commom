@@ -50,10 +50,12 @@ void doTcpTest(string arg0, string arg1, string arg2, string arg3, string arg4){
 	// 测试客户端和服务端消息的连通性。
 	// 封数据包进程：64B 1K 63K 测试服务功能。 单进行50线程  开10个进程。
 	FrTestServer* pTcpServer = new FrTestServer();
-	pTcpServer->run("0.0.0.0", 5555);
-
-	while(1){
-		frSleep(1000);
+	uint32 port = 5555;
+	if(pTcpServer->run("0.0.0.0", port)){
+		DEBUG_D("开始监听端口" << port);
+		while(1){
+			frSleep(1000);
+		}
 	}
 
 	DEBUG_D("测试结束.");

@@ -71,8 +71,6 @@ class FrTcpServer : public FrTcpLinker{
 	private:
 		//! \biref	处理断开/错误请求。
 		virtual void dealConnect(Socket socket);
-		//! \biref	处理断开/错误请求。
-		virtual void dealDisconnect(Socket socket);
 		//! \brief	
 		virtual void dealRecv(Socket socket);
 	private:

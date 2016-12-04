@@ -61,7 +61,7 @@ class FrTcpMsgProcess{
 		void updateEpollStatus(Socket socket);
 	private:
 		//! \brief	或者完整的包。
-		void recvPackets(FrTcpCachePtr pTcpCache, Universal::BinaryMemory &binary);
+		void recvPackets(Socket socket, Universal::BinaryMemory &binary);
 	protected:
 		Socket m_EpollSocket;
 	private:

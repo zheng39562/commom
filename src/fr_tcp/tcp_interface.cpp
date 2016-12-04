@@ -12,6 +12,7 @@
 
 using namespace std;
 
+/*
 bool tcp_listen(const char* ip, uint32 port){
 	SingleFrTcpServer::getInstance()->listen(string(ip), port);
 	return true;
@@ -26,4 +27,6 @@ bool tcp_server_cb(fp_connect_cb connect_cb, fp_disconnect_cb disconn_cb, fp_sen
 	SingleFrTcpServer::getInstance()->setCallBack(connect_cb, disconn_cb, send_cb, receive_cb, etc);
 	return true;
 }
+
+*/
 

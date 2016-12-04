@@ -18,10 +18,12 @@
 extern "C"{
 #endif
 
+/*
 //! \brief	监听端口
 bool tcp_listen(const char* ip, uint32 port);
 //! \brief	关闭服务端口
 bool tcp_server_close();
+*/
 
 #ifdef __cplusplus
 }

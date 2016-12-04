@@ -43,7 +43,7 @@ all: fr_public fr_sql fr_template fr_xls fr_tcp
 
 # 测试使用main 链接库根据测试调整。
 test:
-	g++ -DDEBUG -D__LINUX -g -std=c++11 ./src/main.cpp -I./library/include/ -L./library/lib64/ -lfr_public -lfr_xls -lfr_sql -lboost_regex -lboost_system -lboost_filesystem -lboost_thread -lboost_date_time -luuid -pthread -lrt -ldl -o Main_64 
+	g++ -DDEBUG -D__LINUX -g -std=c++11 ./src/main.cpp -I./library/include/ -L./library/lib64/ -lfr_xls -lfr_sql -lfr_tcp -lfr_public -lboost_regex -lboost_system -lboost_filesystem -lboost_thread -lboost_date_time -luuid -pthread -lrt -ldl -o Main_64 
 		
 .PHONY: fr_public fr_sql fr_template fr_xls help
 

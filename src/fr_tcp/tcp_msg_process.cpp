@@ -8,6 +8,8 @@
 #include "tcp_msg_process.h"
 
 #include <sys/epoll.h>
+#include <sys/socket.h>
+#include "fr_public/pub_tool.h"
 
 using namespace std;
 using namespace Universal;
@@ -19,15 +21,14 @@ FrTcpMsgProcess::FrTcpMsgProcess(Socket _epollSocket)
 	 m_pConnectCB(NULL),
 	 m_pDisconnectCB(NULL),
 	 m_pSendCB(NULL),
-	 m_pReceiveCB(NULL),
-{
-}
+	 m_pReceiveCB(NULL)
+{ ; }
 
 FrTcpMsgProcess::FrTcpMsgProcess(const FrTcpMsgProcess &ref){ ; }
 
 FrTcpMsgProcess::~FrTcpMsgProcess(){ ; }
 
-void FrTcpMsgProcess::push(FrTcpCachePtr pTcpCache, Universal::BinaryMemoryPtr pPacket){
+bool FrTcpMsgProcess::push(FrTcpCachePtr pTcpCache, Universal::BinaryMemoryPtr pPacket){
 	FrTcpCache& refTcpCache = *pTcpCache;
 	mutex::scoped_lock local(refTcpCache.mutexWrite);
 
@@ -35,20 +36,23 @@ void FrTcpMsgProcess::push(FrTcpCachePtr pTcpCache, Universal::BinaryMemoryPtr p
 	while(refTcpCache.bufferWrite.maxLimit() < pPacket->curSize() + refTcpCache.bufferWrite.curSize()){
 		if(waitTimes--){
 			DEBUG_E("缓存没有足够的内存容纳该消息包。请增加缓存，或检查发送是否存在异常（如链接已断开）");
-			return;
+			return false;
 		}
 		frSleep(10);
 	}
 
-	refTcpCache.bufferWrite.add((Byte*)&size, sizeof(proto_size));
+	proto_size size(pPacket->curSize());
+	refTcpCache.bufferWrite.add((Byte*)&size, sizeof(size));
 	refTcpCache.bufferWrite.add(*pPacket);
 
-	if(refTcpCache.activeWrite){
+	if(refTcpCache.writeActive){
 		sint32 sendSize = ::send(refTcpCache.socket, refTcpCache.bufferWrite.buffer(), refTcpCache.bufferWrite.curSize(), MSG_DONTWAIT);
 		if(sendSize > 0){ refTcpCache.bufferWrite.del(0, sendSize); }
 		updateEpollStatus(refTcpCache.socket);
-		refTcpCache.activeWrite = false;
+		refTcpCache.writeActive = false;
 	}
+
+	return true;
 }
 
 void FrTcpMsgProcess::send(FrTcpCachePtr pTcpCache){
@@ -60,28 +64,24 @@ void FrTcpMsgProcess::send(FrTcpCachePtr pTcpCache){
 		updateEpollStatus(refTcpCache.socket);
 	}
 	else{
-		refTcpCache.activeWrite = true;
+		refTcpCache.writeActive = true;
 	}
 	
-	execSendCB(socket);
+	execSendCB(pTcpCache->socket);
 }
 
 void FrTcpMsgProcess::recv(FrTcpCachePtr pTcpCache){
-	auto iterCache = m_pTcpCache->find(socket);
-	if(iterCache != m_pTcpCache->end()){
-		mutex::scoped_lock scopedLock(refTcpCache.mutexRead);
-		FrTcpCache refTcpCache = *refTcpCache;
-		size_t recvSize(0);
-		size_t maxRecvSize = refTcpCache.bufferRead.maxLimit() - refTcpCache.bufferRead.curSize();
-		refTcpCache.bufferTmp.reserve(maxRecvSize);
-		while((recvSize = ::recv(socket, refTcpCache.bufferTmp, maxRecvSize, MSG_DONTWAIT)) > 0){
-			refTcpCache.bufferRead.add(refTcpCache.bufferTmp.bufferPtr(), recvSize);
-			recvPackets(socket, refTcpCache.bufferRead);
+	FrTcpCache& refTcpCache = *pTcpCache;
+	mutex::scoped_lock scopedLock(refTcpCache.mutexRead);
+	size_t recvSize(0);
+	size_t maxRecvSize = refTcpCache.bufferRead.maxLimit() - refTcpCache.bufferRead.curSize();
+	refTcpCache.bufferTmp.reserve(maxRecvSize);
+	while((recvSize = ::recv(pTcpCache->socket, refTcpCache.bufferTmp.buffer(), maxRecvSize, MSG_DONTWAIT)) > 0){
+		refTcpCache.bufferRead.add(refTcpCache.bufferTmp.buffer(), recvSize);
+		recvPackets(pTcpCache->socket, refTcpCache.bufferRead);
 
-			maxRecvSize = refTcpCache.bufferRead.maxLimit() - refTcpCache.bufferRead.curSize();
-			refTcpCache.bufferTmp.clear();
-		}
-
+		maxRecvSize = refTcpCache.bufferRead.maxLimit() - refTcpCache.bufferRead.curSize();
+		refTcpCache.bufferTmp.clear();
 	}
 }
 
@@ -134,7 +134,7 @@ void FrTcpMsgProcess::updateEpollStatus(Socket socket){
 	}
 }
 
-void FrTcpMsgProcess::recvPackets(FrTcpCachePtr pTcpCache, Universal::BinaryMemory &binary){
+void FrTcpMsgProcess::recvPackets(Socket socket, Universal::BinaryMemory &binary){
 	proto_size size(0);
 	while((size = *(proto_size*)binary.buffer()) <= (proto_size)binary.curSize()){
 		// 直接裁剪掉包头

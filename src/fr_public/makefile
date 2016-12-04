@@ -18,17 +18,20 @@ LINK_NONEEDED=-Wl,--no-as-needed
 
 PROJECT_PATH=../../out
 PROJECT_OBJECTS= \
+	./$(PROJECT_PATH)/./pub_cfg.o \
 	./$(PROJECT_PATH)/./pub_collection.o \
 	./$(PROJECT_PATH)/./pub_file.o \
 	./$(PROJECT_PATH)/./pub_ini.o \
+	./$(PROJECT_PATH)/./pub_json.o \
 	./$(PROJECT_PATH)/./pub_log.o \
 	./$(PROJECT_PATH)/./pub_md5.o \
 	./$(PROJECT_PATH)/./pub_memory.o \
+	./$(PROJECT_PATH)/./pub_rc4.o \
+	./$(PROJECT_PATH)/./pub_string.o \
+	./$(PROJECT_PATH)/./pub_test.o \
 	./$(PROJECT_PATH)/./pub_thread.o \
 	./$(PROJECT_PATH)/./pub_timer.o \
-	./$(PROJECT_PATH)/./pub_tool.o \
-	./$(PROJECT_PATH)/./pub_json.o \
-	./$(PROJECT_PATH)/./pub_string.o
+	./$(PROJECT_PATH)/./pub_tool.o
 
 ./${PROJECT_PATH}/%.o : %.cpp
 	-mkdir -p ./${PROJECT_PATH}/$(dir $<)
@@ -46,4 +49,5 @@ clean :
 	rm -rf ${PROJECT_INC}/out/pub_*.o
 	rm -f ${THIRDPART_PATH}/lib64/${TARGET}
 	rm -f ${THIRDPART_INC_PATH}/${LIB_NAME}/*
+
 
