@@ -30,8 +30,7 @@ namespace Universal{
 		 m_MCache(),
 		 m_CurLine(0),
 		 m_MaxLine(1000 * 1000)
-	{
-	}
+	{ ; }
 
 	LogServer::~LogServer(){
 		;
@@ -102,23 +101,24 @@ namespace Universal{
 	}
 }
 
+static string g_TimeFormat = "%Y%m%d %H:%M:%S";
 void Log_D(const std::string &msg, const std::string &fileName, const std::string funcName, long line){
-	SingleLogServer::getInstance()->writeLog(getLocalTimeU("%Y/%m/%d %T"), eLogLevel_Debug, fileName, funcName, line, msg);
+	SingleLogServer::getInstance()->writeLog(getLocalTimeU(g_TimeFormat), eLogLevel_Debug, fileName, funcName, line, msg);
 }
 
 void Log_I(const std::string &msg, const std::string &fileName, const std::string funcName, long line){
-	SingleLogServer::getInstance()->writeLog(getLocalTimeU("%Y/%m/%d %T"), eLogLevel_Info, fileName, funcName, line, msg);
+	SingleLogServer::getInstance()->writeLog(getLocalTimeU(g_TimeFormat), eLogLevel_Info, fileName, funcName, line, msg);
 }
 
 void Log_W(const std::string &msg, const std::string &fileName, const std::string funcName, long line){
-	SingleLogServer::getInstance()->writeLog(getLocalTimeU("%Y/%m/%d %T"), eLogLevel_Warning, fileName, funcName, line, msg);
+	SingleLogServer::getInstance()->writeLog(getLocalTimeU(g_TimeFormat), eLogLevel_Warning, fileName, funcName, line, msg);
 }
 
 void Log_E(const std::string &msg, const std::string &fileName, const std::string funcName, long line){
-	SingleLogServer::getInstance()->writeLog(getLocalTimeU("%Y/%m/%d %T"), eLogLevel_Error, fileName, funcName, line, msg);
+	SingleLogServer::getInstance()->writeLog(getLocalTimeU(g_TimeFormat), eLogLevel_Error, fileName, funcName, line, msg);
 }
 
 void Log_C(const std::string &msg, const std::string &fileName, const std::string funcName, long line){
-	SingleLogServer::getInstance()->writeLog(getLocalTimeU("%Y/%m/%d %T"), eLogLevel_Crash, fileName, funcName, line, msg);
+	SingleLogServer::getInstance()->writeLog(getLocalTimeU(g_TimeFormat), eLogLevel_Crash, fileName, funcName, line, msg);
 }
 

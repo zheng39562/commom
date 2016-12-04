@@ -118,8 +118,8 @@ void FrTcpLinker::execute(){
 			}
 		}
 
-		uint32 eventNum = epoll_wait(m_EpollSocket, events, maxEvent, 50); // 50ms timeout
-		for(uint32 index = 0; index < eventNum; ++index){
+		int32 eventNum = epoll_wait(m_EpollSocket, events, maxEvent, 50); // 50ms timeout
+		for(int32 index = 0; index < eventNum; ++index){
 			Socket socket = events[index].data.fd;
 			socketEventType = eSocketEventType_Invalid;
 			// error and disconnect

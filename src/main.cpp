@@ -33,6 +33,8 @@ class ThreadA : public FrThread{
 };
 
 int main( int agrc, char **argv ){
+	DEBUG_INIT("./log", "test");
+
 	doTcpTest();
 
 	return 0;
