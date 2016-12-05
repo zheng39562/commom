@@ -76,13 +76,21 @@ void FrTcpMsgProcess::recv(FrTcpCachePtr pTcpCache){
 	int recvSize(0);
 	size_t maxRecvSize = refTcpCache.bufferRead.maxLimit() - refTcpCache.bufferRead.curSize();
 	refTcpCache.bufferTmp.reserve(maxRecvSize);
-	while((recvSize = ::recv(pTcpCache->socket, refTcpCache.bufferTmp.buffer(), maxRecvSize, MSG_DONTWAIT)) > 0){
+	if((recvSize = ::recv(pTcpCache->socket, refTcpCache.bufferTmp.buffer(), maxRecvSize, MSG_DONTWAIT)) > 0){
 		refTcpCache.bufferRead.add(refTcpCache.bufferTmp.buffer(), recvSize);
 		DEBUG_D("接受到字节流 [" << recvSize << "] 接受后缓存大小 [" << refTcpCache.bufferRead.curSize() << "]");
 		recvPackets(pTcpCache->socket, refTcpCache.bufferRead);
 
 		maxRecvSize = refTcpCache.bufferRead.maxLimit() - refTcpCache.bufferRead.curSize();
 		refTcpCache.bufferTmp.clear();
+
+		updateEpollStatus(refTcpCache.socket);
+	}
+	else{
+		if(errno != EAGAIN){
+			DEBUG_I("接收到链接关闭消息（没有接受到数据，但触发了接收事件）");
+			close(pTcpCache->socket);
+		}
 	}
 }
 
@@ -129,9 +137,9 @@ void FrTcpMsgProcess::setCallBack(fp_connect_cb connect_cb, fp_disconnect_cb dis
 void FrTcpMsgProcess::updateEpollStatus(Socket socket){
 	epoll_event event;
 	event.data.fd = socket;
-	event.events = EPOLLOUT | EPOLLET;
+	event.events = EPOLLIN | EPOLLOUT | EPOLLET;
 	if(epoll_ctl(m_EpollSocket, EPOLL_CTL_MOD, socket, &event) == -1){
-		DEBUG_E("更新epoll状态失败。");
+		DEBUG_C("更新epoll状态失败。");
 	}
 }
 

@@ -124,6 +124,7 @@ void FrTcpLinker::execute(){
 			socketEventType = eSocketEventType_Invalid;
 			// error and disconnect
 			if((events[index].events & EPOLLHUP) || (events[index].events & EPOLLERR)){
+				DEBUG_D("链接出错 或 已断开.");
 				// 注意增加 socket的 close函数 和 epoll的 delete操作。
 				dealDisconnect(socket);
 			}
@@ -142,9 +143,6 @@ void FrTcpLinker::execute(){
 }
 
 void FrTcpLinker::dealConnect(Socket socket){
-	DEBUG_D("1");
-	addSocketToEpoll(socket);
-
 	FrTcpCachePtr pCache(new FrTcpCache());
 	pCache->socket = socket;
 	pCache->connect = true;
@@ -153,10 +151,13 @@ void FrTcpLinker::dealConnect(Socket socket){
 	pCache->bufferWrite.setMaxLimit(m_MaxBufferSize);
 	pCache->bufferRead.setMaxLimit(m_MaxBufferSize);
 	m_TcpCacheTree.insert(make_pair(socket, pCache));
+
+	addSocketToEpoll(socket);
+
+	dealEvent(socket, eSocketEventType_Connect);
 }
 
 void FrTcpLinker::dealDisconnect(Socket socket){
-	DEBUG_D("1");
 	epoll_ctl(m_EpollSocket, EPOLL_CTL_DEL, socket, NULL);
 	m_TcpCacheTree.erase(socket);
 	close(socket);
@@ -164,17 +165,14 @@ void FrTcpLinker::dealDisconnect(Socket socket){
 }
 
 void FrTcpLinker::dealSend(Socket socket){
-	DEBUG_D("1");
 	dealEvent(socket, eSocketEventType_Send);
 }
 
 void FrTcpLinker::dealRecv(Socket socket){
-	DEBUG_D("1");
 	dealEvent(socket, eSocketEventType_Recv);
 }
 
 void FrTcpLinker::addSocketToEpoll(Socket socket){
-	DEBUG_D("1");
 	epoll_event event;
 	event.data.fd = socket;
 	event.events = EPOLLIN | EPOLLET | EPOLLOUT;
