@@ -19,19 +19,23 @@ namespace Universal{
 		;
 	}
 
-	Configurator::~Configurator(){ ; }
+	Configurator::~Configurator(){ 
+		if(m_pCfg != NULL){
+			delete(IniCfg*)m_pCfg; m_pCfg = NULL;
+		}
+	}
 
 	bool Configurator::initCfg(const std::string &param, const eCfgDataType &type){
 		m_CfgType = type;
 
-		switch (m_CfgType){
+		switch(m_CfgType){
 		case eCfgDataType_Ini:
-			if (m_pCfg != NULL){
-				delete (IniCfg*)m_pCfg; m_pCfg = NULL;
+			if(m_pCfg != NULL){
+				delete(IniCfg*)m_pCfg; m_pCfg = NULL;
 			}
 
 			m_pCfg = new IniCfg();
-			if (!((IniCfg*)m_pCfg)->initFile(param)){
+			if(!((IniCfg*)m_pCfg)->initFile(param)){
 				DEBUG_E("初始化配置类失败（ini模式），参数为[" << param << "]");
 				return false;
 			}
@@ -47,9 +51,9 @@ namespace Universal{
 	}
 
 	std::string Configurator::getString(const std::string &section, const std::string &key, string defaultValue){
-		switch (m_CfgType){
+		switch(m_CfgType){
 			case eCfgDataType_Ini:
-				return ((IniCfg*)m_pCfg)->getString(section, key, defaultValue);
+				return((IniCfg*)m_pCfg)->getString(section, key, defaultValue);
 			default:
 				break;
 		}
@@ -57,9 +61,9 @@ namespace Universal{
 	}
 
 	int Configurator::getInt(const std::string &section, const std::string &key, int defaultValue){
-		switch (m_CfgType){
+		switch(m_CfgType){
 		case eCfgDataType_Ini:
-			return ((IniCfg*)m_pCfg)->getInt(section, key, defaultValue);
+			return((IniCfg*)m_pCfg)->getInt(section, key, defaultValue);
 		default:
 			break;
 		}
@@ -67,9 +71,9 @@ namespace Universal{
 	}
 
 	double Configurator::getDouble(const std::string &section, const std::string &key, double defaultValue){
-		switch (m_CfgType){
+		switch(m_CfgType){
 		case eCfgDataType_Ini:
-			return ((IniCfg*)m_pCfg)->getDouble(section, key, defaultValue);
+			return((IniCfg*)m_pCfg)->getDouble(section, key, defaultValue);
 		default:
 			break;
 		}
