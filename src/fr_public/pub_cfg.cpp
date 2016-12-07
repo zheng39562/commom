@@ -21,7 +21,7 @@ namespace Universal{
 
 	Configurator::~Configurator(){ 
 		if(m_pCfg != NULL){
-			delete(IniCfg*)m_pCfg; m_pCfg = NULL;
+			delete (IniCfg*)m_pCfg; m_pCfg = NULL;
 		}
 	}
 
@@ -29,23 +29,23 @@ namespace Universal{
 		m_CfgType = type;
 
 		switch(m_CfgType){
-		case eCfgDataType_Ini:
-			if(m_pCfg != NULL){
-				delete(IniCfg*)m_pCfg; m_pCfg = NULL;
-			}
+			case eCfgDataType_Ini:
+				if(m_pCfg != NULL){
+					delete (IniCfg*)m_pCfg; m_pCfg = NULL;
+				}
 
-			m_pCfg = new IniCfg();
-			if(!((IniCfg*)m_pCfg)->initFile(param)){
-				DEBUG_E("初始化配置类失败（ini模式），参数为[" << param << "]");
+				m_pCfg = new IniCfg();
+				if(!((IniCfg*)m_pCfg)->initFile(param)){
+					DEBUG_E("初始化配置类失败（ini模式），参数为[" << param << "]");
+					return false;
+				}
+				break;
+			case eCfgDataType_DB:
+				DEBUG_E("DB暂时不支持。");
 				return false;
-			}
-			break;
-		case eCfgDataType_DB:
-			DEBUG_E("DB暂时不支持。");
-			return false;
-		default:
-			DEBUG_E("初始化配置失败。未知的配置类型。");
-			return false;
+			default:
+				DEBUG_E("初始化配置失败。未知的配置类型。");
+				return false;
 		}
 		return true;
 	}
@@ -53,7 +53,7 @@ namespace Universal{
 	std::string Configurator::getString(const std::string &section, const std::string &key, string defaultValue){
 		switch(m_CfgType){
 			case eCfgDataType_Ini:
-				return((IniCfg*)m_pCfg)->getString(section, key, defaultValue);
+				return ((IniCfg*)m_pCfg)->getString(section, key, defaultValue);
 			default:
 				break;
 		}
@@ -62,20 +62,20 @@ namespace Universal{
 
 	int Configurator::getInt(const std::string &section, const std::string &key, int defaultValue){
 		switch(m_CfgType){
-		case eCfgDataType_Ini:
-			return((IniCfg*)m_pCfg)->getInt(section, key, defaultValue);
-		default:
-			break;
+			case eCfgDataType_Ini:
+				return ((IniCfg*)m_pCfg)->getInt(section, key, defaultValue);
+			default:
+				break;
 		}
 		return defaultValue;
 	}
 
 	double Configurator::getDouble(const std::string &section, const std::string &key, double defaultValue){
 		switch(m_CfgType){
-		case eCfgDataType_Ini:
-			return((IniCfg*)m_pCfg)->getDouble(section, key, defaultValue);
-		default:
-			break;
+			case eCfgDataType_Ini:
+				return ((IniCfg*)m_pCfg)->getDouble(section, key, defaultValue);
+			default:
+				break;
 		}
 		return defaultValue;
 	}
