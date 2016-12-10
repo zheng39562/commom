@@ -66,7 +66,7 @@ bool FrTcpServer::run(const string &ip, unsigned int port){
 			return false;
 		}
 
-		addSocketToEpoll(m_ListenSocket);
+		push(PushMsg(m_ListenSocket, eSocketEventType_Connect));
 		return true;
 	}
 
@@ -74,7 +74,7 @@ bool FrTcpServer::run(const string &ip, unsigned int port){
 }
 
 bool FrTcpServer::disconnect(Socket socket){
-	close(socket);
+	push(PushMsg(m_ListenSocket, eSocketEventType_Disconnect));
 	return true;
 }
 
@@ -84,16 +84,17 @@ void FrTcpServer::dealConnect(Socket socket){
 	bzero(&address, sizeof(address));
 	Socket socketRecv = accept(socket, (sockaddr*)&address, &len);
 	while(socketRecv > 0){
-		FrTcpLinker::dealConnect(socketRecv);
+		push(PushMsg(socketRecv, eSocketEventType_Connect));
 		socketRecv = accept(socket, (sockaddr*)&address, &len);
 	}
 }
 
-void FrTcpServer::dealRecv(Socket socket){
+void FrTcpServer::activeRecv(Socket socket){
 	if(m_ListenSocket == socket){
 		dealConnect(socket);
 	}
 	else{
-		FrTcpLinker::dealRecv(socket);
+		FrTcpLinker::activeRecv(socket);
 	}
 }
+

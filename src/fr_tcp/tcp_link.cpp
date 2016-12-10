@@ -49,7 +49,7 @@ void server_disconnect_cb(Socket socket, void* etc){
 void server_push_msg(const PushMsg &msg, void* etc){
 	if(etc != NULL){
 		FrTcpLinker* pServer = (FrTcpLinker*)etc;
-		pServer->m_MsgQueue.push(msg);
+		pServer->push(msg);
 	}
 }
 
@@ -113,7 +113,12 @@ eEventResult FrTcpLinker::onConnect(Socket socket){ return eEventResult_OK; }
 eEventResult FrTcpLinker::onDisconnect(Socket socket){ return eEventResult_OK; }
 
 bool FrTcpLinker::send(Socket socket, const BinaryMemoryPtr &pBinary){
-	m_MsgQueue.push(PushMsg(socket, eSocketEventType_Push, pBinary));
+	push(PushMsg(socket, eSocketEventType_Push, pBinary));
+	return true;
+}
+
+bool FrTcpLinker::push(const PushMsg &msg){
+	m_MsgQueue.push(msg);
 	return true;
 }
 
@@ -154,15 +159,15 @@ void FrTcpLinker::execute(){
 			}
 			// read : 普通数据和带外数据事件一致（暂时）
 			if((events[index].events & EPOLLIN) || (events[index].events & EPOLLPRI)){ 
-				dealRecv(socket);
+				activeRecv(socket);
 			}
 			// write
 			if(events[index].events & EPOLLOUT){
-				dealSend(socket);
+				activeSend(socket);
 			}
 		}
 
-		frSleep(500);
+		frSleep(5);
 	}
 }
 

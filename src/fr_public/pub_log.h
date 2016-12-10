@@ -15,14 +15,12 @@
 #include "fr_template/single_mode.hpp"
 #include "pub_thread.h"
 
-#ifndef _FR_CONSOLE
-	#define DEBUG_INIT(path, file) SingleLogServer::getInstance()->initLog(path, file);
-	#define DEBUG_D(msg) 	{std::cout << msg << endl; std::ostringstream osTmp; osTmp << msg; Log_D(osTmp.str(), __FILE__, __FUNCTION__, __LINE__);}
-	#define DEBUG_I(msg) 	{std::cout << msg << endl; std::ostringstream osTmp; osTmp << msg; Log_I(osTmp.str(), __FILE__, __FUNCTION__, __LINE__);}
-	#define DEBUG_W(msg) 	{std::cout << msg << endl; std::ostringstream osTmp; osTmp << msg; Log_W(osTmp.str(), __FILE__, __FUNCTION__, __LINE__);}
-	#define DEBUG_E(msg) 	{std::cout << msg << endl; std::ostringstream osTmp; osTmp << msg; Log_E(osTmp.str(), __FILE__, __FUNCTION__, __LINE__);}
-	#define DEBUG_C(msg) 	{std::cout << msg << endl; std::ostringstream osTmp; osTmp << msg; Log_C(osTmp.str(), __FILE__, __FUNCTION__, __LINE__);}
-#endif
+#define DEBUG_INIT(path, file) SingleLogServer::getInstance()->initLog(path, file);
+#define DEBUG_D(msg) 	{std::cout << msg << std::endl; std::ostringstream osTmp; osTmp << msg; Log_D(osTmp.str(), __FILE__, __FUNCTION__, __LINE__);}
+#define DEBUG_I(msg) 	{std::cout << msg << std::endl; std::ostringstream osTmp; osTmp << msg; Log_I(osTmp.str(), __FILE__, __FUNCTION__, __LINE__);}
+#define DEBUG_W(msg) 	{std::cout << msg << std::endl; std::ostringstream osTmp; osTmp << msg; Log_W(osTmp.str(), __FILE__, __FUNCTION__, __LINE__);}
+#define DEBUG_E(msg) 	{std::cout << msg << std::endl; std::ostringstream osTmp; osTmp << msg; Log_E(osTmp.str(), __FILE__, __FUNCTION__, __LINE__);}
+#define DEBUG_C(msg) 	{std::cout << msg << std::endl; std::ostringstream osTmp; osTmp << msg; Log_C(osTmp.str(), __FILE__, __FUNCTION__, __LINE__);}
 
 namespace Universal{
 	enum eLogLevel{

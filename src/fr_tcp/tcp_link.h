@@ -42,7 +42,6 @@ class FrTcpLinker : public Universal::FrThread {
 		friend void server_recv_cb(Socket socket, const Universal::BinaryMemoryPtr &pBinary, void* etc);
 		friend void server_connect_cb(Socket socket, void* etc);
 		friend void server_disconnect_cb(Socket socket, void* etc);
-		friend void server_push_msg(const PushMsg &msg, void* etc);
 	public:
 		FrTcpLinker(uint32 threadNum, uint32 _maxBufferSize);
 		virtual ~FrTcpLinker();
@@ -68,6 +67,10 @@ class FrTcpLinker : public Universal::FrThread {
 		//! \brief	发送数据。
 		//! \note	组播和广播有大致实现相同，不服用send是为了减少锁开销。
 		bool send(Socket socket, const Universal::BinaryMemoryPtr &pBuffer);
+		bool push(const PushMsg &msg);
+	protected:
+		inline virtual void activeSend(Socket socket){ dealEvent(socket, eSocketEventType_Send); }
+		inline virtual void activeRecv(Socket socket){ dealEvent(socket, eSocketEventType_Recv); }
 	private:
 		//! \brief	epoll事件处理。
 		virtual void execute();
@@ -75,8 +78,6 @@ class FrTcpLinker : public Universal::FrThread {
 		virtual void dealConnect(Socket socket);
 		//! \breif	处理断开事件。
 		virtual void dealDisconnect(Socket socket);
-		inline virtual void dealSend(Socket socket){ dealEvent(socket, eSocketEventType_Send); }
-		inline virtual void dealRecv(Socket socket){ dealEvent(socket, eSocketEventType_Recv); }
 		//! \brief	添加socket到epoll中
 		void addSocketToEpoll(Socket socket);
 

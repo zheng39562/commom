@@ -68,11 +68,12 @@ class FrTcpServer : public FrTcpLinker{
 		//! \brief	断开某个连接。
 		//! \todo	简单版本。后续视情况增加。
 		bool disconnect(Socket socket);
+	protected:
+		//! \brief	
+		virtual void activeRecv(Socket socket);
 	private:
 		//! \biref	处理断开/错误请求。
 		virtual void dealConnect(Socket socket);
-		//! \brief	
-		virtual void dealRecv(Socket socket);
 	private:
 		Socket m_ListenSocket;
 };
