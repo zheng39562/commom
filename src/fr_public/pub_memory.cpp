@@ -18,7 +18,7 @@ namespace Universal{
 		 m_CurBufferSize(0),
 		 m_MaxBufferSize(0)
 	{ ; }
-	BinaryMemory::BinaryMemory(const void *_buffer, size_t _size)
+	BinaryMemory::BinaryMemory(const void *_buffer, int64 _size)
 		:m_Buffer(NULL),
 		 m_MaxLimit(0xFFFFFFFF),
 		 m_CurBufferSize(0),
@@ -26,7 +26,7 @@ namespace Universal{
 	{ 
 		setBuffer(_buffer, _size);
 	}
-	BinaryMemory::BinaryMemory(const Byte *_buffer, size_t _size)
+	BinaryMemory::BinaryMemory(const Byte *_buffer, int64 _size)
 		:m_Buffer(NULL),
 		 m_MaxLimit(0xFFFFFFFF),
 		 m_CurBufferSize(0),
@@ -35,7 +35,7 @@ namespace Universal{
 		int i = sizeof(Byte);
 		setBuffer((void*)_buffer, _size * sizeof(Byte));
 	}
-	BinaryMemory::BinaryMemory(const char *_buffer, size_t _size)
+	BinaryMemory::BinaryMemory(const char *_buffer, int64 _size)
 		:m_Buffer(NULL),
 		 m_MaxLimit(0xFFFFFFFF),
 		 m_CurBufferSize(0),
@@ -43,7 +43,7 @@ namespace Universal{
 	{
 		setBuffer((void*)_buffer, _size * sizeof(char));
 	}
-	BinaryMemory::BinaryMemory(const uint16 *_buffer, size_t _size)
+	BinaryMemory::BinaryMemory(const uint16 *_buffer, int64 _size)
 		:m_Buffer(NULL),
 		 m_MaxLimit(0xFFFFFFFF),
 		 m_CurBufferSize(0),
@@ -51,13 +51,13 @@ namespace Universal{
 	{
 		setBuffer((void*)_buffer, _size * sizeof(uint16));
 	}
-	BinaryMemory::BinaryMemory(const uint32 *_buffer, size_t _size)
+	BinaryMemory::BinaryMemory(const uint64 *_buffer, int64 _size)
 		:m_Buffer(NULL),
 		 m_MaxLimit(0xFFFFFFFF),
 		 m_CurBufferSize(0),
 		 m_MaxBufferSize(0)
 	{
-		setBuffer((void*)_buffer, _size * sizeof(uint32));
+		setBuffer((void*)_buffer, _size * sizeof(uint64));
 	}
 
 	BinaryMemory::~BinaryMemory(){
@@ -86,8 +86,8 @@ namespace Universal{
 		return *this;
 	}
 
-	void BinaryMemory::setBuffer(const void *buffer, size_t size){
-		if(buffer == NULL || size == 0 || m_Buffer == buffer || size > m_MaxLimit){
+	void BinaryMemory::setBuffer(const void *buffer, int64 size){
+		if(buffer == NULL || size <= 0 || m_Buffer == buffer || size > m_MaxLimit){
 			return;
 		}
 		m_CurBufferSize = size;
@@ -110,8 +110,8 @@ namespace Universal{
 	void BinaryMemory::addBuffer(const BinaryMemory &ref){
 		addBuffer(ref.getBuffer(), ref.getBufferSize());
 	}
-	void BinaryMemory::addBuffer(const void *buffer, size_t size){
-		if(buffer == NULL || size == 0 || m_Buffer == buffer || size + m_CurBufferSize > m_MaxLimit){
+	void BinaryMemory::addBuffer(const void *buffer, int64 size){
+		if(buffer == NULL || size <= 0 || m_Buffer == buffer || size + m_CurBufferSize > m_MaxLimit){
 			return;
 		}
 
@@ -140,13 +140,13 @@ namespace Universal{
 		m_CurBufferSize += size;
 	}
 
-	void BinaryMemory::delBuffer(size_t start, size_t length){
-		if(m_CurBufferSize > start){
+	void BinaryMemory::delBuffer(int64 start, int64 length){
+		if(m_CurBufferSize > start && length > 0){
 			length = length < (m_CurBufferSize - start) ? length : m_CurBufferSize - start;
 
 			void* pMoveBuffer(NULL);
-			size_t movePos = start + length;
-			size_t moveLength = m_CurBufferSize - movePos;
+			int64 movePos = start + length;
+			int64 moveLength = m_CurBufferSize - movePos;
 
 			if(moveLength != 0){
 				pMoveBuffer = malloc(moveLength);
@@ -169,7 +169,7 @@ namespace Universal{
 		m_CurBufferSize = 0;
 	}
 
-	void BinaryMemory::reserve(size_t size){
+	void BinaryMemory::reserve(int64 size){
 		if(m_MaxBufferSize < size &&  size <= m_MaxLimit){
 			void* pSaveBuffer(NULL);
 			if(m_CurBufferSize != 0){
@@ -197,7 +197,7 @@ namespace Universal{
 		}
 
 		Byte* msg = (Byte*)m_Buffer;
-		size_t index(0);
+		int64 index(0);
 		ostringstream ostr;
 		ostr << expand << " buffer is [";
 		while(index < m_CurBufferSize){

@@ -56,10 +56,10 @@ void FrTcpServerThread::execute(){
 					m_pTcpMsgProcess->push(m_pCurCache, m_pCurPacket);
 					break;
 				case eSocketEventType_Recv:
-					m_pTcpMsgProcess->send(m_pCurCache);
+					m_pTcpMsgProcess->recv(m_pCurCache);
 					break;
 				case eSocketEventType_Send:
-					m_pTcpMsgProcess->recv(m_pCurCache);
+					m_pTcpMsgProcess->send(m_pCurCache);
 					break;
 				case eSocketEventType_Connect:
 					m_pTcpMsgProcess->connect(m_pCurCache);

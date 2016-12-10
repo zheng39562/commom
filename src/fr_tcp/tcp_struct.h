@@ -13,21 +13,21 @@
 
 #include "fr_public/pub_thread.h"
 #include "fr_public/pub_memory.h"
-
 #include "tcp_define.h"
+
+extern const Socket UNKNOW_SOCKET;
 
 //! \brief	缓存类。
 //! \note	包含缓存，缓存锁，连接状态，引用计数。
 //! \note	考虑过封装为函数行为，因时间问题没有封。
 class FrTcpCache{
 	public:
-		FrTcpCache();
+		FrTcpCache(Socket _socket, uint32 _maxBufferSize);
 		FrTcpCache(const FrTcpCache &ref)=delete;
 		FrTcpCache operator=(const FrTcpCache &ref)=delete;
 		~FrTcpCache()=default;
 	public:
 		Socket socket;
-		bool writeActive; // 写是否已经激活。
 		bool connect;
 		Universal::FrMutex mutexWrite;
 		Universal::FrMutex mutexRead;
@@ -45,6 +45,20 @@ enum eSocketEventType{
 	eSocketEventType_Connect,
 	eSocketEventType_Disconnect,
 	eSocketEventType_Push
+};
+
+//! \brief	消息传递类:通信主线程处理，其他线程推送。
+class PushMsg{
+	public:
+		PushMsg(Socket _socket, eSocketEventType _eventType);
+		PushMsg(Socket _socket, eSocketEventType _eventType, Universal::BinaryMemoryPtr _pBinary);
+		PushMsg(const PushMsg &ref);
+		PushMsg& operator=(const PushMsg &ref);
+		~PushMsg()=default;
+	public:
+		Socket socket;
+		Universal::BinaryMemoryPtr pBinary;
+		eSocketEventType eventType;
 };
 
 #endif 

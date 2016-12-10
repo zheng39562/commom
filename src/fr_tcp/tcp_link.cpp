@@ -22,33 +22,48 @@ using namespace boost;
 using namespace Universal;
 
 void server_send_cb(Socket socket, void* etc){
-	FrTcpLinker* pServer = (FrTcpLinker*)etc;
-	eEventResult result = pServer->onSend(socket);
+	if(etc != NULL){
+		FrTcpLinker* pServer = (FrTcpLinker*)etc;
+		eEventResult result = pServer->onSend(socket);
+	}
 }
 void server_recv_cb(Socket socket, const Universal::BinaryMemoryPtr &pBinary, void* etc){
-	FrTcpLinker* pServer = (FrTcpLinker*)etc;
-	eEventResult result = pServer->onReceive(socket, pBinary);
+	if(etc != NULL){
+		FrTcpLinker* pServer = (FrTcpLinker*)etc;
+		eEventResult result = pServer->onReceive(socket, pBinary);
+	}
 }
 void server_connect_cb(Socket socket, void* etc){
-	FrTcpLinker* pServer = (FrTcpLinker*)etc;
-	eEventResult result = pServer->onConnect(socket);
+	if(etc != NULL){
+		FrTcpLinker* pServer = (FrTcpLinker*)etc;
+		eEventResult result = pServer->onConnect(socket);
+	}
 }
 void server_disconnect_cb(Socket socket, void* etc){
-	FrTcpLinker* pServer = (FrTcpLinker*)etc;
-	eEventResult result = pServer->onDisconnect(socket);
+	if(etc != NULL){
+		FrTcpLinker* pServer = (FrTcpLinker*)etc;
+		eEventResult result = pServer->onDisconnect(socket);
+	}
+}
+
+void server_push_msg(const PushMsg &msg, void* etc){
+	if(etc != NULL){
+		FrTcpLinker* pServer = (FrTcpLinker*)etc;
+		pServer->m_MsgQueue.push(msg);
+	}
 }
 
 FrTcpLinker::FrTcpLinker(uint32 threadNum, uint32 _maxBufferSize)
 	:m_pTcpMsgProcess(NULL),
 	 m_MsgQueue(),
 	 m_MaxBufferSize(_maxBufferSize),
-	 m_EpollSocket(SOCKET_UNKNOW_VALUE),
+	 m_EpollSocket(UNKNOW_SOCKET),
 	 m_ServerThreads()
 {
 	m_EpollSocket = epoll_create(65535);
 	if(m_EpollSocket > 0){
 		m_pTcpMsgProcess = new FrTcpMsgProcess(m_EpollSocket);
-		m_pTcpMsgProcess->setCallBack(server_connect_cb, server_disconnect_cb, server_send_cb, server_recv_cb, this);
+		m_pTcpMsgProcess->setCallBack(server_connect_cb, server_disconnect_cb, server_send_cb, server_recv_cb, server_push_msg, this);
 
 		while(threadNum--){
 			FrTcpServerThread* pThread = new FrTcpServerThread(m_pTcpMsgProcess);
@@ -89,7 +104,7 @@ bool FrTcpLinker::stop(){
 	m_TcpCacheTree.clear();
 
 	::close(m_EpollSocket);
-	m_EpollSocket = SOCKET_UNKNOW_VALUE;
+	m_EpollSocket = UNKNOW_SOCKET;
 }
 
 eEventResult FrTcpLinker::onSend(Socket socket){ return eEventResult_OK; }
@@ -98,7 +113,7 @@ eEventResult FrTcpLinker::onConnect(Socket socket){ return eEventResult_OK; }
 eEventResult FrTcpLinker::onDisconnect(Socket socket){ return eEventResult_OK; }
 
 bool FrTcpLinker::send(Socket socket, const BinaryMemoryPtr &pBinary){
-	m_MsgQueue.push(PushMsg(socket, pBinary));
+	m_MsgQueue.push(PushMsg(socket, eSocketEventType_Push, pBinary));
 	return true;
 }
 
@@ -113,7 +128,17 @@ void FrTcpLinker::execute(){
 		if(!msgQueue.empty() || m_MsgQueue.swap(msgQueue)){
 			while(!msgQueue.empty()){
 				PushMsg pushMsg = msgQueue.front();
-				dealEvent(pushMsg.first, eSocketEventType_Push, pushMsg.second);
+				switch(pushMsg.eventType){
+					case eSocketEventType_Connect:
+						dealConnect(pushMsg.socket);
+						break;
+					case eSocketEventType_Disconnect:
+						dealDisconnect(pushMsg.socket);
+						break;
+					default:
+						dealEvent(pushMsg.socket, pushMsg.eventType, pushMsg.pBinary);
+						break;
+				}
 				msgQueue.pop();
 			}
 		}
@@ -124,7 +149,6 @@ void FrTcpLinker::execute(){
 			socketEventType = eSocketEventType_Invalid;
 			// error and disconnect
 			if((events[index].events & EPOLLHUP) || (events[index].events & EPOLLERR)){
-				DEBUG_D("链接出错 或 已断开.");
 				// 注意增加 socket的 close函数 和 epoll的 delete操作。
 				dealDisconnect(socket);
 			}
@@ -143,14 +167,7 @@ void FrTcpLinker::execute(){
 }
 
 void FrTcpLinker::dealConnect(Socket socket){
-	FrTcpCachePtr pCache(new FrTcpCache());
-	pCache->socket = socket;
-	pCache->connect = true;
-	pCache->bufferTmp.reserve(m_MaxBufferSize);
-	pCache->bufferTmp.setMaxLimit(m_MaxBufferSize);
-	pCache->bufferWrite.setMaxLimit(m_MaxBufferSize);
-	pCache->bufferRead.setMaxLimit(m_MaxBufferSize);
-	m_TcpCacheTree.insert(make_pair(socket, pCache));
+	m_TcpCacheTree.insert(make_pair(socket, FrTcpCachePtr(new FrTcpCache(socket, m_MaxBufferSize))));
 
 	addSocketToEpoll(socket);
 
@@ -161,15 +178,8 @@ void FrTcpLinker::dealDisconnect(Socket socket){
 	epoll_ctl(m_EpollSocket, EPOLL_CTL_DEL, socket, NULL);
 	m_TcpCacheTree.erase(socket);
 	close(socket);
+
 	dealEvent(socket, eSocketEventType_Disconnect);
-}
-
-void FrTcpLinker::dealSend(Socket socket){
-	dealEvent(socket, eSocketEventType_Send);
-}
-
-void FrTcpLinker::dealRecv(Socket socket){
-	dealEvent(socket, eSocketEventType_Recv);
 }
 
 void FrTcpLinker::addSocketToEpoll(Socket socket){

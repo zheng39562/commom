@@ -18,10 +18,11 @@ using namespace boost;
 FrTcpMsgProcess::FrTcpMsgProcess(Socket _epollSocket)
 	:m_EpollSocket(_epollSocket),
 	 m_pETC(NULL),
-	 m_pConnectCB(NULL),
-	 m_pDisconnectCB(NULL),
-	 m_pSendCB(NULL),
-	 m_pReceiveCB(NULL)
+	 m_fpConnectCB(NULL),
+	 m_fpDisconnectCB(NULL),
+	 m_fpSendCB(NULL),
+	 m_fpReceiveCB(NULL),
+	 m_fpPushMsg(NULL)
 { ; }
 
 FrTcpMsgProcess::FrTcpMsgProcess(const FrTcpMsgProcess &ref){ ; }
@@ -29,27 +30,29 @@ FrTcpMsgProcess::FrTcpMsgProcess(const FrTcpMsgProcess &ref){ ; }
 FrTcpMsgProcess::~FrTcpMsgProcess(){ ; }
 
 bool FrTcpMsgProcess::push(FrTcpCachePtr pTcpCache, Universal::BinaryMemoryPtr pPacket){
+	if(pPacket == NULL){
+		return true;
+	}
+
 	FrTcpCache& refTcpCache = *pTcpCache;
 	mutex::scoped_lock local(refTcpCache.mutexWrite);
 
-	uint32 waitTimes(3);
-	while(refTcpCache.bufferWrite.maxLimit() < pPacket->curSize() + refTcpCache.bufferWrite.curSize()){
-		if(waitTimes--){
-			DEBUG_E("缓存没有足够的内存容纳该消息包。请增加缓存，或检查发送是否存在异常（如链接已断开）");
-			return false;
+	if(refTcpCache.bufferWrite.empty()){
+		sint32 sendSize(0);
+		while(!pPacket->empty()){
+			sendSize = ::send(pTcpCache->socket, pPacket->buffer(), pPacket->curSize(), MSG_DONTWAIT);
+			pPacket->del(0, sendSize);
+			if(sendSize <= 0){
+				checkConnect(pTcpCache->socket);
+				break;
+			}
 		}
-		frSleep(10);
 	}
 
-	proto_size size(pPacket->curSize());
-	refTcpCache.bufferWrite.add((Byte*)&size, sizeof(size));
-	refTcpCache.bufferWrite.add(*pPacket);
-
-	if(refTcpCache.writeActive){
-		sint32 sendSize = ::send(refTcpCache.socket, refTcpCache.bufferWrite.buffer(), refTcpCache.bufferWrite.curSize(), MSG_DONTWAIT);
-		if(sendSize > 0){ refTcpCache.bufferWrite.del(0, sendSize); }
-		updateEpollStatus(refTcpCache.socket);
-		refTcpCache.writeActive = false;
+	if(!pPacket->empty()){
+		proto_size size(pPacket->curSize());
+		refTcpCache.bufferWrite.add((Byte*)&size, sizeof(size));
+		refTcpCache.bufferWrite.add(*pPacket);
 	}
 
 	return true;
@@ -58,15 +61,16 @@ bool FrTcpMsgProcess::push(FrTcpCachePtr pTcpCache, Universal::BinaryMemoryPtr p
 void FrTcpMsgProcess::send(FrTcpCachePtr pTcpCache){
 	FrTcpCache& refTcpCache = *pTcpCache;
 	mutex::scoped_lock scopedLock(refTcpCache.mutexWrite);
-	if(refTcpCache.bufferWrite.curSize() != 0){
+	while(!refTcpCache.bufferWrite.empty()){
 		sint32 sendSize = ::send(refTcpCache.socket, refTcpCache.bufferWrite.buffer(), refTcpCache.bufferWrite.curSize(), MSG_DONTWAIT);
-		if(sendSize > 0){ refTcpCache.bufferWrite.del(0, sendSize); }
-		updateEpollStatus(refTcpCache.socket);
-	}
-	else{
-		refTcpCache.writeActive = true;
+		refTcpCache.bufferWrite.del(0, sendSize);
+		if(sendSize <= 0){
+			checkConnect(pTcpCache->socket);
+			break;
+		}
 	}
 	
+	updateEpollStatus(refTcpCache.socket);
 	execSendCB(pTcpCache->socket);
 }
 
@@ -87,10 +91,7 @@ void FrTcpMsgProcess::recv(FrTcpCachePtr pTcpCache){
 		updateEpollStatus(refTcpCache.socket);
 	}
 	else{
-		if(errno != EAGAIN){
-			DEBUG_I("接收到链接关闭消息（没有接受到数据，但触发了接收事件）");
-			close(pTcpCache->socket);
-		}
+		checkConnect(pTcpCache->socket);
 	}
 }
 
@@ -103,34 +104,40 @@ void FrTcpMsgProcess::disconnect(FrTcpCachePtr pTcpCache){
 }
 
 void FrTcpMsgProcess::execConnectCB(Socket socket){
-	if(m_pConnectCB != NULL){
-		(*m_pConnectCB)(socket, m_pETC);
+	if(m_fpConnectCB != NULL){
+		(*m_fpConnectCB)(socket, m_pETC);
 	}
 }
 
 void FrTcpMsgProcess::execDisconnectCB(Socket socket){
-	if(m_pDisconnectCB != NULL){
-		(*m_pDisconnectCB)(socket, m_pETC);
+	if(m_fpDisconnectCB != NULL){
+		(*m_fpDisconnectCB)(socket, m_pETC);
 	}
 }
 
 void FrTcpMsgProcess::execSendCB(Socket socket){
-	if(m_pSendCB != NULL){
-		(*m_pSendCB)(socket, m_pETC);
+	if(m_fpSendCB != NULL){
+		(*m_fpSendCB)(socket, m_pETC);
 	}
 }
 
 void FrTcpMsgProcess::execReceiveCB(Socket socket, const Universal::BinaryMemoryPtr &pBinary){
-	if(m_pReceiveCB != NULL){
-		(*m_pReceiveCB)(socket, pBinary, m_pETC);
+	if(m_fpReceiveCB != NULL){
+		(*m_fpReceiveCB)(socket, pBinary, m_pETC);
+	}
+}
+void FrTcpMsgProcess::execPushMsg(Socket socket, eSocketEventType eventType, Universal::BinaryMemoryPtr pBinary){
+	if(m_fpPushMsg != NULL){
+		(*m_fpPushMsg)(PushMsg(socket, eventType, pBinary), m_pETC);
 	}
 }
 
-void FrTcpMsgProcess::setCallBack(fp_connect_cb connect_cb, fp_disconnect_cb disconn_cb, fp_send_cb send_cb, fp_receive_cb receive_cb, void* etc){
-	m_pConnectCB = connect_cb;
-	m_pDisconnectCB = disconn_cb;
-	m_pSendCB = send_cb;
-	m_pReceiveCB = receive_cb;
+void FrTcpMsgProcess::setCallBack(fp_connect_cb connect_cb, fp_disconnect_cb disconn_cb, fp_send_cb send_cb, fp_receive_cb receive_cb, fp_push_msg push_msg, void* etc){
+	m_fpConnectCB = connect_cb;
+	m_fpDisconnectCB = disconn_cb;
+	m_fpSendCB = send_cb;
+	m_fpReceiveCB = receive_cb;
+	m_fpPushMsg = push_msg;
 	m_pETC = etc;
 }
 
@@ -153,6 +160,13 @@ void FrTcpMsgProcess::recvPackets(Socket socket, Universal::BinaryMemory &binary
 		binary.del(0, size + sizeof(proto_size));
 		DEBUG_D("得到的包内容[" << string((char*)pBinary->buffer(), pBinary->curSize())<< "] 删除后的cur buffer size [" << binary.curSize() << "]" );
 		execReceiveCB(socket, pBinary);
+	}
+}
+
+void FrTcpMsgProcess::checkConnect(Socket socket){
+	if(errno != EAGAIN && errno != EINTR && errno != EWOULDBLOCK){
+		DEBUG_I("接受or发送消息失败，并且errno反馈异常.推送断开链接消息给主线程");
+		execPushMsg(socket, eSocketEventType_Disconnect);
 	}
 }
 

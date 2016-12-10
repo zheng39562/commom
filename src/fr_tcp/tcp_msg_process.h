@@ -21,6 +21,8 @@ typedef void (*fp_disconnect_cb)(Socket socket, void* etc);
 typedef void (*fp_send_cb)(Socket socket, void* etc);
 //! \brief	连接数据的回调函数指针
 typedef void (*fp_receive_cb)(Socket socket, const Universal::BinaryMemoryPtr &pBinary, void* etc);
+//! \brief	向主线程推送消息的函数调用
+typedef void (*fp_push_msg)(const PushMsg &msg, void* etc);
 
 //! \brief	消息处理类（暂命名）
 //! \note	职责：
@@ -30,6 +32,7 @@ typedef void (*fp_receive_cb)(Socket socket, const Universal::BinaryMemoryPtr &p
 //				* 缓存未处理的消息内容：read/write
 //! \note	细节：
 //				* 发送数据实际上是写入数据到缓存。实际发送存在延时（由底层触发决定）
+//				* 对异常的判断使用的errno。通常来说errno是线程安全的。但无法保证所有linux版本都是安全的。
 class FrTcpMsgProcess{
 	public:
 		FrTcpMsgProcess(Socket _epollSocket);
@@ -50,26 +53,30 @@ class FrTcpMsgProcess{
 		//! \brief	回调函数以及对应的公共数据指针。
 		//! \note	已有：具体回调参考typedef的解释。 
 		//! \param[in] etc 公共数据指针。
-		void setCallBack(fp_connect_cb connect_cb, fp_disconnect_cb disconn_cb, fp_send_cb send_cb, fp_receive_cb receive_cb, void* etc);
+		void setCallBack(fp_connect_cb connect_cb, fp_disconnect_cb disconn_cb, fp_send_cb send_cb, fp_receive_cb receive_cb, fp_push_msg push_msg, void* etc);
 	protected:
-		void execConnectCB(Socket socket);
-		void execDisconnectCB(Socket socket);
-		void execSendCB(Socket socket);
-		void execReceiveCB(Socket socket, const Universal::BinaryMemoryPtr &pBinary);
+		inline void execConnectCB(Socket socket);
+		inline void execDisconnectCB(Socket socket);
+		inline void execSendCB(Socket socket);
+		inline void execReceiveCB(Socket socket, const Universal::BinaryMemoryPtr &pBinary);
+		inline void execPushMsg(Socket socket, eSocketEventType eventType, Universal::BinaryMemoryPtr pBinary = Universal::BinaryMemoryPtr());
 
 		//! \biref	更新写状态。
 		void updateEpollStatus(Socket socket);
 	private:
 		//! \brief	或者完整的包。
 		void recvPackets(Socket socket, Universal::BinaryMemory &binary);
+		//! \brief	检查连接是否出错，如果出错则推送链接断开消息。
+		void checkConnect(Socket socket);
 	protected:
 		Socket m_EpollSocket;
 	private:
 		void* m_pETC;
-		fp_connect_cb m_pConnectCB;
-		fp_disconnect_cb m_pDisconnectCB;
-		fp_send_cb m_pSendCB;
-		fp_receive_cb m_pReceiveCB;
+		fp_connect_cb m_fpConnectCB;
+		fp_disconnect_cb m_fpDisconnectCB;
+		fp_send_cb m_fpSendCB;
+		fp_receive_cb m_fpReceiveCB;
+		fp_push_msg m_fpPushMsg;
 };
 
 

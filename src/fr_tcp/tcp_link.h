@@ -21,6 +21,11 @@
 enum eEventResult{
 	eEventResult_OK = 0
 };
+void server_send_cb(Socket socket, void* etc);
+void server_recv_cb(Socket socket, const Universal::BinaryMemoryPtr &pBinary, void* etc);
+void server_connect_cb(Socket socket, void* etc);
+void server_disconnect_cb(Socket socket, void* etc);
+void server_push_msg(const PushMsg &msg, void* etc);
 
 //! \brief	tcp连接基类。
 //! \note	使用：该类为抽象类无法直接使用。
@@ -30,9 +35,14 @@ enum eEventResult{
 //! \note	细节
 //				* 回调指针每个对象自行维护。
 //					* 考虑过作为静态类。但这导致所有的继承类都用公共的回调。对应client和server的公共继承将无法实现。
+//				* socket的连接和断开的处理函数不能在主线程以外的地方进行调用。
 class FrTcpLinker : public Universal::FrThread {
 	public:
-		typedef std::pair<Socket, Universal::BinaryMemoryPtr> PushMsg;
+		friend void server_send_cb(Socket socket, void* etc);
+		friend void server_recv_cb(Socket socket, const Universal::BinaryMemoryPtr &pBinary, void* etc);
+		friend void server_connect_cb(Socket socket, void* etc);
+		friend void server_disconnect_cb(Socket socket, void* etc);
+		friend void server_push_msg(const PushMsg &msg, void* etc);
 	public:
 		FrTcpLinker(uint32 threadNum, uint32 _maxBufferSize);
 		virtual ~FrTcpLinker();
@@ -58,18 +68,18 @@ class FrTcpLinker : public Universal::FrThread {
 		//! \brief	发送数据。
 		//! \note	组播和广播有大致实现相同，不服用send是为了减少锁开销。
 		bool send(Socket socket, const Universal::BinaryMemoryPtr &pBuffer);
-	protected:
+	private:
 		//! \brief	epoll事件处理。
 		virtual void execute();
 		//! \breif	处理连接事件。
 		virtual void dealConnect(Socket socket);
+		//! \breif	处理断开事件。
 		virtual void dealDisconnect(Socket socket);
-		virtual void dealSend(Socket socket);
-		virtual void dealRecv(Socket socket);
-
+		inline virtual void dealSend(Socket socket){ dealEvent(socket, eSocketEventType_Send); }
+		inline virtual void dealRecv(Socket socket){ dealEvent(socket, eSocketEventType_Recv); }
 		//! \brief	添加socket到epoll中
 		void addSocketToEpoll(Socket socket);
-	private:
+
 		//! \brief	获取空闲线程。
 		FrTcpServerThread* getReadyThread();
 		void dealEvent(Socket socket, eSocketEventType eEventType);

@@ -12,16 +12,48 @@
 
 using namespace Universal;
 
-const Socket SOCKET_UN_INIT_VALUE = -1;
+const Socket UNKNOW_SOCKET = -1;
 
-FrTcpCache::FrTcpCache()
-	:socket(SOCKET_UN_INIT_VALUE),
-	 connect(false),
-	 writeActive(false),
+FrTcpCache::FrTcpCache(Socket _socket, uint32 _maxBufferSize)
+	:socket(_socket),
+	 connect(true),
 	 bufferWrite(),
 	 bufferRead(),
 	 bufferTmp(),
 	 mutexRead(),
 	 mutexWrite()
-{ ; }
+{ 
+	bufferTmp.reserve(_maxBufferSize);
+	bufferTmp.setMaxLimit(_maxBufferSize);
+	bufferWrite.setMaxLimit(_maxBufferSize);
+	bufferRead.setMaxLimit(_maxBufferSize);
+}
+
+// ***************************************************
+PushMsg::PushMsg(Socket _socket, eSocketEventType _eventType)
+	:socket(_socket),
+	 pBinary(),
+	 eventType(_eventType)
+{
+	;
+}
+PushMsg::PushMsg(Socket _socket, eSocketEventType _eventType, Universal::BinaryMemoryPtr _pBinary)
+	:socket(_socket),
+	 pBinary(_pBinary),
+	 eventType(_eventType)
+{
+	;
+}
+PushMsg::PushMsg(const PushMsg &ref){
+	socket = ref.socket;
+	pBinary = ref.pBinary;
+	eventType = ref.eventType;
+}
+PushMsg& PushMsg::operator=(const PushMsg &ref){
+	socket = ref.socket;
+	pBinary = ref.pBinary;
+	eventType = ref.eventType;
+
+	return *this;
+}
 
