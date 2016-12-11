@@ -19,6 +19,11 @@ class FrTestClient : public FrTcpClient{
 	public:
 		virtual eEventResult onConnect(Socket socket){
 			DEBUG_D("链接成功。");
+			string sendMsg("");                                                                                                                                                                                                
+			while( cin >> sendMsg && !sendMsg.empty() && sendMsg != "end" ){                                                                                                                                                   
+				BinaryMemoryPtr pPacket(new BinaryMemory(sendMsg.c_str(), sendMsg.size()));                                                                                                                                    
+				send(pPacket);
+			}  
 			return eEventResult_OK;
 		}
 	private:
@@ -57,6 +62,14 @@ void doTcpTest(string arg0, string arg1, string arg2, string arg3, string arg4){
 			frSleep(1000);
 		}
 	}
+
+	/*
+	FrTestClient* pTcpServer = new FrTestClient();
+	uint32 port = 5555;
+	if(pTcpServer->run("192.168.2.104", port)){
+		frSleep(10000);
+	}
+	*/
 
 	DEBUG_D("测试结束.");
 	DEBUG_D("等待输入任意字符后结束.");

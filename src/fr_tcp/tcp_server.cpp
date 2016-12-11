@@ -74,7 +74,7 @@ bool FrTcpServer::run(const string &ip, unsigned int port){
 }
 
 bool FrTcpServer::disconnect(Socket socket){
-	push(PushMsg(m_ListenSocket, eSocketEventType_Disconnect));
+	dealDisconnect(socket);
 	return true;
 }
 
@@ -84,7 +84,7 @@ void FrTcpServer::dealConnect(Socket socket){
 	bzero(&address, sizeof(address));
 	Socket socketRecv = accept(socket, (sockaddr*)&address, &len);
 	while(socketRecv > 0){
-		push(PushMsg(socketRecv, eSocketEventType_Connect));
+		FrTcpLinker::dealConnect(socketRecv);
 		socketRecv = accept(socket, (sockaddr*)&address, &len);
 	}
 }

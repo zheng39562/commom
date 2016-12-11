@@ -75,7 +75,7 @@ namespace Universal{
 			inline void* buffer(){ return m_Buffer; }
 			inline const void* getBuffer()const{ return m_Buffer; }
 			inline int64 getBufferSize()const{ return m_CurBufferSize; }
-			inline int64 curSize()const{ return m_CurBufferSize; }
+			inline int64 size()const{ return m_CurBufferSize; }
 			inline int64 maxSize()const{ return m_MaxBufferSize; }
 			inline int64 maxLimit()const{ return m_MaxLimit; }
 		private:

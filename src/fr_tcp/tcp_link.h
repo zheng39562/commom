@@ -71,13 +71,13 @@ class FrTcpLinker : public Universal::FrThread {
 	protected:
 		inline virtual void activeSend(Socket socket){ dealEvent(socket, eSocketEventType_Send); }
 		inline virtual void activeRecv(Socket socket){ dealEvent(socket, eSocketEventType_Recv); }
+		//! \breif	处理连接事件。
+		inline virtual void dealConnect(Socket socket){ push(PushMsg(socket, eSocketEventType_Connect)); }
+		//! \breif	处理断开事件。
+		inline virtual void dealDisconnect(Socket socket){ push(PushMsg(socket, eSocketEventType_Connect)); }
 	private:
 		//! \brief	epoll事件处理。
 		virtual void execute();
-		//! \breif	处理连接事件。
-		virtual void dealConnect(Socket socket);
-		//! \breif	处理断开事件。
-		virtual void dealDisconnect(Socket socket);
 		//! \brief	添加socket到epoll中
 		void addSocketToEpoll(Socket socket);
 

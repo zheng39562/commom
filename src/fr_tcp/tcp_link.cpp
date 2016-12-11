@@ -135,10 +135,15 @@ void FrTcpLinker::execute(){
 				PushMsg pushMsg = msgQueue.front();
 				switch(pushMsg.eventType){
 					case eSocketEventType_Connect:
-						dealConnect(pushMsg.socket);
+						m_TcpCacheTree.insert(make_pair(pushMsg.socket, FrTcpCachePtr(new FrTcpCache(pushMsg.socket, m_MaxBufferSize))));
+						addSocketToEpoll(pushMsg.socket);
+						dealEvent(pushMsg.socket, eSocketEventType_Connect);
 						break;
 					case eSocketEventType_Disconnect:
-						dealDisconnect(pushMsg.socket);
+						epoll_ctl(m_EpollSocket, EPOLL_CTL_DEL, pushMsg.socket, NULL);
+						m_TcpCacheTree.erase(pushMsg.socket);
+						close(pushMsg.socket);
+						dealEvent(pushMsg.socket, eSocketEventType_Disconnect);
 						break;
 					default:
 						dealEvent(pushMsg.socket, pushMsg.eventType, pushMsg.pBinary);
@@ -169,22 +174,6 @@ void FrTcpLinker::execute(){
 
 		frSleep(5);
 	}
-}
-
-void FrTcpLinker::dealConnect(Socket socket){
-	m_TcpCacheTree.insert(make_pair(socket, FrTcpCachePtr(new FrTcpCache(socket, m_MaxBufferSize))));
-
-	addSocketToEpoll(socket);
-
-	dealEvent(socket, eSocketEventType_Connect);
-}
-
-void FrTcpLinker::dealDisconnect(Socket socket){
-	epoll_ctl(m_EpollSocket, EPOLL_CTL_DEL, socket, NULL);
-	m_TcpCacheTree.erase(socket);
-	close(socket);
-
-	dealEvent(socket, eSocketEventType_Disconnect);
 }
 
 void FrTcpLinker::addSocketToEpoll(Socket socket){
