@@ -30,28 +30,37 @@ FrTcpMsgProcess::FrTcpMsgProcess(const FrTcpMsgProcess &ref){ ; }
 FrTcpMsgProcess::~FrTcpMsgProcess(){ ; }
 
 bool FrTcpMsgProcess::push(FrTcpCachePtr pTcpCache, Universal::BinaryMemoryPtr pPacket){
-	if(pPacket == NULL){
+	if(pPacket == NULL || pPacket->empty()){
 		return true;
 	}
+	proto_size size = pPacket->size();
 
 	FrTcpCache& refTcpCache = *pTcpCache;
 	mutex::scoped_lock local(refTcpCache.mutexWrite);
 
 	if(refTcpCache.bufferWrite.empty()){
 		sint32 sendSize(0);
-		while(!pPacket->empty()){
-			sendSize = ::send(pTcpCache->socket, pPacket->buffer(), pPacket->curSize(), MSG_DONTWAIT);
-			pPacket->del(0, sendSize);
-			if(sendSize <= 0){
-				checkConnect(pTcpCache->socket);
-				break;
+		sendSize = ::send(pTcpCache->socket, (void*)&size, sizeof(proto_size), MSG_DONTWAIT);
+		if(sendSize > 0){
+			size = 0;
+			while(!pPacket->empty()){
+				sendSize = ::send(pTcpCache->socket, pPacket->buffer(), pPacket->size(), MSG_DONTWAIT);
+				pPacket->del(0, sendSize);
+				if(sendSize <= 0){
+					checkConnect(pTcpCache->socket);
+					break;
+				}
 			}
+		}
+		else{
+			checkConnect(pTcpCache->socket);
 		}
 	}
 
 	if(!pPacket->empty()){
-		proto_size size(pPacket->curSize());
-		refTcpCache.bufferWrite.add((Byte*)&size, sizeof(size));
+		if(size != 0){
+			refTcpCache.bufferWrite.add((Byte*)&size, sizeof(size));
+		}
 		refTcpCache.bufferWrite.add(*pPacket);
 	}
 
@@ -62,7 +71,7 @@ void FrTcpMsgProcess::send(FrTcpCachePtr pTcpCache){
 	FrTcpCache& refTcpCache = *pTcpCache;
 	mutex::scoped_lock scopedLock(refTcpCache.mutexWrite);
 	while(!refTcpCache.bufferWrite.empty()){
-		sint32 sendSize = ::send(refTcpCache.socket, refTcpCache.bufferWrite.buffer(), refTcpCache.bufferWrite.curSize(), MSG_DONTWAIT);
+		sint32 sendSize = ::send(refTcpCache.socket, refTcpCache.bufferWrite.buffer(), refTcpCache.bufferWrite.size(), MSG_DONTWAIT);
 		refTcpCache.bufferWrite.del(0, sendSize);
 		if(sendSize <= 0){
 			checkConnect(pTcpCache->socket);
@@ -78,14 +87,14 @@ void FrTcpMsgProcess::recv(FrTcpCachePtr pTcpCache){
 	FrTcpCache& refTcpCache = *pTcpCache;
 	mutex::scoped_lock scopedLock(refTcpCache.mutexRead);
 	int recvSize(0);
-	size_t maxRecvSize = refTcpCache.bufferRead.maxLimit() - refTcpCache.bufferRead.curSize();
+	size_t maxRecvSize = refTcpCache.bufferRead.maxLimit() - refTcpCache.bufferRead.size();
 	refTcpCache.bufferTmp.reserve(maxRecvSize);
 	if((recvSize = ::recv(pTcpCache->socket, refTcpCache.bufferTmp.buffer(), maxRecvSize, MSG_DONTWAIT)) > 0){
 		refTcpCache.bufferRead.add(refTcpCache.bufferTmp.buffer(), recvSize);
-		DEBUG_D("接受到字节流 [" << recvSize << "] 接受后缓存大小 [" << refTcpCache.bufferRead.curSize() << "]");
+		DEBUG_D("接受到字节流 [" << recvSize << "] 接受后缓存大小 [" << refTcpCache.bufferRead.size() << "]");
 		recvPackets(pTcpCache->socket, refTcpCache.bufferRead);
 
-		maxRecvSize = refTcpCache.bufferRead.maxLimit() - refTcpCache.bufferRead.curSize();
+		maxRecvSize = refTcpCache.bufferRead.maxLimit() - refTcpCache.bufferRead.size();
 		refTcpCache.bufferTmp.clear();
 
 		updateEpollStatus(refTcpCache.socket);
@@ -152,13 +161,13 @@ void FrTcpMsgProcess::updateEpollStatus(Socket socket){
 
 void FrTcpMsgProcess::recvPackets(Socket socket, Universal::BinaryMemory &binary){
 	proto_size size(0);
-	DEBUG_D("包内容大小 [" << *(proto_size*)binary.buffer() << "] cur buffer size [" << binary.curSize() << "]" );
-	while((size = *(proto_size*)binary.buffer()) <= (proto_size)binary.curSize() && size > 0){
+	DEBUG_D("包内容大小 [" << *(proto_size*)binary.buffer() << "] cur buffer size [" << binary.size() << "]" );
+	while((size = *(proto_size*)binary.buffer()) <= (proto_size)binary.size() && size > 0){
 		// 直接裁剪掉包头
 		BinaryMemoryPtr pBinary(new BinaryMemory((Byte*)binary.buffer() + sizeof(proto_size), size));
-		DEBUG_D("包内容大小 [" << *(proto_size*)binary.buffer() << "] cur buffer size [" << binary.curSize() << "]" );
+		DEBUG_D("包内容大小 [" << *(proto_size*)binary.buffer() << "] cur buffer size [" << binary.size() << "]" );
 		binary.del(0, size + sizeof(proto_size));
-		DEBUG_D("得到的包内容[" << string((char*)pBinary->buffer(), pBinary->curSize())<< "] 删除后的cur buffer size [" << binary.curSize() << "]" );
+		DEBUG_D("得到的包内容[" << string((char*)pBinary->buffer(), pBinary->size())<< "] 删除后的cur buffer size [" << binary.size() << "]" );
 		execReceiveCB(socket, pBinary);
 	}
 }
