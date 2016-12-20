@@ -14,13 +14,13 @@ using namespace std;
 namespace Universal{
 	BinaryMemory::BinaryMemory()
 		:m_Buffer(NULL),
-		 m_MaxLimit(0xEFFFFFFF),
+		 m_MaxLimit(0x7FFFFFFF),
 		 m_CurBufferSize(0),
 		 m_MaxBufferSize(0)
 	{ ; }
 	BinaryMemory::BinaryMemory(const void *_buffer, int64 _size)
 		:m_Buffer(NULL),
-		 m_MaxLimit(0xEFFFFFFF),
+		 m_MaxLimit(0x7FFFFFFF),
 		 m_CurBufferSize(0),
 		 m_MaxBufferSize(0)
 	{ 
@@ -28,7 +28,7 @@ namespace Universal{
 	}
 	BinaryMemory::BinaryMemory(const Byte *_buffer, int64 _size)
 		:m_Buffer(NULL),
-		 m_MaxLimit(0xEFFFFFFF),
+		 m_MaxLimit(0x7FFFFFFF),
 		 m_CurBufferSize(0),
 		 m_MaxBufferSize(0)
 	{
@@ -37,7 +37,7 @@ namespace Universal{
 	}
 	BinaryMemory::BinaryMemory(const char *_buffer, int64 _size)
 		:m_Buffer(NULL),
-		 m_MaxLimit(0xEFFFFFFF),
+		 m_MaxLimit(0x7FFFFFFF),
 		 m_CurBufferSize(0),
 		 m_MaxBufferSize(0)
 	{
@@ -45,7 +45,7 @@ namespace Universal{
 	}
 	BinaryMemory::BinaryMemory(const uint16 *_buffer, int64 _size)
 		:m_Buffer(NULL),
-		 m_MaxLimit(0xEFFFFFFF),
+		 m_MaxLimit(0x7FFFFFFF),
 		 m_CurBufferSize(0),
 		 m_MaxBufferSize(0)
 	{
@@ -53,7 +53,7 @@ namespace Universal{
 	}
 	BinaryMemory::BinaryMemory(const uint64 *_buffer, int64 _size)
 		:m_Buffer(NULL),
-		 m_MaxLimit(0xEFFFFFFF),
+		 m_MaxLimit(0x7FFFFFFF),
 		 m_CurBufferSize(0),
 		 m_MaxBufferSize(0)
 	{
