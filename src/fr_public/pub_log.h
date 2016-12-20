@@ -11,53 +11,98 @@
 #ifndef _pub_log_H
 #define _pub_log_H
 
+#include <iostream>
+#include <fstream>
 #include "pub_define.h"
 #include "fr_template/single_mode.hpp"
 #include "pub_thread.h"
 
-#define DEBUG_INIT(path, file) SingleLogServer::getInstance()->initLog(path, file);
-#define DEBUG_D(msg) 	{std::cout << msg << std::endl; std::ostringstream osTmp; osTmp << msg; Log_D(osTmp.str(), __FILE__, __FUNCTION__, __LINE__);}
-#define DEBUG_I(msg) 	{std::cout << msg << std::endl; std::ostringstream osTmp; osTmp << msg; Log_I(osTmp.str(), __FILE__, __FUNCTION__, __LINE__);}
-#define DEBUG_W(msg) 	{std::cout << msg << std::endl; std::ostringstream osTmp; osTmp << msg; Log_W(osTmp.str(), __FILE__, __FUNCTION__, __LINE__);}
-#define DEBUG_E(msg) 	{std::cout << msg << std::endl; std::ostringstream osTmp; osTmp << msg; Log_E(osTmp.str(), __FILE__, __FUNCTION__, __LINE__);}
-#define DEBUG_C(msg) 	{std::cout << msg << std::endl; std::ostringstream osTmp; osTmp << msg; Log_C(osTmp.str(), __FILE__, __FUNCTION__, __LINE__);}
+#define LOG_FILE_MAX_SIZE 1000000
+#define DEBUG_KEY_DEFAULT "debug_log"
+//! \note	来cout 流信息
+#define K_DEBUG_D(Key, msg, show) {if(show){std::cout << std::dec << msg << std::endl; } std::ostringstream osTmp; osTmp << msg; Log_D(Key, osTmp.str(), __FILE__, __FUNCTION__, __LINE__);}
+#define K_DEBUG_I(Key, msg, show) {if(show){std::cout << std::dec << msg << std::endl; } std::ostringstream osTmp; osTmp << msg; Log_I(Key, osTmp.str(), __FILE__, __FUNCTION__, __LINE__);}
+#define K_DEBUG_W(Key, msg, show) {if(show){std::cout << std::dec << msg << std::endl; } std::ostringstream osTmp; osTmp << msg; Log_W(Key, osTmp.str(), __FILE__, __FUNCTION__, __LINE__);}
+#define K_DEBUG_E(Key, msg, show) {if(show){std::cout << std::dec << msg << std::endl; } std::ostringstream osTmp; osTmp << msg; Log_E(Key, osTmp.str(), __FILE__, __FUNCTION__, __LINE__);}
+#define K_DEBUG_C(Key, msg, show) {if(show){std::cout << std::dec << msg << std::endl; } std::ostringstream osTmp; osTmp << msg; Log_C(Key, osTmp.str(), __FILE__, __FUNCTION__, __LINE__);}
+//#define DEBUG_D(msg) 	{std::cout << std::dec << msg << std::endl; std::ostringstream osTmp; osTmp << msg; Log_D(DEBUG_KEY_DEFAULT, osTmp.str(), __FILE__, __FUNCTION__, __LINE__);}
+#define DEBUG_D(msg) K_DEBUG_C(DEBUG_KEY_DEFAULT, msg, true)
+#define DEBUG_I(msg) K_DEBUG_C(DEBUG_KEY_DEFAULT, msg, true)
+#define DEBUG_W(msg) K_DEBUG_C(DEBUG_KEY_DEFAULT, msg, true)
+#define DEBUG_E(msg) K_DEBUG_C(DEBUG_KEY_DEFAULT, msg, true)
+#define DEBUG_C(msg) K_DEBUG_C(DEBUG_KEY_DEFAULT, msg, true)
 
+typedef std::string LogKey;
 namespace Universal{
 	enum eLogLevel{
+		eLogLevel_IgnoreNothing = 0,
 		eLogLevel_Debug,
 		eLogLevel_Info,
 		eLogLevel_Warning,
 		eLogLevel_Error,
 		eLogLevel_Crash
 	};
+	class LogCache{
+		public:
+			LogCache(const FileName &_fileName, eLogLevel _ignore);
+			LogCache(const LogCache &ref)=delete;
+			LogCache& operator=(const LogCache &ref)=delete;
+			~LogCache();
+		public:
+			inline static void setPath(const Path &path);
+			inline static void setMaxSize(size_t maxSize){ m_s_MaxSize = maxSize; }
+
+			//! \breif	缓存的锁
+			//! \note	时间问题，暂时使用外界加锁的形式解决多线程问题。
+			inline void lock(){ m_Mutex.lock(); }
+			inline void unlock(){ m_Mutex.unlock(); }
+
+			//! \brief	单文件已满(即超过设置的最大储存上线)
+			bool fileFull();
+			//! \brief	重打开一个文件。
+			//! \note	如果是当天，则标志+1.否则对应增加新日期的文件。
+			void reopen();
+			//! \brief	将日志从缓存写入文件。
+			void write(const std::string &log);
+		private:
+			static Path m_s_Path;
+			static size_t m_s_MaxSize;
+
+			FrMutex m_Mutex;
+			eLogLevel m_IgnoreLevel;
+			size_t m_CurSize;
+			std::ofstream m_Outfile;
+			int32 m_CurIndex;
+			std::string m_FileDate;
+			FileName m_FileName;
+
+	};
 	//! \brief	日志记录类。
-	//! \note	简略的提供分文件功能：100W条数据作为一个文件。
+	//! \note	增加按照索引分文件记录的功能。
+	//				* key 即作为索引，也作为文件名。
+	//! \note	日志索引和路径在运行过程中不能减少：即不会提供删除key的接口
+	//				* 不能减少,主要防止多线程的删除导致未知的引用or指针
 	class LogServer : public FrThread{
 		public:
 			LogServer();
-			~LogServer();
+			virtual ~LogServer();
 		public:
-			void initLog(const std::string &path, const std::string &fileName);
-			void writeLog(const std::string &time, const eLogLevel &level, const std::string &fileName, const std::string &funcName, const long &line, const std::string &msg);
+			//! \brief	日志初始化。必须进行初始化。因为单例原因。在构造时不能进行初始化。
+			void initLog(const std::string &path, size_t _maxSize);
+			void writeLog(const LogKey &key, const std::string &time, const eLogLevel &level, const std::string &fileName, const std::string &funcName, const long &line, const std::string &msg);
 		protected:
 			virtual void execute();
 			std::string getLevelString(const eLogLevel &level);
 		private:
-			std::string m_Path;
-			std::string m_FileName;
-			std::ostringstream m_Cache;
-			FrMutex m_MCache;
-			size_t m_MaxLine; 
-			size_t m_CurLine; 
+			std::map<LogKey, LogCache*> m_Caches;
 	};
 	typedef DesignMode::SingleMode<LogServer> SingleLogServer;
 }
 
-void Log_D(const std::string &msg, const std::string &fileName, const std::string funcName, long line);
-void Log_I(const std::string &msg, const std::string &fileName, const std::string funcName, long line);
-void Log_W(const std::string &msg, const std::string &fileName, const std::string funcName, long line);
-void Log_E(const std::string &msg, const std::string &fileName, const std::string funcName, long line);
-void Log_C(const std::string &msg, const std::string &fileName, const std::string funcName, long line);
-
+void Log_D(const LogKey &key, const std::string &msg, const std::string &fileName, const std::string funcName, long line);
+void Log_I(const LogKey &key, const std::string &msg, const std::string &fileName, const std::string funcName, long line);
+void Log_W(const LogKey &key, const std::string &msg, const std::string &fileName, const std::string funcName, long line);
+void Log_E(const LogKey &key, const std::string &msg, const std::string &fileName, const std::string funcName, long line);
+void Log_C(const LogKey &key, const std::string &msg, const std::string &fileName, const std::string funcName, long line);
 #endif 
 

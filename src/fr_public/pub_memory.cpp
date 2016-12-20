@@ -67,12 +67,12 @@ namespace Universal{
 		}
 	}
 
-	BinaryMemory::BinaryMemory(const BinaryMemory &ref){
-		if(m_Buffer != ref.getBuffer()){
-			m_Buffer = NULL;
-			m_CurBufferSize = 0;
-			m_MaxBufferSize = 0;
-		}
+	BinaryMemory::BinaryMemory(const BinaryMemory &ref)
+		:m_Buffer(NULL),
+		 m_MaxLimit(0x7FFFFFFF),
+		 m_CurBufferSize(0),
+		 m_MaxBufferSize(0)
+	{
 		setBuffer(ref.getBuffer(), ref.getBufferSize());
 	}
 

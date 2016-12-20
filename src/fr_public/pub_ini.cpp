@@ -27,7 +27,9 @@ namespace Universal{
 
 	bool IniCfg::initFile(const string &filePath){
 		vector<string> lines;
-		if(splitString(readFile(filePath), "\n", lines)){
+		string content = readFile(filePath);
+		strReplaceAll(content, "\r\n", "\n");
+		if(splitString(content, "\n", lines)){
 			map<string, string>* pKeyValueMap(NULL);
 			for(vector<string>::const_iterator citerLine = lines.begin(); citerLine != lines.end(); ++citerLine){
 				if(isNote(*citerLine)){ continue; }
@@ -44,7 +46,7 @@ namespace Universal{
 					string str = citerLine->substr(0, citerLine->find('#'));
 					size_t pos = str.find('=');
 					if(pKeyValueMap == NULL || pos == string::npos || pos == 0){
-						DEBUG_E("ini文件格式错误。");
+						PUB_DEBUG_E("ini文件格式错误。");
 						return false;
 					}
 					pKeyValueMap->insert(pair<string, string>(
@@ -55,7 +57,7 @@ namespace Universal{
 			}
 		}
 		else{
-			DEBUG_E("文件不存在，或格式错误。（注：使用\\n分隔行，而非\\r\\n）");
+			PUB_DEBUG_E("文件不存在，或格式错误。（注：使用\\n分隔行，而非\\r\\n）");
 			return false;
 		}
 
