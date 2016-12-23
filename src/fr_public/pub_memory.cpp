@@ -61,9 +61,8 @@ namespace Universal{
 	}
 
 	BinaryMemory::~BinaryMemory(){
-		if(m_Buffer){
-			free(m_Buffer);
-			m_Buffer = NULL;
+		if(m_Buffer != NULL){
+			freeMemory(&m_Buffer);
 		}
 	}
 
@@ -95,7 +94,7 @@ namespace Universal{
 			if(size > m_MaxBufferSize){
 				m_MaxBufferSize = size;
 
-				free(m_Buffer);
+				freeMemory(&m_Buffer);
 				m_Buffer = malloc(m_MaxBufferSize);
 			}
 		}
@@ -122,12 +121,12 @@ namespace Universal{
 
 				m_MaxBufferSize = (size + m_CurBufferSize) * 2;
 
-				free(m_Buffer);
+				freeMemory(&m_Buffer);
 				m_Buffer = malloc(m_MaxBufferSize);
 				memset(m_Buffer, 0, m_MaxBufferSize);
 				memcpy(m_Buffer, pBufferTmp, m_CurBufferSize);
 
-				free(pBufferTmp);
+				freeMemory(&pBufferTmp);
 			}
 		}
 		else{
@@ -157,7 +156,7 @@ namespace Universal{
 
 			if(pMoveBuffer != NULL){
 				memcpy((char*)m_Buffer + start, pMoveBuffer, moveLength);
-				free(pMoveBuffer); pMoveBuffer = NULL;
+				freeMemory(&pMoveBuffer); pMoveBuffer = NULL;
 			}
 			
 			m_CurBufferSize -= length;
@@ -177,7 +176,7 @@ namespace Universal{
 				memcpy(pSaveBuffer, m_Buffer, m_CurBufferSize);
 			}
 			if(m_Buffer != NULL){
-				free(m_Buffer); m_Buffer = NULL;
+				freeMemory(&m_Buffer); m_Buffer = NULL;
 			}
 
 			m_Buffer = malloc(size);
@@ -186,7 +185,7 @@ namespace Universal{
 
 			if(pSaveBuffer != NULL && m_Buffer != NULL){
 				memcpy(m_Buffer, pSaveBuffer, m_CurBufferSize);
-				free(pSaveBuffer); pSaveBuffer = NULL;
+				freeMemory(&pSaveBuffer); pSaveBuffer = NULL;
 			}
 		}
 	}
@@ -208,5 +207,9 @@ namespace Universal{
 		DEBUG_D(ostr.str());
 	}
 
+	void BinaryMemory::freeMemory(void** pPoint){
+		free(*pPoint);
+		*pPoint = NULL;
+	}
 }
 

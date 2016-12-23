@@ -79,6 +79,8 @@ namespace Universal{
 			inline int64 maxSize()const{ return m_MaxBufferSize; }
 			inline int64 maxLimit()const{ return m_MaxLimit; }
 		private:
+			void freeMemory(void** pPoint);
+		private:
 			void* m_Buffer;
 			int64 m_CurBufferSize;
 			int64 m_MaxBufferSize;
