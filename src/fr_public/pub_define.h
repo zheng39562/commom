@@ -20,6 +20,7 @@
 
 typedef unsigned char Byte;
 typedef std::string Name;
+typedef std::string FileName;
 typedef std::string Path;
 
 typedef unsigned short uint16;
@@ -32,22 +33,15 @@ typedef sint16 int16;
 typedef sint32 int32;
 typedef sint64 int64;
 
-/*
-#define DEBUG_D(msg)  cout << msg;
-#define DEBUG_I(msg)  cout << msg;
-#define DEBUG_W(msg)  cout << msg;
-#define DEBUG_C(msg)  cout << msg;
-#define DEBUG_E(msg)  cout << msg;
-*/
-#ifdef _FR_CONSOLE
-#define DEBUG_D(msg)  std::cout << msg << std::endl;
-#define DEBUG_I(msg)  std::cout << msg << std::endl;
-#define DEBUG_W(msg)  std::cout << msg << std::endl;
-#define DEBUG_C(msg)  std::cout << msg << std::endl;
-#define DEBUG_E(msg)  std::cout << msg << std::endl;
-#else
+
 #include "fr_public/pub_log.h"
-#endif
+
+#define LOG_KEY_PUBLIC "public"
+#define PUB_DEBUG_D(msg) K_DEBUG_D(LOG_KEY_PUBLIC, msg, true)
+#define PUB_DEBUG_I(msg) K_DEBUG_I(LOG_KEY_PUBLIC, msg, true)
+#define PUB_DEBUG_W(msg) K_DEBUG_W(LOG_KEY_PUBLIC, msg, true)
+#define PUB_DEBUG_E(msg) K_DEBUG_E(LOG_KEY_PUBLIC, msg, true)
+#define PUB_DEBUG_C(msg) K_DEBUG_C(LOG_KEY_PUBLIC, msg, true)
 
 /// *******************************************************************************************************
 

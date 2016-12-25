@@ -117,17 +117,6 @@ namespace TestSpace{
 //! \brief	pub_log
 namespace TestSpace{
 	void doLogTest(std::string arg0, std::string arg1, std::string arg2, std::string arg3, std::string arg4){
-		// 该测试需要对应查找文件，病校验文件中的功能。
-#ifndef _FR_CONSOLE
-		SingleLogServer::getInstance()->initLog("./", "logtest");
-		DEBUG_D("调试");
-		DEBUG_I("消息");
-		DEBUG_W("警告");
-		DEBUG_E("错误");
-		DEBUG_C("崩溃");
-#else
-		DEBUG_D("日志测试 ： 该功能测试需要不声明宏 ： _FR_CONSOLE。测试情况下，都会声明该宏");
-#endif
 	}
 }
 
