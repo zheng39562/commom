@@ -31,7 +31,7 @@ namespace Universal{
 	time_t getLocalTime();
 	time_t getLocalTimeU();
     //! \param[in] dateFormat 要处理的格式.
-	string getLocalTime(const string &dateFormat);
+	inline string getLocalTime(const string &dateFormat);
 	//! \brief	在格式后增加纳秒数，使用[]包含，暂不支持更多格式。
 	//! \note	建议格式中包含到秒。
 	//! \note	window下仅支持毫秒级计时，使用TimeU纳秒级数据将默认使用0填充（所以window下纳秒级数据没有实际含义）

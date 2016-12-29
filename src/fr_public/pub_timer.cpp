@@ -102,7 +102,7 @@ namespace Universal{
 	}
 
 	time_t getLocalTime(){
-		ptime pTime(second_clock::universal_time());
+		ptime pTime(second_clock::local_time());
 		ptime pBaseTime = time_from_string("1970-01-01 00:00:00");
 		time_duration ft = pTime - pBaseTime;
 		return ft.total_seconds();
@@ -116,10 +116,7 @@ namespace Universal{
 	}
 
 	string getLocalTime(const string &dateFormat){
-		ptime pTime(second_clock::local_time());
-		ptime pBaseTime = time_from_string("1970-01-01 00:00:00");
-		time_duration ft = pTime - pBaseTime;
-		return formatDateTime(ft.total_seconds(), dateFormat);
+		return formatDateTime(getLocalTime(), dateFormat);
 	}
 
 	string getLocalTimeU(const string &dateFormat){
@@ -246,7 +243,7 @@ namespace Universal{
 		microSecond %= _TIMECONVERSION_SECTOUS;
 
 		if(m_FileName.empty()){
-			DEBUG_D("[" << file << ":" << line << "] 运行时间 [" << second << "." << microSecond << "]");
+			PUB_DEBUG_D("[" << file << ":" << line << "] 运行时间 [" << second << "." << microSecond << "]");
 		}
 		else{
 			std::ostringstream osTmp;
