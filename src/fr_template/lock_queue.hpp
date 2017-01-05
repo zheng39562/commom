@@ -92,6 +92,7 @@ namespace Universal{
 	}
 
 	template < typename T > bool LockQueue<T>::swap(std::queue<T> &TQueue){
+		boost::mutex::scoped_lock localLock(m_Mutex);
 		m_Queue.swap(TQueue);
 		return true;
 	}
