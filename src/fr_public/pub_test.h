@@ -9,19 +9,6 @@
 #define _pub_test_H
 
 #include "pub_define.h"
-#include "pub_cfg.h"
-#include "pub_collection.h"
-#include "pub_file.h"
-#include "pub_ini.h"
-#include "pub_json.h"
-#include "pub_log.h"
-#include "pub_md5.h"
-#include "pub_memory.h"
-#include "pub_rc4.h"
-#include "pub_string.h"
-#include "pub_thread.h"
-#include "pub_timer.h"
-#include "pub_tool.h"
 
 //! \brief	公共测试函数。
 void doPublicTest(std::string arg0 = "", std::string arg1 = "", std::string arg2 = "", std::string arg3 = "", std::string arg4 = "");

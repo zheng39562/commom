@@ -10,7 +10,6 @@
 **********************************************************/
 #include "pub_thread.h"
 
-#include "pub_define.h"
 #include "boost/bind.hpp"
 #include <boost/thread/detail/thread.hpp>
 #include <boost/thread/thread_time.hpp>
@@ -24,12 +23,16 @@ namespace Universal{
 		 m_Cond(),
 		 m_Mutex(),
 		 m_Running(false)
-	{ ; }
+	{ 
+		;
+	}
 
 	FrThread::~FrThread() { 
 		stop();
+		if(m_pThread != NULL){
+			delete m_pThread;
+		}
 	}
-
 
 	void FrThread::threadProxy(){
 		this->execute();
@@ -45,11 +48,7 @@ namespace Universal{
 	void FrThread::stop(){
 		m_Running = false;
 		m_ThreadStatus = eThreadStatus_Exit;
-		if(m_pThread != NULL){
-			DEBUG_I("thread exit");
-			m_pThread->join();
-			delete m_pThread;
-		}
+		join();
 	}
 
 	void FrThread::pause(){
@@ -61,6 +60,12 @@ namespace Universal{
 	void FrThread::resume(){
 		mutex::scoped_lock localLock(m_Mutex);
 		m_Cond.notify_all();
+	}
+
+	void FrThread::join(){
+		if (m_pThread != 0){  
+			m_pThread->join();
+		}  
 	}
 
 }

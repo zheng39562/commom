@@ -30,7 +30,7 @@ namespace Universal{
 			return strTmp;
 		}
 		else{
-			DEBUG_I("open aciton is failed.Please check arg of path:" << path << ".");
+			PUB_DEBUG_I("open aciton is failed.Please check arg of path:" << path << ".");
 			return _STRINGFALSE;
 		}
 	}
@@ -42,7 +42,7 @@ namespace Universal{
 			return true;
 		}
 		else{
-			DEBUG_I("open aciton is failed.Please check arg of path:" << path << ".");
+			PUB_DEBUG_I("open aciton is failed.Please check arg of path:" << path << ".");
 		}
 		return false;
 	}
@@ -54,7 +54,7 @@ namespace Universal{
 			return true;
 		}
 		else{
-			DEBUG_I("open aciton is failed.Please check arg of path:" << path << ".");
+			PUB_DEBUG_I("open aciton is failed.Please check arg of path:" << path << ".");
 			return false;
 		}
 	}

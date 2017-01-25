@@ -47,6 +47,7 @@ namespace Universal{
 					size_t pos = str.find('=');
 					if(pKeyValueMap == NULL || pos == string::npos || pos == 0){
 						PUB_DEBUG_E("ini文件格式错误。");
+						assert(false);
 						return false;
 					}
 					pKeyValueMap->insert(pair<string, string>(

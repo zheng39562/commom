@@ -27,7 +27,6 @@ namespace Universal{
 
 	//! \brief	线程类。
 	//! \note	使用方法：实现execute函数即可。
-	//				* 需要注意，execute如果是死循环，则必须提供出口。
 	//! \note	virtual void execute(){
 	//!				...
 	//!			}
@@ -46,20 +45,20 @@ namespace Universal{
 			void stop();
 			//! \brief	恢复
 			void resume();
+			//! \brief	等待线程退出。
+			void join();
 
 			inline boost::thread::native_handle_type getThreadID(){ return m_pThread->native_handle(); }
 			inline eThreadStatus getStatus(){ return m_ThreadStatus; }
 		protected:
-			//! \brief	执行函数。
-			//! \note	此函数需要自行设置退出时间，否则会一直执行。
-			//! \note	对于exe中的循环线程关闭暂时没有更好的办法。增加m_Running变量，可以辅助关闭线程。但需要在作为循环条件。
-			//! \todo	更好的线程关闭方式。
+			//! \brief	
+			//! \note	
 			virtual void execute()=0;
 			//! \brief	暂停线程
 			//! \note	只支持线程自身暂停自身。
 			void pause();
 		protected:
-			bool m_Running;		//! 启动时设true，析构时false。
+			bool m_Running;
 		private:
 			boost::thread* m_pThread;
 			boost::condition_variable m_Cond;

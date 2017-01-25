@@ -17,19 +17,27 @@
 #include "fr_template/single_mode.hpp"
 #include "pub_thread.h"
 
-#define LOG_FILE_MAX_SIZE 1000000
+#define LOG_FILE_MAX_SIZE 10000000
 #define DEBUG_KEY_DEFAULT "debug_log"
 //! \note	来cout 流信息
-#define K_DEBUG_D(Key, msg, show) {if(show){std::cout << std::dec << msg << std::endl; } std::ostringstream osTmp; osTmp << msg; Log_D(Key, osTmp.str(), __FILE__, __FUNCTION__, __LINE__);}
-#define K_DEBUG_I(Key, msg, show) {if(show){std::cout << std::dec << msg << std::endl; } std::ostringstream osTmp; osTmp << msg; Log_I(Key, osTmp.str(), __FILE__, __FUNCTION__, __LINE__);}
-#define K_DEBUG_W(Key, msg, show) {if(show){std::cout << std::dec << msg << std::endl; } std::ostringstream osTmp; osTmp << msg; Log_W(Key, osTmp.str(), __FILE__, __FUNCTION__, __LINE__);}
-#define K_DEBUG_E(Key, msg, show) {if(show){std::cout << std::dec << msg << std::endl; } std::ostringstream osTmp; osTmp << msg; Log_E(Key, osTmp.str(), __FILE__, __FUNCTION__, __LINE__);}
-#define K_DEBUG_C(Key, msg, show) {if(show){std::cout << std::dec << msg << std::endl; } std::ostringstream osTmp; osTmp << msg; Log_C(Key, osTmp.str(), __FILE__, __FUNCTION__, __LINE__);}
+
+#define K_DEBUG_D(Key, msg, show) {if(show){std::cout << std::dec << "key[" << Key << "] " << msg << std::endl; } std::ostringstream osTmp; osTmp << msg; Log_D(Key, osTmp.str(), __FILE__, __FUNCTION__, __LINE__);}
+#define K_DEBUG_I(Key, msg, show) {if(show){std::cout << std::dec << "key[" << Key << "] " << msg << std::endl; } std::ostringstream osTmp; osTmp << msg; Log_I(Key, osTmp.str(), __FILE__, __FUNCTION__, __LINE__);}
+#define K_DEBUG_W(Key, msg, show) {if(show){std::cout << std::dec << "key[" << Key << "] " << msg << std::endl; } std::ostringstream osTmp; osTmp << msg; Log_W(Key, osTmp.str(), __FILE__, __FUNCTION__, __LINE__);}
+#define K_DEBUG_E(Key, msg, show) {if(show){std::cout << std::dec << "key[" << Key << "] " << msg << std::endl; } std::ostringstream osTmp; osTmp << msg; Log_E(Key, osTmp.str(), __FILE__, __FUNCTION__, __LINE__);}
+#define K_DEBUG_C(Key, msg, show) {if(show){std::cout << std::dec << "key[" << Key << "] " << msg << std::endl; } std::ostringstream osTmp; osTmp << msg; Log_C(Key, osTmp.str(), __FILE__, __FUNCTION__, __LINE__);}
+/*
+#define K_DEBUG_D(Key, msg, show) 
+#define K_DEBUG_I(Key, msg, show) 
+#define K_DEBUG_W(Key, msg, show) 
+#define K_DEBUG_E(Key, msg, show) std::cout << std::dec << msg << std::endl;
+#define K_DEBUG_C(Key, msg, show) 
+*/
 //#define DEBUG_D(msg) 	{std::cout << std::dec << msg << std::endl; std::ostringstream osTmp; osTmp << msg; Log_D(DEBUG_KEY_DEFAULT, osTmp.str(), __FILE__, __FUNCTION__, __LINE__);}
-#define DEBUG_D(msg) K_DEBUG_C(DEBUG_KEY_DEFAULT, msg, true)
-#define DEBUG_I(msg) K_DEBUG_C(DEBUG_KEY_DEFAULT, msg, true)
-#define DEBUG_W(msg) K_DEBUG_C(DEBUG_KEY_DEFAULT, msg, true)
-#define DEBUG_E(msg) K_DEBUG_C(DEBUG_KEY_DEFAULT, msg, true)
+#define DEBUG_D(msg) K_DEBUG_D(DEBUG_KEY_DEFAULT, msg, false)
+#define DEBUG_I(msg) K_DEBUG_I(DEBUG_KEY_DEFAULT, msg, true)
+#define DEBUG_W(msg) K_DEBUG_W(DEBUG_KEY_DEFAULT, msg, true)
+#define DEBUG_E(msg) K_DEBUG_E(DEBUG_KEY_DEFAULT, msg, true)
 #define DEBUG_C(msg) K_DEBUG_C(DEBUG_KEY_DEFAULT, msg, true)
 
 typedef std::string LogKey;
@@ -52,6 +60,8 @@ namespace Universal{
 			inline static void setPath(const Path &path);
 			inline static void setMaxSize(size_t maxSize){ m_s_MaxSize = maxSize; }
 
+			inline void setIgnore(eLogLevel ignore){ m_IgnoreLevel = ignore; }
+
 			//! \breif	缓存的锁
 			//! \note	时间问题，暂时使用外界加锁的形式解决多线程问题。
 			inline void lock(){ m_Mutex.lock(); }
@@ -63,7 +73,9 @@ namespace Universal{
 			//! \note	如果是当天，则标志+1.否则对应增加新日期的文件。
 			void reopen();
 			//! \brief	将日志从缓存写入文件。
-			void write(const std::string &log);
+			void write(const std::string &time, const eLogLevel &level, const std::string &fileName, const std::string &funcName, const long &line, const std::string &msg);
+		private:
+			std::string getLevelString(const eLogLevel &level);
 		private:
 			static Path m_s_Path;
 			static size_t m_s_MaxSize;
@@ -89,10 +101,10 @@ namespace Universal{
 		public:
 			//! \brief	日志初始化。必须进行初始化。因为单例原因。在构造时不能进行初始化。
 			void initLog(const std::string &path, size_t _maxSize);
+			void setLogIgnore(const LogKey &key, eLogLevel ignore);
 			void writeLog(const LogKey &key, const std::string &time, const eLogLevel &level, const std::string &fileName, const std::string &funcName, const long &line, const std::string &msg);
 		protected:
 			virtual void execute();
-			std::string getLevelString(const eLogLevel &level);
 		private:
 			std::map<LogKey, LogCache*> m_Caches;
 	};
@@ -104,5 +116,6 @@ void Log_I(const LogKey &key, const std::string &msg, const std::string &fileNam
 void Log_W(const LogKey &key, const std::string &msg, const std::string &fileName, const std::string funcName, long line);
 void Log_E(const LogKey &key, const std::string &msg, const std::string &fileName, const std::string funcName, long line);
 void Log_C(const LogKey &key, const std::string &msg, const std::string &fileName, const std::string funcName, long line);
+
 #endif 
 

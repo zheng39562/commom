@@ -220,7 +220,7 @@ namespace Universal{
  */
 namespace Universal{
 	TimeCounter::TimeCounter()
-		:m_FileName(""),
+		:m_FileName("time"),
 		 m_Dir("")
 	{ ; }
 	TimeCounter::TimeCounter(const string &_logDir)
@@ -237,24 +237,16 @@ namespace Universal{
 	}
 
 	void TimeCounter::stop(string file, long line){ 
-		m_Stop = std::clock();
-		time_t microSecond = (m_Stop - m_Start) * (_TIMECONVERSION_SECTOUS / CLOCKS_PER_SEC);
-		time_t second = microSecond / _TIMECONVERSION_SECTOUS;
-		microSecond %= _TIMECONVERSION_SECTOUS;
-
-		if(m_FileName.empty()){
-			PUB_DEBUG_D("[" << file << ":" << line << "] 运行时间 [" << second << "." << microSecond << "]");
-		}
-		else{
+		if(!m_FileName.empty()){
 			std::ostringstream osTmp;
-			osTmp << "[" << file << ":" << line << "] 运行时间 [" << second << "." << microSecond << "]";
+			osTmp << "[" << file << ":" << line << "] 运行tick [" << std::clock() - m_Start << "] 每秒tick数[" << CLOCKS_PER_SEC << "]\n";
 			addContentToFile(m_Dir + "time" + getLocalTime("%Y%m%d") + ".log", osTmp.str());
 		}
 	}
 
 	time_t TimeCounter::getUsTime(){ 
 		m_Stop = std::clock();
-		return (std::clock() - m_Start) * (_TIMECONVERSION_SECTOUS / CLOCKS_PER_SEC);
+		return (m_Stop - m_Start) * (_TIMECONVERSION_SECTOUS / CLOCKS_PER_SEC);
 	}
 
 	void TimeCounter::setDirectory(const string &dir){

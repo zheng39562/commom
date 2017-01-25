@@ -81,7 +81,7 @@ namespace Universal{
 	}
 
 	bool rc4_encrypt(string &content, const string &sKey){
-		return rc4_encrypt((Byte*)const_cast<char*>(content.c_str()), content.size(), sKey);
+		return rc4_encrypt(const_cast<char*>(content.c_str()), (int32)content.size(), sKey.c_str(), (int32)sKey.size());
 	}
 	bool rc4_encrypt(Byte* content, uint32 size, const string &sKey){
 		RC4_KEY key;
@@ -90,13 +90,43 @@ namespace Universal{
 		return true;
 	}
 
-	bool rc4_decrypt(string &content, const string &sKey){
-		return rc4_decrypt((Byte*)const_cast<char*>(content.c_str()), content.size(), sKey);
-	}
-	bool rc4_decrypt(Byte* content, uint32 size, const string &sKey){
-		RC4_KEY key;
-		RC4Init(sKey.c_str(), sKey.size(), &key);
-		RC4Works(content, size, &key);
+#ifndef SWAP_VALUE
+	#define SWAP_VALUE(x, y) { t = *x; *x = *y; *y = t; }
+#endif
+	bool rc4_encrypt(char *content, int32 contentLength, const char* sKey, int32 ketLength){
+		char t;
+		unsigned char box[256];
+		int index = 0;
+
+		//生成对应的Key
+		int seed_len = ketLength;
+		unsigned char *seed = (unsigned char *)sKey;
+
+		int src_len = contentLength;
+		unsigned char *src = (unsigned char *)content;
+
+		int i;
+		for(i = 0; i < 256; i++){
+			box[i] = i;
+		}
+
+		int j = 0;
+		for (int i = 0; i < 256; i++) {
+			j = (j + seed[i % seed_len] + box[i]) % 256;
+			SWAP_VALUE(&box[i], &box[j]);
+		}
+
+		int x = 0; int y = 0;
+		for (int i = 0; i < src_len; i++) {
+			x = 0; y = 0;
+			x = (x + 1) % 256;
+			y = (box[x] + y) % 256;
+			SWAP_VALUE(&box[x], &box[y]);
+			index = (box[x] + box[y]) % 256;
+			t = *(src + i);
+			t ^= box[index];
+			*(src + i) = t;
+		}
 		return true;
 	}
 }  // namespace : Universal

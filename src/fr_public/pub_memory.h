@@ -65,6 +65,9 @@ namespace Universal{
 			//! \note	如果已满足扩展大小则不做操作。
 			//! \note	扩展不会影响已有的数据。
 			void reserve(int64 size);
+			//! \brief	重定义内存大小。
+			//! \note	resize 和 reserve的区别主要在于，resize会或者内存尺寸。
+			void resize(int64 size);
 			void print(std::string expand = "")const;
 			void setMaxLimit(int64 _maxLimit){ m_MaxLimit = _maxLimit; }
 
@@ -73,6 +76,7 @@ namespace Universal{
 			//! \note	对内存的增删没有意义:因size不会改变。如做内存增删,请使用delBuffer函数。
 			inline void* getBuffer(){ return m_Buffer; }
 			inline void* buffer(){ return m_Buffer; }
+			inline const void* buffer()const{ return (const void*)m_Buffer; }
 			inline const void* getBuffer()const{ return m_Buffer; }
 			inline int64 getBufferSize()const{ return m_CurBufferSize; }
 			inline int64 size()const{ return m_CurBufferSize; }

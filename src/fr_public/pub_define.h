@@ -22,26 +22,26 @@ typedef unsigned char Byte;
 typedef std::string Name;
 typedef std::string FileName;
 typedef std::string Path;
+typedef std::string FilePath;
 
 typedef unsigned short uint16;
 typedef unsigned int uint32;
 typedef unsigned long uint64;
 typedef short sint16;
 typedef int sint32;
-typedef long sint64;
+typedef long long sint64;
 typedef sint16 int16;
 typedef sint32 int32;
 typedef sint64 int64;
 
-
 #include "fr_public/pub_log.h"
 
-#define LOG_KEY_PUBLIC "public"
+#define LOG_KEY_PUBLIC "log_public"
 #define PUB_DEBUG_D(msg) K_DEBUG_D(LOG_KEY_PUBLIC, msg, true)
 #define PUB_DEBUG_I(msg) K_DEBUG_I(LOG_KEY_PUBLIC, msg, true)
 #define PUB_DEBUG_W(msg) K_DEBUG_W(LOG_KEY_PUBLIC, msg, true)
 #define PUB_DEBUG_E(msg) K_DEBUG_E(LOG_KEY_PUBLIC, msg, true)
-#define PUB_DEBUG_C(msg) K_DEBUG_C(LOG_KEY_PUBLIC, msg, true)
+#define PUB_DEBUG_C(msg) K_DEBUG_C(LOG_KEY_PUBLIC, msg, true) 
 
 /// *******************************************************************************************************
 
@@ -53,6 +53,7 @@ typedef sint64 int64;
 #define _INTFALSE									-1
 #define _BOOLFALSE									false
 #define _DOUBLEFALSE								-1.0
+
 /// *******************************************************************************************************
 
 /*
@@ -77,13 +78,6 @@ typedef sint64 int64;
 #define _TIMECONVERSION_YEARTODAT					365
 #define _TIMECONVERSION_DAYTOSEC					_TIMECONVERSION_DATTOHOUR * _TIMECONVERSION_HOURTOSEC
 #define _TIMECONVERSION_MONTHTOSEC				_TIMECONVERSION_MONTHTODAY * _TIMECONVERSION_DAYTOSEC
-/// *******************************************************************************************************
-
-//
-// marco function
-//
-#define _LOOP_MAP_DEBUG(preStr, mapName )			for(map<string,string>::const_iterator citer = mapName.begin(); citer != mapName.end(); ++citer ) \
-														DEBUG_D("%s : [%s] => [%s]", string(preStr).pub_str(), citer->first.pub_str(), citer->second.pub_str() );
 /// *******************************************************************************************************
 
 #endif 

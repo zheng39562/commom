@@ -10,6 +10,13 @@
 **********************************************************/
 #include "pub_log.h"
 
+#ifdef WIN32
+#include <windows.h>
+#endif
+#ifdef Linux
+#include <pthread.h>
+#endif
+
 #include <sstream>
 #include "pub_define.h"
 #include "pub_file.h"
@@ -60,21 +67,55 @@ namespace Universal{
 			m_FileDate = curDate;
 			m_Outfile.close();
 			m_Outfile.open(string(m_s_Path + m_FileName + "_" + m_FileDate + "_" + intToStr(++m_CurIndex) + ".log").c_str(), ios::app);
+			m_CurSize = 0;
 		}
 		else{
 			assert(false);
 		}
 	}
 
-	void LogCache::write(const string &log){
-		if(m_Outfile){
-			m_CurSize += log.size();
-			m_Outfile << log;
-			m_Outfile.flush();
+	void LogCache::write(const std::string &time, const eLogLevel &level, const std::string &fileName, const std::string &funcName, const long &line, const std::string &msg){
+		lock();
+		if(m_IgnoreLevel < level){
+			std::ostringstream cache;
+			cache << "[" << time << "]"
+#ifdef WIN32
+				<< "[" << GetCurrentThreadId() << "]"
+#endif
+#ifdef Linux
+				<< "[" << pthread_self() << "]"
+#endif
+				<< "[" << getLevelString(level) << "]"
+				<< "[" << fileName << "]"
+				<< "[" << funcName << ":"<< line << "]"
+				<< " : " << msg << "\n";
+
+			if(m_Outfile){
+				m_CurSize += cache.str().size();
+				m_Outfile << cache.str();
+				m_Outfile.flush();
+			}
+			else{
+				assert(false);
+			}
 		}
-		else{
-			assert(false);
+		unlock();
+	}
+
+	string LogCache::getLevelString(const eLogLevel &level){
+		switch(level){
+			case eLogLevel_Debug:
+				return "调试";
+			case eLogLevel_Info:
+				return "消息";
+			case eLogLevel_Warning:
+				return "警告";
+			case eLogLevel_Error:
+				return "错误";
+			case eLogLevel_Crash:
+				return "异常";
 		}
+		return "未知";
 	}
 }
 
@@ -96,41 +137,20 @@ namespace Universal{
 		start();
 	}
 
-	void LogServer::writeLog(const LogKey &key, const string &time, const eLogLevel &level, const std::string &fileName, const string &funcName, const long &line, const string &msg){
+	void LogServer::setLogIgnore(const LogKey &key, eLogLevel ignore){
 		if(m_Caches.find(key) == m_Caches.end()){
-			if(m_Caches.find(key) == m_Caches.end()){
-				m_Caches.insert(make_pair(key, new LogCache(key, eLogLevel_IgnoreNothing)));
-			}
+			m_Caches.insert(make_pair(key, new LogCache(key, ignore)));
 		}
-
-		std::ostringstream cache;
-		cache << "[" << time << "]"
-			<< "[" << getThreadID() << "]"
-			<< "[" << getLevelString(level) << "]"
-			<< "[" << fileName << "]"
-			<< "[" << funcName << ":"<< line << "]"
-			<< " : " << msg << "\n";
-
-		LogCache* pCache = m_Caches.find(key)->second;
-		pCache->lock();
-		pCache->write(cache.str());
-		pCache->unlock();
+		else{
+			m_Caches.find(key)->second->setIgnore(ignore);
+		}
 	}
 
-	string LogServer::getLevelString(const eLogLevel &level){
-		switch(level){
-			case eLogLevel_Debug:
-				return "调试";
-			case eLogLevel_Info:
-				return "消息";
-			case eLogLevel_Warning:
-				return "警告";
-			case eLogLevel_Error:
-				return "错误";
-			case eLogLevel_Crash:
-				return "异常";
+	void LogServer::writeLog(const LogKey &key, const string &time, const eLogLevel &level, const std::string &fileName, const string &funcName, const long &line, const string &msg){
+		if(m_Caches.find(key) == m_Caches.end()){
+			m_Caches.insert(make_pair(key, new LogCache(key, eLogLevel_IgnoreNothing)));
 		}
-		return "未知";
+		m_Caches.find(key)->second->write(time, level, fileName, funcName, line, msg);
 	}
 
 	void LogServer::execute(){
@@ -151,7 +171,7 @@ namespace Universal{
 	}
 }
 
-static std::string g_LogFormat = "%H:%M:%S";  //%Y/%m/%d  
+static std::string g_LogFormat = "%m/%d-%H:%M:%S";  //%Y/%m/%d  
 void Log_D(const LogKey &key, const std::string &msg, const std::string &fileName, const std::string funcName, long line){
 	SingleLogServer::getInstance()->writeLog(key, getLocalTimeU(g_LogFormat), eLogLevel_Debug, fileName, funcName, line, msg);
 }
