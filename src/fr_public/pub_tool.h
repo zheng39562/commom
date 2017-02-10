@@ -29,23 +29,23 @@ namespace Universal{
 #define _PTHONETYPE_QT						"QT"
 #ifndef WIN32
 	//! \brief	执行shell指令/脚本
-	bool execShellCmd( const string &cmd );
+	bool execShellCmd( const std::string &cmd );
 #endif
 	//! \brief	获取手机的运营商。
-	string getMobileType( const string &mobile );
+	std::string getMobileType( const std::string &mobile );
 
 	//! \brief	从map中查询key对应的数据。如果查询不到则返回 宏[_STRINGFALSE] 定义的字符串。
-	string findDataFromMap( const map<string, string> &mapData, const string &key );
+	std::string findDataFromMap( const std::map<std::string, std::string> &mapData, const std::string &key );
 
 	//! \brief	生成MD5
 	//! \note	默认为32位的.如果需要使用16位。可以调用md5_16
-	string md5(const std::string str);
+	std::string md5(const std::string str);
 	//! \brief	生成MD5(16位)
-	string md5_16(const std::string str);
+	std::string md5_16(const std::string str);
 
 	bool rc4_encrypt(char *content, int32 contentLength, const char* sKey, int32 ketLength);
-	bool rc4_encrypt(string &content, const string &sKey);
-	bool rc4_encrypt(Byte* content, uint32 size, const string &sKey);
+	bool rc4_encrypt(std::string &content, const std::string &sKey);
+	bool rc4_encrypt(Byte* content, uint32 size, const std::string &sKey);
 }  // namespace : Universal
 
 
@@ -55,13 +55,13 @@ namespace Universal{
 namespace Universal{
 	//! \brief	验证字符串是否是一个数字。
 	//!	\note	可验证：正负，整数，小数。
-	bool checkNumber( const string &number );
+	bool checkNumber( const std::string &number );
 	//! \brief	验证是否是一个正确的格式。
 	//! \note	使用正则表达式进行解析，暂时不支持平年和闰年的差别。
 	//! \todo	平年和闰年的识别：正则修正，或添加逻辑代码。
-	bool checkDate( const string &date );
+	bool checkDate( const std::string &date );
 	//! \brief	验证手机格式。
-	bool checkMobile( const string &mobile );
+	bool checkMobile( const std::string &mobile );
 
 }  // namespace : Universal
 

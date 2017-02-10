@@ -17,15 +17,39 @@
 #include "fr_template/single_mode.hpp"
 #include "pub_thread.h"
 
-#define LOG_FILE_MAX_SIZE 10000000
+#define LOG_FILE_MAX_SIZE 10000000 // 10MB
 #define DEBUG_KEY_DEFAULT "debug_log"
 //! \note	来cout 流信息
 
+#ifdef _MFC
+#include "mfc_interface.h"
+#define K_DEBUG_D(Key, msg, show) {\
+	if(show){std::ostringstream osTmp; osTmp << "key[" << Key << "] " << msg << std::endl; MFC_addLog(Key, osTmp.str());} \
+	std::ostringstream osTmp; osTmp << msg; Log_D(Key, osTmp.str(), __FILE__, __FUNCTION__, __LINE__);\
+}
+#define K_DEBUG_I(Key, msg, show) {\
+	if(show){std::ostringstream osTmp; osTmp << "key[" << Key << "] " << msg << std::endl; MFC_addLog(Key, osTmp.str());} \
+	std::ostringstream osTmp; osTmp << msg; Log_I(Key, osTmp.str(), __FILE__, __FUNCTION__, __LINE__);\
+}
+#define K_DEBUG_W(Key, msg, show) {\
+	if(show){std::ostringstream osTmp; osTmp << "key[" << Key << "] " << msg << std::endl; MFC_addLog(Key, osTmp.str());} \
+	std::ostringstream osTmp; osTmp << msg; Log_W(Key, osTmp.str(), __FILE__, __FUNCTION__, __LINE__);\
+}
+#define K_DEBUG_E(Key, msg, show) {\
+	if(show){std::ostringstream osTmp; osTmp << "key[" << Key << "] " << msg << std::endl; MFC_addLog(Key, osTmp.str());} \
+	std::ostringstream osTmp; osTmp << msg; Log_E(Key, osTmp.str(), __FILE__, __FUNCTION__, __LINE__);\
+}
+#define K_DEBUG_C(Key, msg, show) {\
+	if(show){std::ostringstream osTmp; osTmp << "key[" << Key << "] " << msg << std::endl; MFC_addLog(Key, osTmp.str());} \
+	std::ostringstream osTmp; osTmp << msg; Log_C(Key, osTmp.str(), __FILE__, __FUNCTION__, __LINE__);\
+}
+#else
 #define K_DEBUG_D(Key, msg, show) {if(show){std::cout << std::dec << "key[" << Key << "] " << msg << std::endl; } std::ostringstream osTmp; osTmp << msg; Log_D(Key, osTmp.str(), __FILE__, __FUNCTION__, __LINE__);}
 #define K_DEBUG_I(Key, msg, show) {if(show){std::cout << std::dec << "key[" << Key << "] " << msg << std::endl; } std::ostringstream osTmp; osTmp << msg; Log_I(Key, osTmp.str(), __FILE__, __FUNCTION__, __LINE__);}
 #define K_DEBUG_W(Key, msg, show) {if(show){std::cout << std::dec << "key[" << Key << "] " << msg << std::endl; } std::ostringstream osTmp; osTmp << msg; Log_W(Key, osTmp.str(), __FILE__, __FUNCTION__, __LINE__);}
 #define K_DEBUG_E(Key, msg, show) {if(show){std::cout << std::dec << "key[" << Key << "] " << msg << std::endl; } std::ostringstream osTmp; osTmp << msg; Log_E(Key, osTmp.str(), __FILE__, __FUNCTION__, __LINE__);}
 #define K_DEBUG_C(Key, msg, show) {if(show){std::cout << std::dec << "key[" << Key << "] " << msg << std::endl; } std::ostringstream osTmp; osTmp << msg; Log_C(Key, osTmp.str(), __FILE__, __FUNCTION__, __LINE__);}
+#endif
 /*
 #define K_DEBUG_D(Key, msg, show) 
 #define K_DEBUG_I(Key, msg, show) 
@@ -69,6 +93,8 @@ namespace Universal{
 
 			//! \brief	单文件已满(即超过设置的最大储存上线)
 			bool fileFull();
+			//! \brief	是不是新的一天
+			bool isNewDate();
 			//! \brief	重打开一个文件。
 			//! \note	如果是当天，则标志+1.否则对应增加新日期的文件。
 			void reopen();
@@ -94,7 +120,7 @@ namespace Universal{
 	//				* key 即作为索引，也作为文件名。
 	//! \note	日志索引和路径在运行过程中不能减少：即不会提供删除key的接口
 	//				* 不能减少,主要防止多线程的删除导致未知的引用or指针
-	class LogServer : public FrThread{
+	class LogServer : public Universal::FrThread{
 		public:
 			LogServer();
 			virtual ~LogServer();

@@ -10,17 +10,20 @@
 #include "pub_ini.h"
 
 using namespace std;
+using namespace boost;
 
 namespace Universal{
 	Configurator::Configurator()
 		:m_CfgMap(),
 		 m_DefaultCfgKey(""),
-		 m_CfgType(eCfgDataType_Unknow)
+		 m_CfgType(eCfgDataType_Unknow),
+		 m_Mutex()
 	{
 		;
 	}
 
 	Configurator::~Configurator(){ 
+		mutex::scoped_lock localLock(m_Mutex);
 		for(auto iterCfg = m_CfgMap.begin(); iterCfg != m_CfgMap.begin(); ++iterCfg){
 			if(iterCfg->second != NULL){
 				switch(m_CfgType){
@@ -37,6 +40,7 @@ namespace Universal{
 	}
 
 	bool Configurator::addCfg(const CfgKey &cfgKey, const std::string &param, const eCfgDataType &type){
+		mutex::scoped_lock localLock(m_Mutex);
 		if(m_CfgMap.find(cfgKey) != m_CfgMap.end()){
 			PUB_DEBUG_I("该配置key已经存在，不能重复添加.");
 		}
@@ -69,7 +73,21 @@ namespace Universal{
 		return true;
 	}
 
+	void Configurator::saveCfg(const CfgKey &cfgKey){
+		mutex::scoped_lock localLock(m_Mutex);
+		void* m_pCfg = getCfgPtr(cfgKey);
+		if(m_pCfg != NULL){
+			switch (m_CfgType){
+				case eCfgDataType_Ini:
+					((IniCfg*)m_pCfg)->saveFile();
+				default:
+					break;
+			}
+		}
+	}
+
 	std::string Configurator::getString(const CfgKey &cfgKey, const std::string &section, const std::string &key, const string &defaultValue){
+		mutex::scoped_lock localLock(m_Mutex);
 		void* m_pCfg = getCfgPtr(cfgKey);
 		if(m_pCfg != NULL){
 			switch (m_CfgType){
@@ -83,6 +101,7 @@ namespace Universal{
 	}
 
 	int Configurator::getInt(const CfgKey &cfgKey, const std::string &section, const std::string &key, const int &defaultValue){
+		mutex::scoped_lock localLock(m_Mutex);
 		void* m_pCfg = getCfgPtr(cfgKey);
 		if(m_pCfg != NULL){
 			switch (m_CfgType){
@@ -96,6 +115,7 @@ namespace Universal{
 	}
 
 	double Configurator::getDouble(const CfgKey &cfgKey, const std::string &section, const std::string &key, const double &defaultValue){
+		mutex::scoped_lock localLock(m_Mutex);
 		void* m_pCfg = getCfgPtr(cfgKey);
 		if(m_pCfg != NULL){
 			switch (m_CfgType){
@@ -106,6 +126,48 @@ namespace Universal{
 			}
 		}
 		return defaultValue;
+	}
+
+	bool Configurator::setString(const CfgKey &cfgKey, const std::string &section, const std::string &key, const std::string &value){
+		mutex::scoped_lock localLock(m_Mutex);
+		void* m_pCfg = getCfgPtr(cfgKey);
+		if(m_pCfg != NULL){
+			switch (m_CfgType){
+				case eCfgDataType_Ini:
+					return ((IniCfg*)m_pCfg)->setString(section, key, value);
+				default:
+					break;
+			}
+		}
+		return false;
+	}
+
+	bool Configurator::setInt(const CfgKey &cfgKey, const std::string &section, const std::string &key, int32 value){
+		mutex::scoped_lock localLock(m_Mutex);
+		void* m_pCfg = getCfgPtr(cfgKey);
+		if(m_pCfg != NULL){
+			switch (m_CfgType){
+				case eCfgDataType_Ini:
+					return ((IniCfg*)m_pCfg)->setInt(section, key, value);
+				default:
+					break;
+			}
+		}
+		return false;
+	}
+
+	bool Configurator::setDouble(const CfgKey &cfgKey, const std::string &section, const std::string &key, double value){
+		mutex::scoped_lock localLock(m_Mutex);
+		void* m_pCfg = getCfgPtr(cfgKey);
+		if(m_pCfg != NULL){
+			switch (m_CfgType){
+				case eCfgDataType_Ini:
+					return ((IniCfg*)m_pCfg)->setDouble(section, key, value);
+				default:
+					break;
+			}
+		}
+		return false;
 	}
 
 	void* Configurator::getCfgPtr(const CfgKey &cfgKey){

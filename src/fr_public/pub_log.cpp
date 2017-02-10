@@ -10,8 +10,13 @@
 **********************************************************/
 #include "pub_log.h"
 
+
 #ifdef WIN32
+#ifdef _MFC
+#include "afxwin.h"
+#else
 #include <windows.h>
+#endif
 #endif
 #ifdef Linux
 #include <pthread.h>
@@ -35,9 +40,18 @@ namespace Universal{
 		 m_CurSize(0),
 		 m_Outfile(),
 		 m_CurIndex(0),
-		 m_FileDate(""),
+		 m_FileDate(getLocalTime("%Y%m%d")),
 		 m_FileName(_fileName)
 	{ 
+		vector<string> fileNames;
+		findFileFromDir(m_s_Path, fileNames, ".*" + m_FileName + ".*\.log");
+
+		for(auto iterFileName = fileNames.begin(); iterFileName != fileNames.end(); ++iterFileName){
+			int index = strToInt(iterFileName->substr(iterFileName->find_last_of("_") + 1, iterFileName->find_last_of(".") - iterFileName->find_last_of("_")));
+			m_CurIndex = m_CurIndex > index ? m_CurIndex : index;
+		}
+		
+		m_CurIndex -= 1;
 		reopen(); 
 	}
 
@@ -56,6 +70,10 @@ namespace Universal{
 			return false;
 		}
 		return m_CurSize >= m_s_MaxSize;
+	}
+
+	bool LogCache::isNewDate(){ 
+		return Universal::getLocalTime("%Y%m%d") != m_FileDate; 
 	}
 
 	void LogCache::reopen(){
@@ -94,6 +112,9 @@ namespace Universal{
 				m_CurSize += cache.str().size();
 				m_Outfile << cache.str();
 				m_Outfile.flush();
+				if(fileFull()){
+					reopen();
+				}
 			}
 			else{
 				assert(false);
@@ -155,17 +176,27 @@ namespace Universal{
 
 	void LogServer::execute(){
 		while(m_Running){
-			frSleep(1000); // 10ms
-
 			for(auto iterCache = m_Caches.begin(); iterCache != m_Caches.end(); ++iterCache){
 				if(!iterCache->first.empty()){
 					LogCache* pCache = iterCache->second;
 					pCache->lock();
-					if(pCache->fileFull()){
+					if(pCache->isNewDate()){
 						pCache->reopen();
 					}
 					pCache->unlock();
 				}
+			}
+
+			int curHour(strToInt(getLocalTime("%H")));
+			int curMin(strToInt(getLocalTime("%M")));
+			if(curHour < 23){
+				frSleep(3600 * _TIMECONVERSION_SECTOMS);
+			}
+			else if(curMin < 59){
+				frSleep(60 * _TIMECONVERSION_SECTOMS);
+			}
+			else{
+				frSleep(1 * _TIMECONVERSION_SECTOMS);
 			}
 		}
 	}

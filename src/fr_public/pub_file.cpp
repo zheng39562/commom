@@ -75,7 +75,7 @@ namespace Universal{
 
 	bool findFileFromDir(string filePath, vector<string> &fileNames, string filePattern){
 		path pPath(filePath);
-		if (is_directory(pPath)){
+		if(is_directory(pPath)){
 			directory_iterator end;
 			for (directory_iterator citer(pPath); citer != end; ++citer){
 				if(!is_directory(*citer)){

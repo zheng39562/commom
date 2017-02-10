@@ -14,7 +14,11 @@
 #include "pub_rc4.h"
 
 #ifdef WIN32
+#ifdef _MFC
+#include <afxwin.h>
+#else
 #include <windows.h>
+#endif
 #else
 #include <unistd.h>
 #endif
