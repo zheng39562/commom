@@ -6,12 +6,12 @@
  * \version 
  * \author zheng39562@163.com
 **********************************************************/
-#include "pub_tool.h"
+#include "fr_public/pub_tool.h"
 
-#include "pub_string.h"
+#include "fr_public/pub_string.h"
 #include "boost/regex.hpp"
-#include "pub_md5.h"
-#include "pub_rc4.h"
+#include "fr_public/pub_md5.h"
+#include "fr_public/pub_rc4.h"
 
 #ifdef WIN32
 #ifdef _MFC
@@ -30,7 +30,7 @@ using namespace boost;
  * other function
  */
 namespace Universal{
-#ifndef WIN32
+#ifdef LINUX
 	bool execShellCmd( const string &cmd ){
 		FILE* fp = NULL;
 		if( (fp=popen(cmd.c_str(), "r" ) ) != NULL ){
@@ -133,6 +133,63 @@ namespace Universal{
 		}
 		return true;
 	}
+
+	bool myStrEncrypt(std::string &content, const std::string &key){
+		if(rc4_encrypt(content, key)){
+			return convertBinaryToHexString(content);
+		}
+		return false;
+	}
+
+	bool myStrDecrypt(std::string &content, const std::string &key){
+		if(convertHexStringToBinary(content)){
+			return rc4_encrypt(content, key);
+		}
+		return false;
+	}
+
+	bool convertBinaryToHexString(string &content){
+		auto funcBinaryToStr = [](char c)->char{
+			if(0 <= c && c <= 9){
+				return c + '0';
+			}
+			else if(10 <= c && c <= 15){
+				return c - 10 + 'A';
+			}
+			return 'G';
+		};
+
+		string tmp;
+		for(auto iterContent = content.begin(); iterContent != content.end(); ++iterContent){
+			tmp += funcBinaryToStr((*iterContent & 0xF0) >> 4);
+			tmp += funcBinaryToStr(*iterContent & 0x0F);
+		}
+		content = tmp;
+		return true;
+	}
+
+	bool convertHexStringToBinary(string &content){
+		auto funcHexCharToChar = [](char c)->char{
+			switch(c){
+				case '1': return 1; case '2': return 2; case '3': return 3; case '4': return 4; case '5': return 5; case '6': return 6; case '7': return 7; case '8': return 8; case '9': return 9; 
+				case 'A': return 10; case 'B': return 11; case 'C': return 12; case 'D': return 13; case 'E': return 14; case 'F': return 15;
+				default: return 0;
+			}
+		};
+
+		string tmp;
+		auto iterContent = content.begin();
+		while(iterContent != content.end()){
+			char high = iterContent != content.end() ? *(iterContent++) : 0;
+			char low = iterContent != content.end() ? *(iterContent++) : 0;
+			char data = (funcHexCharToChar(high) << 4) + funcHexCharToChar(low);
+
+			tmp += data;
+		}
+		content = tmp;
+		return true;
+	}
+
 }  // namespace : Universal
 
 
@@ -190,13 +247,39 @@ namespace Universal{
 #endif
 	}
 
+#ifdef LINUX
 	void frUSleep(unsigned long time){
-#ifdef WIN32
-#else
 		usleep(time * 1000);
+	}
+#endif
+}  // namespace : Universal
+
+namespace Universal{
+	void getIp(std::string &ip){
+		ip.clear();
+#ifdef WIN32
+		/*
+		// 获得本机主机名  
+		char hostname[MAX_PATH] = { 0 };
+		gethostname(hostname, MAX_PATH);
+		struct hostent FAR* lpHostEnt = gethostbyname(hostname);
+		if(lpHostEnt == NULL)
+		{
+			return DEFAULT_IP;
+		}
+
+		// 取得IP地址列表中的第一个为返回的IP(因为一台主机可能会绑定多个IP)  
+		LPSTR lpAddr = lpHostEnt->h_addr_list[0];
+
+		// 将IP地址转化成字符串形式  
+		struct in_addr inAddr;
+		memmove(&inAddr, lpAddr, 4);
+
+		return CString(inet_ntoa(inAddr));
+		*/
+#else
 #endif
 	}
 }  // namespace : Universal
-
 
 

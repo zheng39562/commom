@@ -8,7 +8,7 @@
  * \!version 
  * * \!author zheng39562@163.com
 **********************************************************/
-#include "pub_thread.h"
+#include "fr_public/pub_thread.h"
 
 #include "boost/bind.hpp"
 #include <boost/thread/detail/thread.hpp>
@@ -51,12 +51,6 @@ namespace Universal{
 		join();
 	}
 
-	void FrThread::pause(){
-		m_ThreadStatus = eThreadStatus_Pause;
-		mutex::scoped_lock localLock(m_Mutex);
-		m_Cond.wait(localLock);
-	}
-
 	void FrThread::resume(){
 		mutex::scoped_lock localLock(m_Mutex);
 		m_Cond.notify_all();
@@ -66,6 +60,16 @@ namespace Universal{
 		if (m_pThread != 0){  
 			m_pThread->join();
 		}  
+	}
+
+	void FrThread::pause(){
+		m_ThreadStatus = eThreadStatus_Pause;
+		mutex::scoped_lock localLock(m_Mutex);
+		m_Cond.wait(localLock);
+	}
+
+	bool FrThread::isRunningThread()const{ 
+		return m_Running; 
 	}
 
 }

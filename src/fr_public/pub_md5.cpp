@@ -31,7 +31,7 @@ documentation and/or software.
 */
 
 /* interface header */
-#include "pub_md5.h"
+#include "fr_public/pub_md5.h"
 
 /* system implementation headers */
 #include <stdio.h>

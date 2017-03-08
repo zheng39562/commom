@@ -5,7 +5,7 @@
  * \!version 
  * * \!author zheng39562@163.com
 **********************************************************/
-#include "pub_memory.h"
+#include "fr_public/pub_memory.h"
 
 #include <string.h>
 

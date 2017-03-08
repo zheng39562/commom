@@ -13,61 +13,47 @@
 
 #include <iostream>
 #include <fstream>
-#include "pub_define.h"
+#include "fr_public/pub_define.h"
 #include "fr_template/single_mode.hpp"
-#include "pub_thread.h"
-
-#define LOG_FILE_MAX_SIZE 10000000 // 10MB
-#define DEBUG_KEY_DEFAULT "debug_log"
-//! \note	来cout 流信息
+#include "fr_public/pub_thread.h"
 
 #ifdef _MFC
-#include "mfc_interface.h"
-#define K_DEBUG_D(Key, msg, show) {\
-	if(show){std::ostringstream osTmp; osTmp << "key[" << Key << "] " << msg << std::endl; MFC_addLog(Key, osTmp.str());} \
-	std::ostringstream osTmp; osTmp << msg; Log_D(Key, osTmp.str(), __FILE__, __FUNCTION__, __LINE__);\
-}
-#define K_DEBUG_I(Key, msg, show) {\
-	if(show){std::ostringstream osTmp; osTmp << "key[" << Key << "] " << msg << std::endl; MFC_addLog(Key, osTmp.str());} \
-	std::ostringstream osTmp; osTmp << msg; Log_I(Key, osTmp.str(), __FILE__, __FUNCTION__, __LINE__);\
-}
-#define K_DEBUG_W(Key, msg, show) {\
-	if(show){std::ostringstream osTmp; osTmp << "key[" << Key << "] " << msg << std::endl; MFC_addLog(Key, osTmp.str());} \
-	std::ostringstream osTmp; osTmp << msg; Log_W(Key, osTmp.str(), __FILE__, __FUNCTION__, __LINE__);\
-}
-#define K_DEBUG_E(Key, msg, show) {\
-	if(show){std::ostringstream osTmp; osTmp << "key[" << Key << "] " << msg << std::endl; MFC_addLog(Key, osTmp.str());} \
-	std::ostringstream osTmp; osTmp << msg; Log_E(Key, osTmp.str(), __FILE__, __FUNCTION__, __LINE__);\
-}
-#define K_DEBUG_C(Key, msg, show) {\
-	if(show){std::ostringstream osTmp; osTmp << "key[" << Key << "] " << msg << std::endl; MFC_addLog(Key, osTmp.str());} \
-	std::ostringstream osTmp; osTmp << msg; Log_C(Key, osTmp.str(), __FILE__, __FUNCTION__, __LINE__);\
+#include "other/mfc_interface.h"
+#define LOG_PRINT(key, msg, level) \
+{\
+	std::ostringstream osTmp; osTmp << msg; \
+	MFC_addLog(key, osTmp.str()); \
+	Universal::SingleLogServer::getInstance()->writeLog(key, level, __FILE__, __FUNCTION__, __LINE__, osTmp.str());\
 }
 #else
-#define K_DEBUG_D(Key, msg, show) {if(show){std::cout << std::dec << "key[" << Key << "] " << msg << std::endl; } std::ostringstream osTmp; osTmp << msg; Log_D(Key, osTmp.str(), __FILE__, __FUNCTION__, __LINE__);}
-#define K_DEBUG_I(Key, msg, show) {if(show){std::cout << std::dec << "key[" << Key << "] " << msg << std::endl; } std::ostringstream osTmp; osTmp << msg; Log_I(Key, osTmp.str(), __FILE__, __FUNCTION__, __LINE__);}
-#define K_DEBUG_W(Key, msg, show) {if(show){std::cout << std::dec << "key[" << Key << "] " << msg << std::endl; } std::ostringstream osTmp; osTmp << msg; Log_W(Key, osTmp.str(), __FILE__, __FUNCTION__, __LINE__);}
-#define K_DEBUG_E(Key, msg, show) {if(show){std::cout << std::dec << "key[" << Key << "] " << msg << std::endl; } std::ostringstream osTmp; osTmp << msg; Log_E(Key, osTmp.str(), __FILE__, __FUNCTION__, __LINE__);}
-#define K_DEBUG_C(Key, msg, show) {if(show){std::cout << std::dec << "key[" << Key << "] " << msg << std::endl; } std::ostringstream osTmp; osTmp << msg; Log_C(Key, osTmp.str(), __FILE__, __FUNCTION__, __LINE__);}
+#define LOG_PRINT(key, msg, level) \
+{\
+	std::ostringstream osTmp; osTmp << msg; \
+	std::cout << std::dec << "key[" << key << "] " << msg << std::endl;\
+	Universal::SingleLogServer::getInstance()->writeLog(key, level, __FILE__, __FUNCTION__, __LINE__, msg)\
+}
 #endif
-/*
-#define K_DEBUG_D(Key, msg, show) 
-#define K_DEBUG_I(Key, msg, show) 
-#define K_DEBUG_W(Key, msg, show) 
-#define K_DEBUG_E(Key, msg, show) std::cout << std::dec << msg << std::endl;
-#define K_DEBUG_C(Key, msg, show) 
-*/
-//#define DEBUG_D(msg) 	{std::cout << std::dec << msg << std::endl; std::ostringstream osTmp; osTmp << msg; Log_D(DEBUG_KEY_DEFAULT, osTmp.str(), __FILE__, __FUNCTION__, __LINE__);}
-#define DEBUG_D(msg) K_DEBUG_D(DEBUG_KEY_DEFAULT, msg, false)
-#define DEBUG_I(msg) K_DEBUG_I(DEBUG_KEY_DEFAULT, msg, true)
-#define DEBUG_W(msg) K_DEBUG_W(DEBUG_KEY_DEFAULT, msg, true)
-#define DEBUG_E(msg) K_DEBUG_E(DEBUG_KEY_DEFAULT, msg, true)
-#define DEBUG_C(msg) K_DEBUG_C(DEBUG_KEY_DEFAULT, msg, true)
 
-typedef std::string LogKey;
+#define K_DEBUG_P(key, msg) if(Universal::SingleLogServer::getInstance()->getLogLevel(key) <= Universal::eLogLevel_Program){ LOG_PRINT(key, msg, Universal::eLogLevel_Program); }
+#define K_DEBUG_D(key, msg) if(Universal::SingleLogServer::getInstance()->getLogLevel(key) <= Universal::eLogLevel_Debug){ LOG_PRINT(key, msg, Universal::eLogLevel_Debug); }
+#define K_DEBUG_I(key, msg) if(Universal::SingleLogServer::getInstance()->getLogLevel(key) <= Universal::eLogLevel_Info){ LOG_PRINT(key, msg, Universal::eLogLevel_Info); }
+#define K_DEBUG_W(key, msg) if(Universal::SingleLogServer::getInstance()->getLogLevel(key) <= Universal::eLogLevel_Warning){ LOG_PRINT(key, msg, Universal::eLogLevel_Warning); }
+#define K_DEBUG_E(key, msg) if(Universal::SingleLogServer::getInstance()->getLogLevel(key) <= Universal::eLogLevel_Error){ LOG_PRINT(key, msg, Universal::eLogLevel_Error); }
+#define K_DEBUG_C(key, msg) if(Universal::SingleLogServer::getInstance()->getLogLevel(key) <= Universal::eLogLevel_Crash){ LOG_PRINT(key, msg, Universal::eLogLevel_Crash); }
+
+#define DEBUG_KEY_DEFAULT "debug_log"
+#define DEBUG_P(msg) K_DEBUG_P(DEBUG_KEY_DEFAULT, msg)
+#define DEBUG_D(msg) K_DEBUG_D(DEBUG_KEY_DEFAULT, msg)
+#define DEBUG_I(msg) K_DEBUG_I(DEBUG_KEY_DEFAULT, msg)
+#define DEBUG_W(msg) K_DEBUG_W(DEBUG_KEY_DEFAULT, msg)
+#define DEBUG_E(msg) K_DEBUG_E(DEBUG_KEY_DEFAULT, msg)
+#define DEBUG_C(msg) K_DEBUG_C(DEBUG_KEY_DEFAULT, msg)
+
 namespace Universal{
+	typedef std::string LogKey;
 	enum eLogLevel{
 		eLogLevel_IgnoreNothing = 0,
+		eLogLevel_Program,		//  开发时（编写代码阶段）使用，该功能开发完成后删除或转为其他等级
 		eLogLevel_Debug,
 		eLogLevel_Info,
 		eLogLevel_Warning,
@@ -76,7 +62,7 @@ namespace Universal{
 	};
 	class LogCache{
 		public:
-			LogCache(const FileName &_fileName, eLogLevel _ignore);
+			LogCache(const FileName &_fileName, eLogLevel _level);
 			LogCache(const LogCache &ref)=delete;
 			LogCache& operator=(const LogCache &ref)=delete;
 			~LogCache();
@@ -84,7 +70,8 @@ namespace Universal{
 			inline static void setPath(const Path &path);
 			inline static void setMaxSize(size_t maxSize){ m_s_MaxSize = maxSize; }
 
-			inline void setIgnore(eLogLevel ignore){ m_IgnoreLevel = ignore; }
+			inline void setLogLevel(eLogLevel level){ m_LogLevel = level; }
+			inline eLogLevel getLogLevel()const{ return m_LogLevel; }
 
 			//! \breif	缓存的锁
 			//! \note	时间问题，暂时使用外界加锁的形式解决多线程问题。
@@ -107,13 +94,12 @@ namespace Universal{
 			static size_t m_s_MaxSize;
 
 			FrMutex m_Mutex;
-			eLogLevel m_IgnoreLevel;
+			eLogLevel m_LogLevel;
 			size_t m_CurSize;
 			std::ofstream m_Outfile;
 			int32 m_CurIndex;
 			std::string m_FileDate;
 			FileName m_FileName;
-
 	};
 	//! \brief	日志记录类。
 	//! \note	增加按照索引分文件记录的功能。
@@ -127,8 +113,9 @@ namespace Universal{
 		public:
 			//! \brief	日志初始化。必须进行初始化。因为单例原因。在构造时不能进行初始化。
 			void initLog(const std::string &path, size_t _maxSize);
-			void setLogIgnore(const LogKey &key, eLogLevel ignore);
-			void writeLog(const LogKey &key, const std::string &time, const eLogLevel &level, const std::string &fileName, const std::string &funcName, const long &line, const std::string &msg);
+			void setLogLevel(const LogKey &key, eLogLevel level);
+			eLogLevel getLogLevel(const LogKey &key)const;
+			void writeLog(const LogKey &key, const eLogLevel &level, const std::string &fileName, const std::string &funcName, const long &line, const std::string &msg);
 		protected:
 			virtual void execute();
 		private:
@@ -137,11 +124,7 @@ namespace Universal{
 	typedef DesignMode::SingleMode<LogServer> SingleLogServer;
 }
 
-void Log_D(const LogKey &key, const std::string &msg, const std::string &fileName, const std::string funcName, long line);
-void Log_I(const LogKey &key, const std::string &msg, const std::string &fileName, const std::string funcName, long line);
-void Log_W(const LogKey &key, const std::string &msg, const std::string &fileName, const std::string funcName, long line);
-void Log_E(const LogKey &key, const std::string &msg, const std::string &fileName, const std::string funcName, long line);
-void Log_C(const LogKey &key, const std::string &msg, const std::string &fileName, const std::string funcName, long line);
+Universal::eLogLevel PARSE_LOG_STRING(const std::string &log_level);
 
 #endif 
 

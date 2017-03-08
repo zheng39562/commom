@@ -8,7 +8,7 @@
  * \!version 
  * * \!author zheng39562@163.com
 **********************************************************/
-#include "pub_log.h"
+#include "fr_public/pub_log.h"
 
 
 #ifdef WIN32
@@ -23,20 +23,21 @@
 #endif
 
 #include <sstream>
-#include "pub_define.h"
-#include "pub_file.h"
-#include "pub_tool.h"
-#include "pub_timer.h"
+#include "fr_public/pub_define.h"
+#include "fr_public/pub_file.h"
+#include "fr_public/pub_tool.h"
+#include "fr_public/pub_timer.h"
+#include "fr_public/pub_string.h"
 
 using namespace std;
 using namespace Universal;
 
 namespace Universal{
 	Path LogCache::m_s_Path = "";
-	size_t LogCache::m_s_MaxSize = LOG_FILE_MAX_SIZE;
+	size_t LogCache::m_s_MaxSize = 10 * 1024 * 1024;
 
-	LogCache::LogCache(const FileName &_fileName, eLogLevel _ignore)
-		:m_IgnoreLevel(_ignore),
+	LogCache::LogCache(const FileName &_fileName, eLogLevel _level)
+		:m_LogLevel(_level),
 		 m_CurSize(0),
 		 m_Outfile(),
 		 m_CurIndex(0),
@@ -66,7 +67,9 @@ namespace Universal{
 
 	bool LogCache::fileFull(){
 		if(m_s_MaxSize == 0){
+#ifdef _DEBUG
 			assert(false);
+#endif
 			return false;
 		}
 		return m_CurSize >= m_s_MaxSize;
@@ -88,13 +91,15 @@ namespace Universal{
 			m_CurSize = 0;
 		}
 		else{
+#ifdef _DEBUG
 			assert(false);
+#endif
 		}
 	}
 
 	void LogCache::write(const std::string &time, const eLogLevel &level, const std::string &fileName, const std::string &funcName, const long &line, const std::string &msg){
 		lock();
-		if(m_IgnoreLevel < level){
+		if(m_LogLevel <= level){
 			std::ostringstream cache;
 			cache << "[" << time << "]"
 #ifdef WIN32
@@ -117,7 +122,9 @@ namespace Universal{
 				}
 			}
 			else{
+#ifdef _DEBUG
 				assert(false);
+#endif
 			}
 		}
 		unlock();
@@ -158,24 +165,32 @@ namespace Universal{
 		start();
 	}
 
-	void LogServer::setLogIgnore(const LogKey &key, eLogLevel ignore){
+	void LogServer::setLogLevel(const LogKey &key, eLogLevel level){
 		if(m_Caches.find(key) == m_Caches.end()){
-			m_Caches.insert(make_pair(key, new LogCache(key, ignore)));
+			m_Caches.insert(make_pair(key, new LogCache(key, level)));
 		}
 		else{
-			m_Caches.find(key)->second->setIgnore(ignore);
+			m_Caches.find(key)->second->setLogLevel(level);
 		}
 	}
 
-	void LogServer::writeLog(const LogKey &key, const string &time, const eLogLevel &level, const std::string &fileName, const string &funcName, const long &line, const string &msg){
+	eLogLevel LogServer::getLogLevel(const LogKey &key)const{
+		auto iterCache = m_Caches.find(key);
+		if(iterCache != m_Caches.end()){
+			return iterCache->second->getLogLevel();
+		}
+		return eLogLevel_IgnoreNothing;
+	}
+
+	void LogServer::writeLog(const LogKey &key, const eLogLevel &level, const std::string &fileName, const string &funcName, const long &line, const string &msg){
 		if(m_Caches.find(key) == m_Caches.end()){
 			m_Caches.insert(make_pair(key, new LogCache(key, eLogLevel_IgnoreNothing)));
 		}
-		m_Caches.find(key)->second->write(time, level, fileName, funcName, line, msg);
+		m_Caches.find(key)->second->write(getLocalTimeU("%m/%d-%H:%M:%S"), level, fileName, funcName, line, msg);
 	}
 
 	void LogServer::execute(){
-		while(m_Running){
+		while(isRunningThread()){
 			for(auto iterCache = m_Caches.begin(); iterCache != m_Caches.end(); ++iterCache){
 				if(!iterCache->first.empty()){
 					LogCache* pCache = iterCache->second;
@@ -202,24 +217,13 @@ namespace Universal{
 	}
 }
 
-static std::string g_LogFormat = "%m/%d-%H:%M:%S";  //%Y/%m/%d  
-void Log_D(const LogKey &key, const std::string &msg, const std::string &fileName, const std::string funcName, long line){
-	SingleLogServer::getInstance()->writeLog(key, getLocalTimeU(g_LogFormat), eLogLevel_Debug, fileName, funcName, line, msg);
-}
-
-void Log_I(const LogKey &key, const std::string &msg, const std::string &fileName, const std::string funcName, long line){
-	SingleLogServer::getInstance()->writeLog(key, getLocalTimeU(g_LogFormat), eLogLevel_Info, fileName, funcName, line, msg);
-}
-
-void Log_W(const LogKey &key, const std::string &msg, const std::string &fileName, const std::string funcName, long line){
-	SingleLogServer::getInstance()->writeLog(key, getLocalTimeU(g_LogFormat), eLogLevel_Warning, fileName, funcName, line, msg);
-}
-
-void Log_E(const LogKey &key, const std::string &msg, const std::string &fileName, const std::string funcName, long line){
-	SingleLogServer::getInstance()->writeLog(key, getLocalTimeU(g_LogFormat), eLogLevel_Error, fileName, funcName, line, msg);
-}
-
-void Log_C(const LogKey &key, const std::string &msg, const std::string &fileName, const std::string funcName, long line){
-	SingleLogServer::getInstance()->writeLog(key, getLocalTimeU(g_LogFormat), eLogLevel_Crash, fileName, funcName, line, msg);
+Universal::eLogLevel PARSE_LOG_STRING(const std::string &log_level){
+	if("program" == Universal::strToLower(log_level)){ return Universal::eLogLevel_Program; }
+	else if("debug" == Universal::strToLower(log_level)){ return Universal::eLogLevel_Debug; }
+	else if("info" == Universal::strToLower(log_level)){ return Universal::eLogLevel_Info; }
+	else if("warning" == Universal::strToLower(log_level)){ return Universal::eLogLevel_Warning; }
+	else if("error" == Universal::strToLower(log_level)){ return Universal::eLogLevel_Error; }
+	else if("crash" == Universal::strToLower(log_level)){ return Universal::eLogLevel_Crash; }
+	else { return Universal::eLogLevel_IgnoreNothing; }
 }
 

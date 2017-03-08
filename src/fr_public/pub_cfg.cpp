@@ -5,9 +5,9 @@
  * \version 
  * * \author zheng39562@163.com
 **********************************************************/
-#include "pub_cfg.h"
+#include "fr_public/pub_cfg.h"
 
-#include "pub_ini.h"
+#include "fr_public/pub_ini.h"
 
 using namespace std;
 using namespace boost;

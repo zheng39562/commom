@@ -8,7 +8,7 @@
 #ifndef _pub_test_H
 #define _pub_test_H
 
-#include "pub_define.h"
+#include "fr_public/pub_define.h"
 
 //! \brief	公共测试函数。
 void doPublicTest(std::string arg0 = "", std::string arg1 = "", std::string arg2 = "", std::string arg3 = "", std::string arg4 = "");

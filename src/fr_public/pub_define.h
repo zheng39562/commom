@@ -37,11 +37,12 @@ typedef sint64 int64;
 #include "fr_public/pub_log.h"
 
 #define LOG_KEY_PUBLIC "log_public"
-#define PUB_DEBUG_D(msg) K_DEBUG_D(LOG_KEY_PUBLIC, msg, true)
-#define PUB_DEBUG_I(msg) K_DEBUG_I(LOG_KEY_PUBLIC, msg, true)
-#define PUB_DEBUG_W(msg) K_DEBUG_W(LOG_KEY_PUBLIC, msg, true)
-#define PUB_DEBUG_E(msg) K_DEBUG_E(LOG_KEY_PUBLIC, msg, true)
-#define PUB_DEBUG_C(msg) K_DEBUG_C(LOG_KEY_PUBLIC, msg, true) 
+#define PUB_DEBUG_P(msg) K_DEBUG_P(LOG_KEY_PUBLIC, msg)
+#define PUB_DEBUG_D(msg) K_DEBUG_D(LOG_KEY_PUBLIC, msg)
+#define PUB_DEBUG_I(msg) K_DEBUG_I(LOG_KEY_PUBLIC, msg)
+#define PUB_DEBUG_W(msg) K_DEBUG_W(LOG_KEY_PUBLIC, msg)
+#define PUB_DEBUG_E(msg) K_DEBUG_E(LOG_KEY_PUBLIC, msg)
+#define PUB_DEBUG_C(msg) K_DEBUG_C(LOG_KEY_PUBLIC, msg) 
 
 /// *******************************************************************************************************
 

@@ -5,9 +5,14 @@
  * \version 
  * * \author zheng39562@163.com
 **********************************************************/
-#include "pub_system.h"
+#include "fr_public/pub_system.h"
 
-#include <windows.h>  
+#ifdef _MFC
+#include <afxwin.h>
+#else
+#include <windows.h>
+#endif
+
 #include <psapi.h>  
 #include <assert.h>  
 
@@ -15,8 +20,9 @@
 static uint64_t file_time_2_utc(const FILETIME* ftime)
 {
 	LARGE_INTEGER li;
-
+#ifdef _DEBUG
 	assert(ftime);
+#endif
 	li.LowPart = ftime->dwLowDateTime;
 	li.HighPart = ftime->dwHighDateTime;
 	return li.QuadPart;

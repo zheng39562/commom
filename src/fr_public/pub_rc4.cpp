@@ -4,7 +4,7 @@
  * \version 
  * * \author zheng39562@163.com
 **********************************************************/
-#include "pub_rc4.h"
+#include "fr_public/pub_rc4.h"
 
 using namespace std;
 

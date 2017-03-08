@@ -30,13 +30,13 @@ namespace Universal{
 	//! \note	virtual void execute(){
 	//!				...
 	//!			}
-	//! \todo	支持window
+	//! \attetion	通常派生类实现的execute会使用派生的成员变量，所以建议在派生类析构函数中对线程进行停止（调用stop func）。否则可能对未知内存进行引用
+	//				当前通过m_Running变量来通知派生类，线程是否即将被停止
 	class FrThread{
 		public:
 			FrThread();
 			virtual ~FrThread();
 		public:
-
 			void threadProxy();
 
 			//! \brief	线程启动
@@ -52,14 +52,15 @@ namespace Universal{
 			inline eThreadStatus getStatus(){ return m_ThreadStatus; }
 		protected:
 			//! \brief	
-			//! \note	
+			//! \note	如果对execute实现中增加死循环，需要将isRunningThread()作为循环的终止条件之一。
 			virtual void execute()=0;
 			//! \brief	暂停线程
 			//! \note	只支持线程自身暂停自身。
 			void pause();
+			bool isRunningThread()const;
 		protected:
-			bool m_Running;
 		private:
+			bool m_Running;
 			boost::thread* m_pThread;
 			boost::condition_variable m_Cond;
 			FrMutex m_Mutex;

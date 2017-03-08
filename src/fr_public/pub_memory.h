@@ -11,7 +11,7 @@
 #include "boost/shared_ptr.hpp"
 // 前端使用。
 #ifndef _CLIENT
-#include "pub_define.h"
+#include "fr_public/pub_define.h"
 #else
 #include "common/Common.h"
 #include <string>

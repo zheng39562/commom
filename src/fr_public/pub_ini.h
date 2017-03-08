@@ -11,7 +11,7 @@
 #ifndef _pub_ini_H
 #define _pub_ini_H
 
-#include "pub_define.h"
+#include "fr_public/pub_define.h"
 #include "fr_template/single_mode.hpp"
 
 namespace Universal{

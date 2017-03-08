@@ -8,11 +8,11 @@
  * \!version 
  * * \!author zheng39562@163.com
 **********************************************************/
-#include "pub_ini.h"
+#include "fr_public/pub_ini.h"
 
-#include "pub_tool.h"
-#include "pub_file.h"
-#include "pub_string.h"
+#include "fr_public/pub_tool.h"
+#include "fr_public/pub_file.h"
+#include "fr_public/pub_string.h"
 
 using namespace std;
 
@@ -50,7 +50,9 @@ namespace Universal{
 					size_t pos = str.find('=');
 					if(pKeyValueMap == NULL || pos == string::npos || pos == 0){
 						PUB_DEBUG_E("ini文件格式错误。");
+#ifdef _DEBUG
 						assert(false);
+#endif
 						return false;
 					}
 					pKeyValueMap->insert(pair<string, string>(

@@ -17,7 +17,7 @@
 #ifndef _pub_rc4_H
 #define _pub_rc4_H
 
-#include "pub_define.h"
+#include "fr_public/pub_define.h"
 
 #ifdef __cplusplus
 extern "C" {

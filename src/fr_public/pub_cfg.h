@@ -9,7 +9,7 @@
 #ifndef _pub_cfg_H
 #define _pub_cfg_H
 
-#include "pub_define.h"
+#include "fr_public/pub_define.h"
 #include "fr_template/single_mode.hpp"
 #include "fr_public/pub_thread.h"
 

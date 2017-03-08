@@ -5,16 +5,16 @@
  * \version 
  * * \author zheng39562@163.com
 **********************************************************/
-#include "pub_test.h"
+#include "fr_public/pub_test.h"
 
-#include "pub_file.h"
-#include "pub_ini.h"
-#include "pub_log.h"
-#include "pub_memory.h"
-#include "pub_string.h"
-#include "pub_thread.h"
-#include "pub_timer.h"
-#include "pub_tool.h"
+#include "fr_public/pub_file.h"
+#include "fr_public/pub_ini.h"
+#include "fr_public/pub_log.h"
+#include "fr_public/pub_memory.h"
+#include "fr_public/pub_string.h"
+#include "fr_public/pub_thread.h"
+#include "fr_public/pub_timer.h"
+#include "fr_public/pub_tool.h"
 
 using namespace std;
 using namespace TestSpace;
@@ -112,17 +112,6 @@ namespace TestSpace{
 //! \brief	pub_log
 namespace TestSpace{
 	void doLogTest(std::string arg0, std::string arg1, std::string arg2, std::string arg3, std::string arg4){
-		// 该测试需要对应查找文件，病校验文件中的功能。
-#ifndef _FR_CONSOLE
-		SingleLogServer::getInstance()->initLog("./", LOG_FILE_MAX_SIZE);
-		PUB_DEBUG_D("调试");
-		PUB_DEBUG_I("消息");
-		PUB_DEBUG_W("警告");
-		PUB_DEBUG_E("错误");
-		PUB_DEBUG_C("崩溃");
-#else
-		PUB_DEBUG_D("日志测试 ： 该功能测试需要不声明宏 ： _FR_CONSOLE。测试情况下，都会声明该宏");
-#endif
 	}
 }
 

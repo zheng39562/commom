@@ -14,10 +14,10 @@
 #include <stdio.h>
 #include <algorithm>
 
-#include "pub_define.h"
-#include "pub_file.h"
-#include "pub_string.h"
-#include "pub_timer.h"
+#include "fr_public/pub_define.h"
+#include "fr_public/pub_file.h"
+#include "fr_public/pub_string.h"
+#include "fr_public/pub_timer.h"
 
 /*
  * other function
@@ -27,7 +27,7 @@ namespace Universal{
 #define _PTHONETYPE_UNICOM					"LT"
 #define _PTHONETYPE_CDMA					"DX"
 #define _PTHONETYPE_QT						"QT"
-#ifndef WIN32
+#ifdef LINUX
 	//! \brief	执行shell指令/脚本
 	bool execShellCmd( const std::string &cmd );
 #endif
@@ -46,6 +46,15 @@ namespace Universal{
 	bool rc4_encrypt(char *content, int32 contentLength, const char* sKey, int32 ketLength);
 	bool rc4_encrypt(std::string &content, const std::string &sKey);
 	bool rc4_encrypt(Byte* content, uint32 size, const std::string &sKey);
+
+	//! \brief	字符串版本的rc4(加密)
+	//! \note	先用rc4转换二进制，然后将二进制转为十六进制的字符串
+	bool myStrEncrypt(std::string &content, const std::string &key);
+	//! \brief	字符串版本的rc4(加密)
+	//! \note	先用rc4转换二进制，然后将二进制转为十六进制的字符串
+	bool myStrDecrypt(std::string &content, const std::string &key);
+	bool convertBinaryToHexString(std::string &content);
+	bool convertHexStringToBinary(std::string &content);
 }  // namespace : Universal
 
 
@@ -55,24 +64,30 @@ namespace Universal{
 namespace Universal{
 	//! \brief	验证字符串是否是一个数字。
 	//!	\note	可验证：正负，整数，小数。
-	bool checkNumber( const std::string &number );
+	bool checkNumber(const std::string &number);
 	//! \brief	验证是否是一个正确的格式。
 	//! \note	使用正则表达式进行解析，暂时不支持平年和闰年的差别。
 	//! \todo	平年和闰年的识别：正则修正，或添加逻辑代码。
-	bool checkDate( const std::string &date );
+	bool checkDate(const std::string &date);
 	//! \brief	验证手机格式。
-	bool checkMobile( const std::string &mobile );
+	bool checkMobile(const std::string &mobile);
 
 }  // namespace : Universal
 
 namespace Universal{
 	//! \brief	线程休眠，单位ms
 	void frSleep(unsigned long time);
-#ifndef WIN32
+#ifdef LINUX
 	//! \brief	线程休眠，单位us
-	//! \note	window不支持该函数。
+	//! \note	仅在linux下使用。
 	void frUSleep(unsigned long time);
 #endif
+}
+
+namespace Universal{
+	//! \brief	获取本机IP： 支持IPV4 支持window and linux 
+	//! \note	window版本需要定义宏 WIN32
+	void getIp(std::string &ip);
 }
 
 #endif
