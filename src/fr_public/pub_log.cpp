@@ -132,6 +132,8 @@ namespace Universal{
 
 	string LogCache::getLevelString(const eLogLevel &level){
 		switch(level){
+			case eLogLevel_Program:
+				return "程序";
 			case eLogLevel_Debug:
 				return "调试";
 			case eLogLevel_Info:

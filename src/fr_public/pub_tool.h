@@ -88,7 +88,14 @@ namespace Universal{
 	//! \brief	获取本机IP： 支持IPV4 支持window and linux 
 	//! \note	window版本需要定义宏 WIN32
 	void getIp(std::string &ip);
+#ifdef WIN32
+	//! \brief	
+	std::string GBKToUTF8(const std::string& strGBK);
+	//! \brief	
+	std::string UTF8ToGBK(const std::string& strGBK);
+#endif
 }
+
 
 #endif
 
