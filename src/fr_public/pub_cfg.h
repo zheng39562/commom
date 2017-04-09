@@ -9,9 +9,10 @@
 #ifndef _pub_cfg_H
 #define _pub_cfg_H
 
+#include <mutex>
+#include <thread>
 #include "fr_public/pub_define.h"
 #include "fr_template/single_mode.hpp"
-#include "fr_public/pub_thread.h"
 
 namespace Universal{
 	enum eCfgDataType{
@@ -66,7 +67,7 @@ namespace Universal{
 			std::map<CfgKey, void*> m_CfgMap;	//! 根据配置(eCfgDataType)保存不同的文件指针。collection 表示不同的文件集合
 			CfgKey m_DefaultCfgKey;
 			eCfgDataType m_CfgType;	//! 
-			Universal::FrMutex m_Mutex;
+			std::mutex m_Mutex;
 	};
 	typedef DesignMode::SingleMode<Configurator> SingleConfigurator;
 }

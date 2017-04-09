@@ -28,8 +28,6 @@ PROJECT_OBJECTS= \
 	./$(PROJECT_PATH)/./pub_memory.o \
 	./$(PROJECT_PATH)/./pub_rc4.o \
 	./$(PROJECT_PATH)/./pub_string.o \
-	./$(PROJECT_PATH)/./pub_test.o \
-	./$(PROJECT_PATH)/./pub_thread.o \
 	./$(PROJECT_PATH)/./pub_timer.o \
 	./$(PROJECT_PATH)/./pub_tool.o
 

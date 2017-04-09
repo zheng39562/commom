@@ -39,7 +39,8 @@ define make_tcp
 	done;
 endef
 
-all: fr_public fr_sql fr_template fr_xls fr_tcp
+all: fr_public fr_sql fr_template fr_xls
+# all: fr_public fr_sql fr_template fr_xls fr_tcp
 
 # 测试使用main 链接库根据测试调整。
 test:
