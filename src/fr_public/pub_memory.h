@@ -50,17 +50,12 @@ namespace Universal{
 			BinaryMemory& operator=(const BinaryMemory &ref);
 			BinaryMemory& operator+(const BinaryMemory &ref);
 		public:
-			void addBuffer(const BinaryMemory &ref);
-			inline void add(const BinaryMemory &ref){ addBuffer(ref); }
-			void addBuffer(const void* buffer, int64 size);
-			inline void add(const void* buffer, int64 size){ addBuffer(buffer, size); }
-			void setBuffer(const void* buffer, int64 size);
-			inline void set(const void* buffer, int64 size){ setBuffer(buffer, size); }
+			void add(const BinaryMemory &ref);
+			void add(const void* buffer, int64 size);
+			void set(const void* buffer, int64 size);
 			//! \brief	删除buffer内容:不更改内存大小。
-			void delBuffer(int64 start, int64 length);
-			inline void del(int64 start, int64 length){ delBuffer(start, length); }
-			void clearBuffer();
-			inline void clear(){ clearBuffer(); }
+			void del(int64 start, int64 length);
+			void clear();
 			//! \brief	扩展内存大小。
 			//! \note	如果已满足扩展大小则不做操作。
 			//! \note	扩展不会影响已有的数据。
@@ -73,12 +68,9 @@ namespace Universal{
 
 			inline bool empty()const{ return m_CurBufferSize == 0; }
 			//! \note	直接操作内存.仅用于内容修改。：如有需要可以使用，但请慎重使用。
-			//! \note	对内存的增删没有意义:因size不会改变。如做内存增删,请使用delBuffer函数。
-			inline void* getBuffer(){ return m_Buffer; }
+			//! \note	对内存的增删没有意义:因size不会改变。如做内存增删,请使用del函数。
 			inline void* buffer(){ return m_Buffer; }
 			inline const void* buffer()const{ return (const void*)m_Buffer; }
-			inline const void* getBuffer()const{ return m_Buffer; }
-			inline int64 getBufferSize()const{ return m_CurBufferSize; }
 			inline int64 size()const{ return m_CurBufferSize; }
 			inline int64 maxSize()const{ return m_MaxBufferSize; }
 			inline int64 maxLimit()const{ return m_MaxLimit; }
