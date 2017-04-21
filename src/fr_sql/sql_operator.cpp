@@ -12,10 +12,10 @@
 
 #include "boost/variant.hpp" 
 
-#include "mysql/cppconn/connection.h"
-#include "mysql/cppconn/statement.h"
-#include "mysql/cppconn/resultset.h"
-#include "mysql/cppconn/resultset_metadata.h"
+#include "cppconn/connection.h"
+#include "cppconn/statement.h"
+#include "cppconn/resultset.h"
+#include "cppconn/resultset_metadata.h"
 #include "fr_public/pub_string.h"
 
 
