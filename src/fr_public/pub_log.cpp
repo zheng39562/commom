@@ -132,6 +132,8 @@ namespace Universal{
 
 	string LogCache::getLevelString(const eLogLevel &level){
 		switch(level){
+			case eLogLevel_Program:
+				return "程序";
 			case eLogLevel_Debug:
 				return "调试";
 			case eLogLevel_Info:
@@ -149,9 +151,18 @@ namespace Universal{
 
 namespace Universal{
 	LogServer::LogServer()
-		:m_Caches()
-	{ ; } 
+		:m_Caches(),
+		 m_LoopThread(),
+		 m_Running(false)
+	{ 
+		;
+	}
+
 	LogServer::~LogServer(){ 
+		if(m_LoopThread.joinable()){
+			m_Running = false;
+			m_LoopThread.join();
+		}
 		for(auto iterCache = m_Caches.begin(); iterCache != m_Caches.end(); ++iterCache){
 			if(iterCache->second != NULL){
 				delete iterCache->second; iterCache->second = NULL;
@@ -162,7 +173,34 @@ namespace Universal{
 	void LogServer::initLog(const string &path, size_t _maxSize){
 		LogCache::setPath(path);
 		LogCache::setMaxSize(_maxSize);
-		start();
+
+		m_Running = true;
+		m_LoopThread = std::thread([&](){
+			while(m_Running){
+				for(auto iterCache = m_Caches.begin(); iterCache != m_Caches.end(); ++iterCache){
+					if(!iterCache->first.empty()){
+						LogCache* pCache = iterCache->second;
+						pCache->lock();
+						if(pCache->isNewDate()){
+							pCache->reopen();
+						}
+						pCache->unlock();
+					}
+				}
+
+				int curHour(strToInt(getLocalTime("%H")));
+				int curMin(strToInt(getLocalTime("%M")));
+				if(curHour < 23){
+					frSleep(3600 * _TIMECONVERSION_SECTOMS);
+				}
+				else if(curMin < 59){
+					frSleep(60 * _TIMECONVERSION_SECTOMS);
+				}
+				else{
+					frSleep(1 * _TIMECONVERSION_SECTOMS);
+				}
+			}
+		});
 	}
 
 	void LogServer::setLogLevel(const LogKey &key, eLogLevel level){
@@ -187,33 +225,6 @@ namespace Universal{
 			m_Caches.insert(make_pair(key, new LogCache(key, eLogLevel_IgnoreNothing)));
 		}
 		m_Caches.find(key)->second->write(getLocalTimeU("%m/%d-%H:%M:%S"), level, fileName, funcName, line, msg);
-	}
-
-	void LogServer::execute(){
-		while(isRunningThread()){
-			for(auto iterCache = m_Caches.begin(); iterCache != m_Caches.end(); ++iterCache){
-				if(!iterCache->first.empty()){
-					LogCache* pCache = iterCache->second;
-					pCache->lock();
-					if(pCache->isNewDate()){
-						pCache->reopen();
-					}
-					pCache->unlock();
-				}
-			}
-
-			int curHour(strToInt(getLocalTime("%H")));
-			int curMin(strToInt(getLocalTime("%M")));
-			if(curHour < 23){
-				frSleep(3600 * _TIMECONVERSION_SECTOMS);
-			}
-			else if(curMin < 59){
-				frSleep(60 * _TIMECONVERSION_SECTOMS);
-			}
-			else{
-				frSleep(1 * _TIMECONVERSION_SECTOMS);
-			}
-		}
 	}
 }
 

@@ -23,7 +23,7 @@ namespace Universal{
 	}
 
 	Configurator::~Configurator(){ 
-		mutex::scoped_lock localLock(m_Mutex);
+		std::lock_guard<std::mutex> localLock(m_Mutex);
 		for(auto iterCfg = m_CfgMap.begin(); iterCfg != m_CfgMap.begin(); ++iterCfg){
 			if(iterCfg->second != NULL){
 				switch(m_CfgType){
@@ -40,7 +40,7 @@ namespace Universal{
 	}
 
 	bool Configurator::addCfg(const CfgKey &cfgKey, const std::string &param, const eCfgDataType &type){
-		mutex::scoped_lock localLock(m_Mutex);
+		std::lock_guard<std::mutex> localLock(m_Mutex);
 		if(m_CfgMap.find(cfgKey) != m_CfgMap.end()){
 			PUB_DEBUG_I("该配置key已经存在，不能重复添加.");
 		}
@@ -74,7 +74,7 @@ namespace Universal{
 	}
 
 	void Configurator::saveCfg(const CfgKey &cfgKey){
-		mutex::scoped_lock localLock(m_Mutex);
+		std::lock_guard<std::mutex> localLock(m_Mutex);
 		void* m_pCfg = getCfgPtr(cfgKey);
 		if(m_pCfg != NULL){
 			switch (m_CfgType){
@@ -87,7 +87,7 @@ namespace Universal{
 	}
 
 	std::string Configurator::getString(const CfgKey &cfgKey, const std::string &section, const std::string &key, const string &defaultValue){
-		mutex::scoped_lock localLock(m_Mutex);
+		std::lock_guard<std::mutex> localLock(m_Mutex);
 		void* m_pCfg = getCfgPtr(cfgKey);
 		if(m_pCfg != NULL){
 			switch (m_CfgType){
@@ -101,7 +101,7 @@ namespace Universal{
 	}
 
 	int Configurator::getInt(const CfgKey &cfgKey, const std::string &section, const std::string &key, const int &defaultValue){
-		mutex::scoped_lock localLock(m_Mutex);
+		std::lock_guard<std::mutex> localLock(m_Mutex);
 		void* m_pCfg = getCfgPtr(cfgKey);
 		if(m_pCfg != NULL){
 			switch (m_CfgType){
@@ -115,7 +115,7 @@ namespace Universal{
 	}
 
 	double Configurator::getDouble(const CfgKey &cfgKey, const std::string &section, const std::string &key, const double &defaultValue){
-		mutex::scoped_lock localLock(m_Mutex);
+		std::lock_guard<std::mutex> localLock(m_Mutex);
 		void* m_pCfg = getCfgPtr(cfgKey);
 		if(m_pCfg != NULL){
 			switch (m_CfgType){
@@ -129,7 +129,7 @@ namespace Universal{
 	}
 
 	bool Configurator::setString(const CfgKey &cfgKey, const std::string &section, const std::string &key, const std::string &value){
-		mutex::scoped_lock localLock(m_Mutex);
+		std::lock_guard<std::mutex> localLock(m_Mutex);
 		void* m_pCfg = getCfgPtr(cfgKey);
 		if(m_pCfg != NULL){
 			switch (m_CfgType){
@@ -143,7 +143,7 @@ namespace Universal{
 	}
 
 	bool Configurator::setInt(const CfgKey &cfgKey, const std::string &section, const std::string &key, int32 value){
-		mutex::scoped_lock localLock(m_Mutex);
+		std::lock_guard<std::mutex> localLock(m_Mutex);
 		void* m_pCfg = getCfgPtr(cfgKey);
 		if(m_pCfg != NULL){
 			switch (m_CfgType){
@@ -157,7 +157,7 @@ namespace Universal{
 	}
 
 	bool Configurator::setDouble(const CfgKey &cfgKey, const std::string &section, const std::string &key, double value){
-		mutex::scoped_lock localLock(m_Mutex);
+		std::lock_guard<std::mutex> localLock(m_Mutex);
 		void* m_pCfg = getCfgPtr(cfgKey);
 		if(m_pCfg != NULL){
 			switch (m_CfgType){

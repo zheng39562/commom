@@ -11,7 +11,8 @@
 #ifndef _SingleMode_H
 #define _SingleMode_H
 
-#include "fr_public/pub_thread.h"
+#include <thread>
+#include <mutex>
 #include "boost/shared_ptr.hpp"
 
 namespace DesignMode{
@@ -48,19 +49,18 @@ namespace DesignMode{
 			};
 			static Deleter						m_s_Deleter;
 		private:
-			static SingleMode<T>*					m_s_p_Instance;  // 
-			static Universal::FrMutex				m_s_Mutex;
+			static SingleMode<T>*				m_s_p_Instance;  // 
+			static std::mutex					m_s_Mutex;
 	
 			boost::shared_ptr<T>					m_p_Object;
 	};
 
-	template < typename T > Universal::FrMutex	SingleMode<T>::m_s_Mutex;
 	template < typename T > SingleMode<T>*		SingleMode<T>::m_s_p_Instance = NULL;
 	
 	template < typename T >
 	boost::shared_ptr<T> SingleMode<T>::getInstance(){
 		if( m_s_p_Instance == NULL ){
-			boost::mutex::scoped_lock localLock(m_s_Mutex);
+			std::lock_guard<std::mutex> localLock(m_s_Mutex);
 			if( m_s_p_Instance == NULL ){
 				m_s_p_Instance = new SingleMode();
 				return m_s_p_Instance->m_p_Object;
@@ -71,7 +71,7 @@ namespace DesignMode{
 	template < typename T >
 	boost::shared_ptr<T> SingleMode<T>::getInstance( boost::shared_ptr<T> ptrT ){
 		if( m_s_p_Instance == NULL ){
-			boost::mutex::scoped_lock localLock(m_s_Mutex);
+			std::lock_guard<std::mutex> localLock(m_s_Mutex);
 			if( m_s_p_Instance == NULL ){
 				m_s_p_Instance = new SingleMode(ptrT);
 				return m_s_p_Instance->m_p_Object;

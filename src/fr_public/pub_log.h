@@ -13,9 +13,10 @@
 
 #include <iostream>
 #include <fstream>
+#include <mutex>
+#include <thread>
 #include "fr_public/pub_define.h"
 #include "fr_template/single_mode.hpp"
-#include "fr_public/pub_thread.h"
 
 #ifdef _MFC
 #include "other/mfc_interface.h"
@@ -93,7 +94,7 @@ namespace Universal{
 			static Path m_s_Path;
 			static size_t m_s_MaxSize;
 
-			FrMutex m_Mutex;
+			std::mutex m_Mutex;
 			eLogLevel m_LogLevel;
 			size_t m_CurSize;
 			std::ofstream m_Outfile;
@@ -106,7 +107,7 @@ namespace Universal{
 	//				* key 即作为索引，也作为文件名。
 	//! \note	日志索引和路径在运行过程中不能减少：即不会提供删除key的接口
 	//				* 不能减少,主要防止多线程的删除导致未知的引用or指针
-	class LogServer : public Universal::FrThread{
+	class LogServer{
 		public:
 			LogServer();
 			virtual ~LogServer();
@@ -116,10 +117,10 @@ namespace Universal{
 			void setLogLevel(const LogKey &key, eLogLevel level);
 			eLogLevel getLogLevel(const LogKey &key)const;
 			void writeLog(const LogKey &key, const eLogLevel &level, const std::string &fileName, const std::string &funcName, const long &line, const std::string &msg);
-		protected:
-			virtual void execute();
 		private:
 			std::map<LogKey, LogCache*> m_Caches;
+			std::thread m_LoopThread;
+			bool m_Running;
 	};
 	typedef DesignMode::SingleMode<LogServer> SingleLogServer;
 }
