@@ -46,7 +46,7 @@ bool FrTcpServerThread::active(FrTcpCachePtr pCache, eSocketEventType eventType,
 }
 
 void FrTcpServerThread::execute(){
-	while(m_Running){
+	while(isRunningThread()){
 		m_Ready = true;
 		pause();
 		m_Ready = false;

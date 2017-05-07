@@ -68,8 +68,4 @@ namespace Universal{
 		m_Cond.wait(localLock);
 	}
 
-	bool FrThread::isRunningThread()const{ 
-		return m_Running; 
-	}
-
 }

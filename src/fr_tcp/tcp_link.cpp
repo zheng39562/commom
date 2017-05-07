@@ -128,7 +128,7 @@ void FrTcpLinker::execute(){
 	eSocketEventType socketEventType(eSocketEventType_Invalid);
 
 	queue<PushMsg> msgQueue;
-	while(m_Running){
+	while(isRunningThread()){
 		// 待发送的队列处理。
 		if(!msgQueue.empty() || m_MsgQueue.swap(msgQueue)){
 			while(!msgQueue.empty()){

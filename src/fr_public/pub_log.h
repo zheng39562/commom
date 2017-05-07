@@ -30,7 +30,7 @@
 {\
 	std::ostringstream osTmp; osTmp << msg; \
 	std::cout << std::dec << "key[" << key << "] " << msg << std::endl;\
-	Universal::SingleLogServer::getInstance()->writeLog(key, level, __FILE__, __FUNCTION__, __LINE__, msg)\
+	Universal::SingleLogServer::getInstance()->writeLog(key, level, __FILE__, __FUNCTION__, __LINE__, osTmp.str());\
 }
 #endif
 

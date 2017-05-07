@@ -57,7 +57,7 @@ namespace Universal{
 			//! \brief	暂停线程
 			//! \note	只支持线程自身暂停自身。
 			void pause();
-			bool isRunningThread()const;
+			inline bool isRunningThread()const{ return m_Running; }
 		protected:
 		private:
 			bool m_Running;

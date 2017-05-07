@@ -27,7 +27,7 @@ namespace DesignMode{
 		public:
 			static boost::shared_ptr<T> getInstance();
 			//! \brief	允许外界传入一个指针初始化：为保证意外的delete，故使用智能指针。
-			static boost::shared_ptr<T> getInstance( boost::shared_ptr<T> ptrT );
+			static boost::shared_ptr<T> getInstance(boost::shared_ptr<T> ptrT);
 			//!	\brief	在希望删除单例时调用。但需要注意，如果删除后再调用getInstance依然会重新创建单例.
 			static void destoryInstance();
 		private:
@@ -54,35 +54,33 @@ namespace DesignMode{
 			boost::shared_ptr<T>					m_p_Object;
 	};
 
-	template < typename T > Universal::FrMutex	SingleMode<T>::m_s_Mutex = Universal::FrMutex();
+	template < typename T > Universal::FrMutex	SingleMode<T>::m_s_Mutex;
 	template < typename T > SingleMode<T>*		SingleMode<T>::m_s_p_Instance = NULL;
 	
 	template < typename T >
 	boost::shared_ptr<T> SingleMode<T>::getInstance(){
 		if( m_s_p_Instance == NULL ){
-			m_s_Mutex.lock();
+			boost::mutex::scoped_lock localLock(m_s_Mutex);
 			if( m_s_p_Instance == NULL ){
 				m_s_p_Instance = new SingleMode();
 				return m_s_p_Instance->m_p_Object;
 			}
-			m_s_Mutex.unlock();
 		}
 		return m_s_p_Instance->m_p_Object;
 	}
 	template < typename T >
 	boost::shared_ptr<T> SingleMode<T>::getInstance( boost::shared_ptr<T> ptrT ){
 		if( m_s_p_Instance == NULL ){
-			m_s_Mutex.lock();
+			boost::mutex::scoped_lock localLock(m_s_Mutex);
 			if( m_s_p_Instance == NULL ){
 				m_s_p_Instance = new SingleMode(ptrT);
 				return m_s_p_Instance->m_p_Object;
 			}
-			m_s_Mutex.unlock();
 		}
 		return m_s_p_Instance->m_p_Object;
 	}
 	template < typename T >
-	static void SingleMode<T>::destoryInstance(){ 
+	void SingleMode<T>::destoryInstance(){ 
 		if( SingleMode::m_s_p_Instance != NULL ){ 
 			delete SingleMode::m_s_p_Instance; 
 			SingleMode::m_s_p_Instance = NULL;
