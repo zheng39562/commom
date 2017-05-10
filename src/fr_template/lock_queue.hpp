@@ -32,6 +32,9 @@ namespace Universal{
 			void push( const T &data );
 			//! \brief	从栈顶获取对象并从栈中移除
 			T pop();
+			//! \param[in] TQueue 从队列中取出N个变量
+			//! \prarm[in] size 取出的量，大于队列中消息量时,取出所有
+			void pop(std::queue<T> &TQueue, int32 size);
 			//! \brief	从栈顶获取对象
 			T top();
 			//! \brief	
@@ -68,6 +71,14 @@ namespace Universal{
 		}
 
 		return dataTmp;
+	}
+
+	template < typename T > T LockQueue<T>::pop(std::queue<T> &TQueue, int32 size){
+		boost::mutex::scoped_lock localLock(m_Mutex);
+		while(TQueue.size() < size && !m_Queue.empty()){
+			TQueue.push(m_Queue.front());
+			m_Queue.pop();
+		}
 	}
 
 	template < typename T > T LockQueue<T>::top(){
