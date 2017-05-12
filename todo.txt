@@ -19,3 +19,12 @@
 		3	window命名设置。
 
 
+### 拆分方案
+	* 所有拆分重新写cmake
+	* public : fr_public and fr_template
+	* sql : fr_sql  依赖 mysql connecto++
+	* xls : fr_xls 依赖 libxls xlslib 
+	* network : delete fr_tcp. rename network : 新库，依赖libco
+	* 所有依赖依靠源码，不再有直接的lib依赖。
+	* 删除library
+
