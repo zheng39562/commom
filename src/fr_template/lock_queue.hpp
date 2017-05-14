@@ -30,6 +30,8 @@ namespace Universal{
 			void clear();
 			//! \brief	推送数据进栈
 			void push( const T &data );
+			//! \brief	
+			void push(const std::queue<T> &datas);
 			//! \brief	从栈顶获取对象并从栈中移除
 			T pop();
 			//! \param[in] TQueue 从队列中取出N个变量
@@ -60,6 +62,14 @@ namespace Universal{
 	template < typename T > void LockQueue<T>::push( const T &data ){
 		boost::mutex::scoped_lock localLock(m_Mutex);
 		m_Queue.push( data );
+	}
+
+	template < typename T > void LockQueue<T>::push( const std::queue<T> &datas ){
+		boost::mutex::scoped_lock localLock(m_Mutex);
+		while(!datas.empty()){
+			m_Queue.push(datas.front());
+			datas.pop();
+		}
 	}
 
 	template < typename T > T LockQueue<T>::pop(){
