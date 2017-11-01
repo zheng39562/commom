@@ -15,8 +15,9 @@
 #include <fstream>
 #include <mutex>
 #include <thread>
-#include "fr_public/pub_define.h"
-#include "fr_template/single_mode.hpp"
+#include "pub_define.h"
+#include "pub_file.h"
+#include "single_mode.hpp"
 
 #ifdef _MFC
 #include "other/mfc_interface.h"
@@ -24,23 +25,23 @@
 {\
 	std::ostringstream osTmp; osTmp << msg; \
 	MFC_addLog(key, osTmp.str()); \
-	Universal::SingleLogServer::getInstance()->writeLog(key, level, __FILE__, __FUNCTION__, __LINE__, osTmp.str());\
+	universal::SingleLogServer::GetInstance()->WriteLog(key, level, __FILE__, __FUNCTION__, __LINE__, osTmp.str());\
 }
 #else
 #define LOG_PRINT(key, msg, level) \
 {\
 	std::ostringstream osTmp; osTmp << msg; \
 	std::cout << std::dec << "key[" << key << "] " << msg << std::endl;\
-	Universal::SingleLogServer::getInstance()->writeLog(key, level, __FILE__, __FUNCTION__, __LINE__, osTmp.str());\
+	universal::SingleLogServer::GetInstance()->WriteLog(key, level, __FILE__, __FUNCTION__, __LINE__, osTmp.str());\
 }
 #endif
 
-#define K_DEBUG_P(key, msg) if(Universal::SingleLogServer::getInstance()->getLogLevel(key) <= Universal::eLogLevel_Program){ LOG_PRINT(key, msg, Universal::eLogLevel_Program); }
-#define K_DEBUG_D(key, msg) if(Universal::SingleLogServer::getInstance()->getLogLevel(key) <= Universal::eLogLevel_Debug){ LOG_PRINT(key, msg, Universal::eLogLevel_Debug); }
-#define K_DEBUG_I(key, msg) if(Universal::SingleLogServer::getInstance()->getLogLevel(key) <= Universal::eLogLevel_Info){ LOG_PRINT(key, msg, Universal::eLogLevel_Info); }
-#define K_DEBUG_W(key, msg) if(Universal::SingleLogServer::getInstance()->getLogLevel(key) <= Universal::eLogLevel_Warning){ LOG_PRINT(key, msg, Universal::eLogLevel_Warning); }
-#define K_DEBUG_E(key, msg) if(Universal::SingleLogServer::getInstance()->getLogLevel(key) <= Universal::eLogLevel_Error){ LOG_PRINT(key, msg, Universal::eLogLevel_Error); }
-#define K_DEBUG_C(key, msg) if(Universal::SingleLogServer::getInstance()->getLogLevel(key) <= Universal::eLogLevel_Crash){ LOG_PRINT(key, msg, Universal::eLogLevel_Crash); }
+#define K_DEBUG_P(key, msg) if(universal::SingleLogServer::GetInstance()->log_level(key) <= universal::eLogLevel_Program){ LOG_PRINT(key, msg, universal::eLogLevel_Program); }
+#define K_DEBUG_D(key, msg) if(universal::SingleLogServer::GetInstance()->log_level(key) <= universal::eLogLevel_Debug){ LOG_PRINT(key, msg, universal::eLogLevel_Debug); }
+#define K_DEBUG_I(key, msg) if(universal::SingleLogServer::GetInstance()->log_level(key) <= universal::eLogLevel_Info){ LOG_PRINT(key, msg, universal::eLogLevel_Info); }
+#define K_DEBUG_W(key, msg) if(universal::SingleLogServer::GetInstance()->log_level(key) <= universal::eLogLevel_Warning){ LOG_PRINT(key, msg, universal::eLogLevel_Warning); }
+#define K_DEBUG_E(key, msg) if(universal::SingleLogServer::GetInstance()->log_level(key) <= universal::eLogLevel_Error){ LOG_PRINT(key, msg, universal::eLogLevel_Error); }
+#define K_DEBUG_C(key, msg) if(universal::SingleLogServer::GetInstance()->log_level(key) <= universal::eLogLevel_Crash){ LOG_PRINT(key, msg, universal::eLogLevel_Crash); }
 
 #define DEBUG_KEY_DEFAULT "debug_log"
 #define DEBUG_P(msg) K_DEBUG_P(DEBUG_KEY_DEFAULT, msg)
@@ -50,7 +51,7 @@
 #define DEBUG_E(msg) K_DEBUG_E(DEBUG_KEY_DEFAULT, msg)
 #define DEBUG_C(msg) K_DEBUG_C(DEBUG_KEY_DEFAULT, msg)
 
-namespace Universal{
+namespace universal{
 	typedef std::string LogKey;
 	enum eLogLevel{
 		eLogLevel_IgnoreNothing = 0,
@@ -68,39 +69,39 @@ namespace Universal{
 			LogCache& operator=(const LogCache &ref)=delete;
 			~LogCache();
 		public:
-			inline static void setPath(const Path &path);
-			inline static void setMaxSize(size_t maxSize){ m_s_MaxSize = maxSize; }
+			static void set_static_path(const Path &path);
+			inline static void set_static_max_size(size_t maxSize){ static_max_size_ = maxSize; }
 
-			inline void setLogLevel(eLogLevel level){ m_LogLevel = level; }
-			inline eLogLevel getLogLevel()const{ return m_LogLevel; }
+			inline void set_log_level(eLogLevel level){ log_level_ = level; }
+			inline eLogLevel log_level()const{ return log_level_; }
 
 			//! \breif	缓存的锁
 			//! \note	时间问题，暂时使用外界加锁的形式解决多线程问题。
-			inline void lock(){ m_Mutex.lock(); }
-			inline void unlock(){ m_Mutex.unlock(); }
+			inline void lock(){ mutex_.lock(); }
+			inline void unlock(){ mutex_.unlock(); }
 
 			//! \brief	单文件已满(即超过设置的最大储存上线)
-			bool fileFull();
+			bool IsFileFull();
 			//! \brief	是不是新的一天
-			bool isNewDate();
+			bool IsNewDate();
 			//! \brief	重打开一个文件。
 			//! \note	如果是当天，则标志+1.否则对应增加新日期的文件。
-			void reopen();
+			void Reopen();
 			//! \brief	将日志从缓存写入文件。
-			void write(const std::string &time, const eLogLevel &level, const std::string &fileName, const std::string &funcName, const long &line, const std::string &msg);
+			void Write(const std::string &time, const eLogLevel &level, const std::string &fileName, const std::string &funcName, const long &line, const std::string &msg);
 		private:
 			std::string getLevelString(const eLogLevel &level);
 		private:
-			static Path m_s_Path;
-			static size_t m_s_MaxSize;
+			static Path static_path_;
+			static size_t static_max_size_;
 
-			std::mutex m_Mutex;
-			eLogLevel m_LogLevel;
-			size_t m_CurSize;
-			std::ofstream m_Outfile;
-			int32 m_CurIndex;
-			std::string m_FileDate;
-			FileName m_FileName;
+			std::mutex mutex_;
+			eLogLevel log_level_;
+			size_t cur_size_;
+			std::ofstream out_file_;
+			int cur_index_;
+			std::string file_date_;
+			FileName file_name_;
 	};
 	//! \brief	日志记录类。
 	//! \note	增加按照索引分文件记录的功能。
@@ -113,19 +114,19 @@ namespace Universal{
 			virtual ~LogServer();
 		public:
 			//! \brief	日志初始化。必须进行初始化。因为单例原因。在构造时不能进行初始化。
-			void initLog(const std::string &path, size_t _maxSize);
-			void setLogLevel(const LogKey &key, eLogLevel level);
-			eLogLevel getLogLevel(const LogKey &key)const;
-			void writeLog(const LogKey &key, const eLogLevel &level, const std::string &fileName, const std::string &funcName, const long &line, const std::string &msg);
+			void InitLog(const std::string &path, size_t _maxSize);
+			void set_log_level(const LogKey &key, eLogLevel level);
+			eLogLevel log_level(const LogKey &key)const;
+			void WriteLog(const LogKey &key, const eLogLevel &level, const std::string &fileName, const std::string &funcName, const long &line, const std::string &msg);
 		private:
-			std::map<LogKey, LogCache*> m_Caches;
-			std::thread m_LoopThread;
-			bool m_Running;
+			std::map<LogKey, LogCache*> caches_;
+			std::thread loop_thread_;
+			bool running_;
 	};
-	typedef DesignMode::SingleMode<LogServer> SingleLogServer;
+	typedef universal::SingleMode<LogServer> SingleLogServer;
 }
 
-Universal::eLogLevel PARSE_LOG_STRING(const std::string &log_level);
+universal::eLogLevel PARSE_LOG_STRING(const std::string &log_level);
 
 #endif 
 

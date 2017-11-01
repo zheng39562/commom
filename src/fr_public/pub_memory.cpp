@@ -5,20 +5,20 @@
  * \!version 
  * * \!author zheng39562@163.com
 **********************************************************/
-#include "fr_public/pub_memory.h"
+#include "pub_memory.h"
 
 #include <string.h>
 
 using namespace std;
 
-namespace Universal{
+namespace universal{
 	BinaryMemory::BinaryMemory()
 		:m_Buffer(NULL),
 		 m_MaxLimit(0x7FFFFFFF),
 		 m_CurBufferSize(0),
 		 m_MaxBufferSize(0)
 	{ ; }
-	BinaryMemory::BinaryMemory(const void *_buffer, int64 _size)
+	BinaryMemory::BinaryMemory(const void *_buffer, int _size)
 		:m_Buffer(NULL),
 		 m_MaxLimit(0x7FFFFFFF),
 		 m_CurBufferSize(0),
@@ -26,7 +26,7 @@ namespace Universal{
 	{ 
 		set(_buffer, _size);
 	}
-	BinaryMemory::BinaryMemory(const Byte *_buffer, int64 _size)
+	BinaryMemory::BinaryMemory(const Byte *_buffer, int _size)
 		:m_Buffer(NULL),
 		 m_MaxLimit(0x7FFFFFFF),
 		 m_CurBufferSize(0),
@@ -35,7 +35,7 @@ namespace Universal{
 		int i = sizeof(Byte);
 		set((void*)_buffer, _size * sizeof(Byte));
 	}
-	BinaryMemory::BinaryMemory(const char *_buffer, int64 _size)
+	BinaryMemory::BinaryMemory(const char *_buffer, int _size)
 		:m_Buffer(NULL),
 		 m_MaxLimit(0x7FFFFFFF),
 		 m_CurBufferSize(0),
@@ -43,21 +43,21 @@ namespace Universal{
 	{
 		set((void*)_buffer, _size * sizeof(char));
 	}
-	BinaryMemory::BinaryMemory(const uint16 *_buffer, int64 _size)
+	BinaryMemory::BinaryMemory(const short *_buffer, int _size)
 		:m_Buffer(NULL),
 		 m_MaxLimit(0x7FFFFFFF),
 		 m_CurBufferSize(0),
 		 m_MaxBufferSize(0)
 	{
-		set((void*)_buffer, _size * sizeof(uint16));
+		set((void*)_buffer, _size * sizeof(short));
 	}
-	BinaryMemory::BinaryMemory(const uint64 *_buffer, int64 _size)
+	BinaryMemory::BinaryMemory(const int *_buffer, int _size)
 		:m_Buffer(NULL),
 		 m_MaxLimit(0x7FFFFFFF),
 		 m_CurBufferSize(0),
 		 m_MaxBufferSize(0)
 	{
-		set((void*)_buffer, _size * sizeof(uint64));
+		set((void*)_buffer, _size * sizeof(int));
 	}
 
 	BinaryMemory::~BinaryMemory(){
@@ -85,7 +85,7 @@ namespace Universal{
 		return *this;
 	}
 
-	void BinaryMemory::set(const void *buffer, int64 size){
+	void BinaryMemory::set(const void *buffer, int size){
 		if(buffer == NULL || size <= 0 || m_Buffer == buffer || size > m_MaxLimit){
 			return;
 		}
@@ -109,7 +109,7 @@ namespace Universal{
 	void BinaryMemory::add(const BinaryMemory &ref){
 		add(ref.buffer(), ref.size());
 	}
-	void BinaryMemory::add(const void *buffer, int64 size){
+	void BinaryMemory::add(const void *buffer, int size){
 		if(buffer == NULL || size <= 0 || m_Buffer == buffer || size + m_CurBufferSize > m_MaxLimit){
 			return;
 		}
@@ -139,13 +139,13 @@ namespace Universal{
 		m_CurBufferSize += size;
 	}
 
-	void BinaryMemory::del(int64 start, int64 length){
+	void BinaryMemory::del(int start, int length){
 		if(m_CurBufferSize > start && length > 0){
 			length = length < (m_CurBufferSize - start) ? length : m_CurBufferSize - start;
 
 			void* pMoveBuffer(NULL);
-			int64 movePos = start + length;
-			int64 moveLength = m_CurBufferSize - movePos;
+			int movePos = start + length;
+			int moveLength = m_CurBufferSize - movePos;
 
 			if(moveLength != 0){
 				pMoveBuffer = malloc(moveLength);
@@ -168,7 +168,7 @@ namespace Universal{
 		m_CurBufferSize = 0;
 	}
 
-	void BinaryMemory::reserve(int64 size){
+	void BinaryMemory::reserve(int size){
 		if(m_MaxBufferSize < size &&  size <= m_MaxLimit){
 			void* pSaveBuffer(NULL);
 			if(m_CurBufferSize != 0){
@@ -190,7 +190,7 @@ namespace Universal{
 		}
 	}
 
-	void BinaryMemory::resize(int64 size){
+	void BinaryMemory::resize(int size){
 		if(m_Buffer != NULL){
 			freeMemory(&m_Buffer);
 		}
@@ -202,21 +202,21 @@ namespace Universal{
 		memset(m_Buffer, 0, m_MaxBufferSize);
 	}
 
-	void BinaryMemory::print(string expand)const{
+	string BinaryMemory::print(string expand)const{
 		if(m_Buffer == NULL){
-			return;
+			return "buffer is null.";
 		}
 
 		Byte* msg = (Byte*)m_Buffer;
-		int64 index(0);
+		int index(0);
 		ostringstream ostr;
 		ostr << expand << " buffer is [";
 		while(index < m_CurBufferSize){
-			ostr << (uint16)(unsigned char)msg[index] << "|";
+			ostr << (short)(unsigned char)msg[index] << "|";
 			++index;
 		}
 		ostr << "]";
-		DEBUG_D(ostr.str());
+		return ostr.str();
 	}
 
 	void BinaryMemory::freeMemory(void** pPoint){

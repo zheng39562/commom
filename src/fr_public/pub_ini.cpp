@@ -8,75 +8,75 @@
  * \!version 
  * * \!author zheng39562@163.com
 **********************************************************/
-#include "fr_public/pub_ini.h"
+#include "pub_ini.h"
 
-#include "fr_public/pub_tool.h"
-#include "fr_public/pub_file.h"
-#include "fr_public/pub_string.h"
+#include "pub_tool.h"
+#include "pub_file.h"
+#include "pub_string.h"
 
 using namespace std;
 
-namespace Universal{
+namespace universal{
 	IniCfg::IniCfg()
-		:m_IniInfo(),
-		 m_IniContent(),
-		 m_FilePath()
+		:ini_info_(),
+		 ini_content_(),
+		 file_path_()
 	{
 		;
 	}
 
 	IniCfg::~IniCfg(){ ; }
 
-	bool IniCfg::initFile(const string &filePath){
-		m_FilePath = filePath;
+	bool IniCfg::InitFile(const string &filePath){
+		file_path_ = filePath;
 		vector<string> lines;
-		m_IniContent = readFile(m_FilePath);
-		strReplaceAll(m_IniContent, "\r\n", "\n");
-		if(splitString(m_IniContent, "\n", lines)){
+		ini_content_ = ReadFile(file_path_);
+		StrReplaceAll(ini_content_, "\r\n", "\n");
+		if(SplitString(ini_content_, "\n", lines)){
 			map<string, string>* pKeyValueMap(NULL);
 			for(vector<string>::const_iterator citerLine = lines.begin(); citerLine != lines.end(); ++citerLine){
-				if(isNote(*citerLine)){ continue; }
+				if(IsNote(*citerLine)){ continue; }
 
-				if(isNewSection(*citerLine)){
+				if(IsNewSection(*citerLine)){
 					pKeyValueMap = NULL;
 					string section = citerLine->substr(1, citerLine->size()-2);
-					if(m_IniInfo.find(section) == m_IniInfo.end()){
-						m_IniInfo.insert(pair<string, map<string, string> >(section, map<string, string>()));
-						pKeyValueMap = &(m_IniInfo.find(section)->second);
+					if(ini_info_.find(section) == ini_info_.end()){
+						ini_info_.insert(pair<string, map<string, string> >(section, map<string, string>()));
+						pKeyValueMap = &(ini_info_.find(section)->second);
 					}
 				}
 				else{
 					string str = citerLine->substr(0, citerLine->find('#'));
 					size_t pos = str.find('=');
 					if(pKeyValueMap == NULL || pos == string::npos || pos == 0){
-						PUB_DEBUG_E("ini文件格式错误。");
+						std::runtime_error("ini文件格式错误。");
 #ifdef _DEBUG
 						assert(false);
 #endif
 						return false;
 					}
 					pKeyValueMap->insert(pair<string, string>(
-							trim(str.substr(0, pos)), 
-							trim(str.substr(pos+1, str.size() - pos - 1))
+							Trim(str.substr(0, pos)), 
+							Trim(str.substr(pos+1, str.size() - pos - 1))
 							));
 				}
 			}
 		}
 		else{
-			PUB_DEBUG_E("文件不存在，或格式错误。（注：使用\\n分隔行，而非\\r\\n）");
+			std::runtime_error("文件不存在，或格式错误。（注：使用\\n分隔行，而非\\r\\n）");
 			return false;
 		}
 
 		return true;
 	}
 
-	void IniCfg::saveFile(const std::string &filePath){
-		writeFile(filePath, m_IniContent);
+	void IniCfg::SaveFile(const std::string &filePath){
+		WriteFile(filePath, ini_content_);
 	}
 
-	string IniCfg::getString(const string &section, const string &key, string defaultValue){
-		map<string, map<string, string> >::const_iterator citerSection = m_IniInfo.find(section);
-		if(citerSection != m_IniInfo.end()){
+	string IniCfg::GetString(const string &section, const string &key, string defaultValue){
+		map<string, map<string, string> >::const_iterator citerSection = ini_info_.find(section);
+		if(citerSection != ini_info_.end()){
 			if(citerSection->second.find(key) != citerSection->second.end()){
 				return citerSection->second.find(key)->second;
 			}
@@ -84,71 +84,71 @@ namespace Universal{
 		return defaultValue;
 	}
 
-	int IniCfg::getInt(const string &section, const string &key, int defaultValue){
-		string value = getString(section, key);
-		if(checkNumber(value)){
-			return strToInt(value);
+	int IniCfg::GetInt(const string &section, const string &key, int defaultValue){
+		string value = GetString(section, key);
+		if(CheckNumber(value)){
+			return stoi(value);
 		}
 		return defaultValue;
 	}
 
-	double IniCfg::getDouble(const string &section, const string &key, double defaultValue){
-		string value = getString(section, key);
-		if(checkNumber(value)){
-			return strToDouble(value);
+	double IniCfg::GetDouble(const string &section, const string &key, double defaultValue){
+		string value = GetString(section, key);
+		if(CheckNumber(value)){
+			return stod(value);
 		}
 		return defaultValue;
 	}
 
-	bool IniCfg::setString(const std::string &section, const std::string &key, const std::string &value){
-		auto iterSection = m_IniInfo.find(section);
-		if(iterSection != m_IniInfo.end()){
+	bool IniCfg::SetString(const std::string &section, const std::string &key, const std::string &value){
+		auto iterSection = ini_info_.find(section);
+		if(iterSection != ini_info_.end()){
 			auto iterKeyValue = iterSection->second.find(key);
 			if(iterKeyValue != iterSection->second.end()){
 				iterKeyValue->second = value;
-				return updateIniContent(section, key, value);
+				return UpdateIniContent(section, key, value);
 			}
 			else{
-				PUB_DEBUG_W("设置ini配置信息失败 : key[" << key << "] 不存在");
+				std::runtime_error("设置ini配置信息失败 : key[" + key + "] 不存在");
 			}
 		}
 		else{
-			PUB_DEBUG_W("设置ini配置信息失败 : section[" << section << "] 不存在");
+			std::runtime_error("设置ini配置信息失败 : section[" + section + "] 不存在");
 		}
 		return false;
 	}
 
-	bool IniCfg::setInt(const std::string &section, const std::string &key, int32 value){
-		return setString(section, key, intToStr(value));
+	bool IniCfg::SetInt(const std::string &section, const std::string &key, int value){
+		return SetString(section, key, to_string(value));
 	}
 
-	bool IniCfg::setDouble(const std::string &section, const std::string &key, double value){
-		return setString(section, key, doubleToStr(value));
+	bool IniCfg::SetDouble(const std::string &section, const std::string &key, double value){
+		return SetString(section, key, to_string(value));
 	}
 
-	bool IniCfg::isNewSection(const string &section){
+	bool IniCfg::IsNewSection(const string &section){
 		if(section.size() <= 2 || section[0] != '[' || section[section.size()-1] != ']'){
 			return false;
 		}
 		return true;
 	}
 
-	bool IniCfg::isNote(const std::string &str){
-		return str.empty() || trim(str)[0] == '#';
+	bool IniCfg::IsNote(const std::string &str){
+		return str.empty() || Trim(str)[0] == '#';
 	}
 
-	bool IniCfg::updateIniContent(const std::string &section, const std::string &key, const std::string &value){
-		string::size_type sectionPos(m_IniContent.find("\n[" + section + "]") + 1);
+	bool IniCfg::UpdateIniContent(const std::string &section, const std::string &key, const std::string &value){
+		string::size_type sectionPos(ini_content_.find("\n[" + section + "]") + 1);
 		if(sectionPos != std::string::npos){
-			string::size_type nextSectionPos = m_IniContent.find("\n[", sectionPos);
-			nextSectionPos = nextSectionPos != std::string::npos ? nextSectionPos : m_IniContent.size();
+			string::size_type nextSectionPos = ini_content_.find("\n[", sectionPos);
+			nextSectionPos = nextSectionPos != std::string::npos ? nextSectionPos : ini_content_.size();
 
-			string::size_type keyPos = m_IniContent.find(string("\n" + key).c_str(), sectionPos) + 1;
+			string::size_type keyPos = ini_content_.find(string("\n" + key).c_str(), sectionPos) + 1;
 			if(keyPos < nextSectionPos){
-				string::size_type valueBeginPos = m_IniContent.find('=', keyPos) + 1; 
-				string::size_type valueEndPos = m_IniContent.find('\n', keyPos); 
+				string::size_type valueBeginPos = ini_content_.find('=', keyPos) + 1; 
+				string::size_type valueEndPos = ini_content_.find('\n', keyPos); 
 				if(valueBeginPos != std::string::npos && valueEndPos != std::string::npos && valueBeginPos < valueEndPos){
-					m_IniContent.replace(valueBeginPos, valueEndPos - valueBeginPos, value);
+					ini_content_.replace(valueBeginPos, valueEndPos - valueBeginPos, value);
 					return true;
 				}
 			}

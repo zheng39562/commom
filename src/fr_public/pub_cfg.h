@@ -11,10 +11,10 @@
 
 #include <mutex>
 #include <thread>
-#include "fr_public/pub_define.h"
-#include "fr_template/single_mode.hpp"
+#include "pub_define.h"
+#include "single_mode.hpp"
 
-namespace Universal{
+namespace universal{
 	enum eCfgDataType{
 		eCfgDataType_Unknow,
 		eCfgDataType_Ini,
@@ -37,40 +37,131 @@ namespace Universal{
 			//! \brief	配置添加。
 			//! \param[in] param 读取参数，根据type的不同表示不同的信息。
 			//! \param[in] type 配置的数据存储方式。
-			bool addCfg(const CfgKey &cfgKey, const std::string &param, const eCfgDataType &type);
-			void saveCfg(const CfgKey &cfgKey);
-			inline void setDefaultCfgKey(const CfgKey &cfgKey){ if(m_DefaultCfgKey.empty()){ m_DefaultCfgKey = cfgKey; } }
+			bool AddCfg(const CfgKey &cfg_key, const std::string &param, const eCfgDataType &type);
+			void SaveCfg(const CfgKey &cfg_key);
+			inline void SaveCfg(){ SaveCfg(default_cfg_key_); }
+			inline void SetDefaultCfgKey(const CfgKey &cfg_key){ if(default_cfg_key_.empty()){ default_cfg_key_ = cfg_key; } }
 
 			//! \brief	获取int数据：需要自己保证可转换。否则行为未定义
-			std::string getString(const CfgKey &cfgKey, const std::string &section, const std::string &key, const std::string &defaultValue);
-			inline std::string getString(const std::string &section, const std::string &key, const std::string &defaultValue){ return getString(m_DefaultCfgKey, section, key, defaultValue); }
+			std::string GetString(const CfgKey &cfg_key, const std::string &section, const std::string &key, const std::string &default_value);
+			inline std::string GetString(const std::string &section, const std::string &key, const std::string &default_value){ return GetString(default_cfg_key_, section, key, default_value); }
 			//! \brief	获取int数据：需要自己保证可转换。否则行为未定义
-			int getInt(const CfgKey &cfgKey, const std::string &section, const std::string &key, const int &defaultValue);
-			inline int getInt(const std::string &section, const std::string &key, const int &defaultValue){ return getInt(m_DefaultCfgKey, section, key, defaultValue); }
+			int GetInt(const CfgKey &cfg_key, const std::string &section, const std::string &key, const int &default_value);
+			inline int GetInt(const std::string &section, const std::string &key, const int &default_value){ return GetInt(default_cfg_key_, section, key, default_value); }
 			//! \brief	获取double数据：需要自己保证可转换。否则行为未定义
-			double getDouble(const CfgKey &cfgKey, const std::string &section, const std::string &key, const double &defaultValue);
-			inline double getDouble(const std::string &section, const std::string &key, const double &defaultValue){ return getDouble(m_DefaultCfgKey, section, key, defaultValue); }
+			double GetDouble(const CfgKey &cfg_key, const std::string &section, const std::string &key, const double &default_value);
+			inline double GetDouble(const std::string &section, const std::string &key, const double &default_value){ return GetDouble(default_cfg_key_, section, key, default_value); }
 
 			//! \brief	设置ini文件的值
 			//! \note	如果section or key不存在，则不做任何操作(会有日志信息).
-			bool setString(const CfgKey &cfgKey, const std::string &section, const std::string &key, const std::string &value);
-			inline bool setString(const std::string &section, const std::string &key, const std::string &value){ return setString(m_DefaultCfgKey, section, key, value); }
+			bool SetString(const CfgKey &cfg_key, const std::string &section, const std::string &key, const std::string &value);
+			inline bool SetString(const std::string &section, const std::string &key, const std::string &value){ return SetString(default_cfg_key_, section, key, value); }
 			//! \brief	设置ini文件的值
-			bool setInt(const CfgKey &cfgKey, const std::string &section, const std::string &key, int32 value);
-			inline bool setInt(const std::string &section, const std::string &key, int32 value){ return setInt(m_DefaultCfgKey, section, key, value); }
+			bool SetInt(const CfgKey &cfg_key, const std::string &section, const std::string &key, int value);
+			inline bool SetInt(const std::string &section, const std::string &key, int value){ return SetInt(default_cfg_key_, section, key, value); }
 			//! \brief	设置ini文件的值
-			bool setDouble(const CfgKey &cfgKey, const std::string &section, const std::string &key, double value);
-			inline bool setDouble(const std::string &section, const std::string &key, double value){ return setInt(m_DefaultCfgKey, section, key, value); }
+			bool SetDouble(const CfgKey &cfg_key, const std::string &section, const std::string &key, double value);
+			inline bool SetDouble(const std::string &section, const std::string &key, double value){ return SetInt(default_cfg_key_, section, key, value); }
 		private:
-			void* getCfgPtr(const CfgKey &cfgKey);
+			void* GetCfgPtr(const CfgKey &cfg_key);
 		private:
-			std::map<CfgKey, void*> m_CfgMap;	//! 根据配置(eCfgDataType)保存不同的文件指针。collection 表示不同的文件集合
-			CfgKey m_DefaultCfgKey;
-			eCfgDataType m_CfgType;	//! 
-			std::mutex m_Mutex;
+			std::map<CfgKey, void*> cfg_map_;	//! 根据配置(eCfgDataType)保存不同的文件指针。collection 表示不同的文件集合
+			CfgKey default_cfg_key_;
+			eCfgDataType cfg_type_;	//! 
+			std::mutex mutex_;
 	};
-	typedef DesignMode::SingleMode<Configurator> SingleConfigurator;
+	typedef universal::SingleMode<Configurator> SingleConfigurator;
 }
+
+inline bool CFG_GET_BOOL(const std::string& section, const std::string& key, const bool &default_value){ 
+	return (bool)universal::SingleConfigurator::GetInstance()->GetInt(section, key, (int)default_value); 
+}
+inline bool CFG_GET_BOOL(const universal::Configurator::CfgKey& cfg_key, const std::string& section, const std::string& key, const bool &default_value){ 
+	return (bool)universal::SingleConfigurator::GetInstance()->GetInt(cfg_key, section, key, (int)default_value); 
+}
+
+inline int CFG_GET_INT(const std::string& section, const std::string& key, const int &default_value){ 
+	return universal::SingleConfigurator::GetInstance()->GetInt(section, key, default_value); 
+}
+inline int CFG_GET_INT(const universal::Configurator::CfgKey& cfg_key, const std::string& section, const std::string& key, const int &default_value){ 
+	return universal::SingleConfigurator::GetInstance()->GetInt(cfg_key, section, key, default_value); 
+}
+
+inline double CFG_GET_DOUBLE(const std::string& section, const std::string& key, const double &default_value){ 
+	return universal::SingleConfigurator::GetInstance()->GetDouble(section, key, default_value); 
+}
+inline double CFG_GET_DOUBLE(const universal::Configurator::CfgKey& cfg_key, const std::string& section, const std::string& key, const double &default_value){ 
+	return universal::SingleConfigurator::GetInstance()->GetDouble(cfg_key, section, key, default_value); 
+}
+
+inline std::string CFG_GET_STRING(const std::string& section, const std::string& key, const std::string &default_value){ 
+	return universal::SingleConfigurator::GetInstance()->GetString(section, key, default_value); 
+}
+inline std::string CFG_GET_STRING(const universal::Configurator::CfgKey& cfg_key, const std::string& section, const std::string& key, const std::string &default_value){ 
+	return universal::SingleConfigurator::GetInstance()->GetString(cfg_key, section, key, default_value); 
+}
+
+
+inline bool CFG_SET_BOOL(const std::string& section, const std::string& key, bool value){ 
+	if(universal::SingleConfigurator::GetInstance()->SetInt(section, key, (int)value)){
+		universal::SingleConfigurator::GetInstance()->SaveCfg();
+		return true;
+	}
+	return false; 
+}
+inline bool CFG_SET_BOOL(const universal::Configurator::CfgKey& cfg_key, const std::string& section, const std::string& key, bool value){ 
+	if(universal::SingleConfigurator::GetInstance()->SetInt(cfg_key, section, key, (int)value)){
+		universal::SingleConfigurator::GetInstance()->SaveCfg(cfg_key);
+		return true;
+	}
+	return false; 
+}
+
+inline bool CFG_SET_INT(const std::string& section, const std::string& key, int value){ 
+	if(universal::SingleConfigurator::GetInstance()->SetInt(section, key, value)){
+		universal::SingleConfigurator::GetInstance()->SaveCfg();
+		return true;
+	}
+	return false; 
+}
+inline bool CFG_SET_INT(const universal::Configurator::CfgKey& cfg_key, const std::string& section, const std::string& key, int value){ 
+	if(universal::SingleConfigurator::GetInstance()->SetInt(cfg_key, section, key, value)){
+		universal::SingleConfigurator::GetInstance()->SaveCfg(cfg_key);
+		return true;
+	}
+	return false; 
+}
+
+inline bool CFG_SET_DOUBLE(const std::string& section, const std::string& key, double value){ 
+	if(universal::SingleConfigurator::GetInstance()->SetDouble(section, key, value)){
+		universal::SingleConfigurator::GetInstance()->SaveCfg();
+		return true;
+	}
+	return false; 
+}
+inline bool CFG_SET_DOUBLE(const universal::Configurator::CfgKey& cfg_key, const std::string& section, const std::string& key, double value){ 
+	if(universal::SingleConfigurator::GetInstance()->SetDouble(cfg_key, section, key, value)){
+		universal::SingleConfigurator::GetInstance()->SaveCfg(cfg_key);
+		return true;
+	}
+	return false; 
+}
+
+inline bool CFG_SET_STRING(const std::string& section, const std::string& key, const std::string &value){ 
+	if(CFG_SET_STRING(section, key, value)){
+		universal::SingleConfigurator::GetInstance()->SaveCfg();
+		return true;
+	}
+	return false; 
+}
+inline bool CFG_SET_STRING(const universal::Configurator::CfgKey& cfg_key, const std::string& section, const std::string& key, const std::string &value){ 
+	if(CFG_SET_STRING(cfg_key, section, key, value)){
+		universal::SingleConfigurator::GetInstance()->SaveCfg(cfg_key);
+		return true;
+	}
+	return false; 
+}
+
 
 #endif 
 

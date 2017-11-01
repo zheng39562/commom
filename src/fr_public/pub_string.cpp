@@ -6,91 +6,59 @@
  * \version 
  * \author zheng39562@163.com
 **********************************************************/
-#include "fr_public/pub_string.h"
+#include "pub_string.h"
 
 #include <sstream>
 #include <cctype>
 #include <algorithm>
 
-#include "fr_public/pub_tool.h"
+#include "pub_tool.h"
 
 using namespace std;
-using namespace Universal;
+using namespace universal;
 
 //
 // 字符和其他格式之间的转换。
 //
-namespace Universal{
-
-	long strToInt(const string &number){
-		stringstream strStream;
-		strStream << number;
-
-		long numberTmp;
-		strStream >> numberTmp;
-		return numberTmp;
-	}
-
-	std::string intToStr(const long &number){
-		stringstream strStream;
-		strStream << number;
-		return strStream.str();
-	}
-
-	string doubleToStr(const double &number){
-		stringstream strStream;
-		strStream << number;
-		return strStream.str();
-	}
-	
-
-	double strToDouble(const string &number){
-		stringstream strStream;
-		strStream << number;
-
-		double numberTmp;
-		strStream >> numberTmp;
-		return numberTmp;
-	}
-
-	string strToXmlStr(string content){
+namespace universal{
+	string StrToXmlStr(string content){
 		// & -> &amp;
-		strReplaceAll(content, "&", "&amp;");
+		StrReplaceAll(content, "&", "&amp;");
 		// < -> &lt;
-		strReplaceAll(content, "<", "&lt;");
+		StrReplaceAll(content, "<", "&lt;");
 		// > -> &gt;
-		strReplaceAll(content, ">", "&gt;");
+		StrReplaceAll(content, ">", "&gt;");
 		// ' -> &apos;
-		strReplaceAll(content, "'", "&apos;");
+		StrReplaceAll(content, "'", "&apos;");
 		// " -> &quot;
-		strReplaceAll(content, "\"", "quot;");
+		StrReplaceAll(content, "\"", "quot;");
 
 		return content;
 	}
 	
 
-	string xmlStrToStr(string content){
+	string XmlStrToStr(string content){
 		// & -> &amp;
-		strReplaceAll(content, "&amp;", "&");
+		StrReplaceAll(content, "&amp;", "&");
 		// < -> &lt;
-		strReplaceAll(content, "&lt;", "<");
+		StrReplaceAll(content, "&lt;", "<");
 		// > -> &gt;
-		strReplaceAll(content, "&gt;", ">");
+		StrReplaceAll(content, "&gt;", ">");
 		// ' -> &apos;
-		strReplaceAll(content, "&apos;", "'");
+		StrReplaceAll(content, "&apos;", "'");
 		// " -> &quot;
-		strReplaceAll(content, "quot;", "\"");
+		StrReplaceAll(content, "quot;", "\"");
 
 		return content;
 	}
 	
-	string strToJsonStr(string content){
-		strReplaceAll(content, "\"", "\\\"");
+	string StrToJsonStr(string content){
+		StrReplaceAll(content, "\"", "\\\"");
 		return content;
 	}
 
-	string jsonStrToStr(string content){
-		strReplaceAll(content, "\\\"", "\"");
+	string JsonStrToStr(string content){
+		StrReplaceAll(content, "\\\"", "\"");
 		return content;
 	}
 
@@ -116,7 +84,7 @@ namespace Universal{
 	void ConvertToUtf8(string &str, const eCharacterEncoding &originalEncoding){ ; }
 
 
-	void convertFullToHalf(string &str, eCharacterEncoding encoding){
+	void ConvertFullToHalf(string &str, eCharacterEncoding encoding){
 		ConvertToUtf8(str, encoding);
 
 	    std::string temp; 
@@ -146,7 +114,7 @@ namespace Universal{
 	}
 
 
-	void convertHalfToFull(string &str, eCharacterEncoding encoding){
+	void ConvertHalfToFull(string &str, eCharacterEncoding encoding){
 		ConvertToUtf8(str, encoding);
 
 		string temp;
@@ -169,7 +137,7 @@ namespace Universal{
 	}
 
 
-	size_t getStrSize(const string &str, eCharacterEncoding encoding){
+	size_t GetStrSize(const string &str, eCharacterEncoding encoding){
 		if(!str.empty()){
 			size_t size = 0;
 
@@ -189,35 +157,35 @@ namespace Universal{
 		}
 		return 0;
 	}
-} // namespace Universal{
+} // namespace universal{
 
 
 //
 // 字符本身的转换。
 //
-namespace Universal{
-	string strToUpper(const string &str){
+namespace universal{
+	string StrToUpper(const string &str){
 		string strTmp = str;
 		transform(strTmp.begin(), strTmp.end(), strTmp.begin(), (int (*)(int))toupper);
 		return strTmp;
 	}
 
 
-	string strToLower(const string &str){
+	string StrToLower(const string &str){
 		string strTmp = str;
 		transform(strTmp.begin(), strTmp.end(), strTmp.begin(), (int (*)(int))tolower);
 		return strTmp;
 	}
 
 
-} // namespace Universal{
+} // namespace universal{
 
 
 //
 // 字符操作：合并，分割，替换。。。
 //
-namespace Universal{
-	bool strReplaceAll(string &content, const string &replace, const string &dest){
+namespace universal{
+	bool StrReplaceAll(string &content, const string &replace, const string &dest){
 		string::size_type pos = 0;
 		string::size_type replaceSize = replace.size();
 		string::size_type destSize = dest.size();
@@ -228,7 +196,7 @@ namespace Universal{
 
 		return true;
 	}
-	bool splitString(const string &strValue, const string &splittingKey, vector<string> &result){
+	bool SplitString(const string &strValue, const string &splittingKey, vector<string> &result){
 		result.clear();
 		
 		if(strValue.empty()){  
@@ -258,7 +226,7 @@ namespace Universal{
 		}	
 		return false;
 	}
-	bool splitString(const string &strValue, const string &splittingKey, list<string> &result){
+	bool SplitString(const string &strValue, const string &splittingKey, list<string> &result){
 		result.clear();
 		
 		if(strValue.empty()){  
@@ -285,7 +253,7 @@ namespace Universal{
 		}	
 		return false;
 	}
-	string mergeString(const vector<string> &strings, const string &mergerKey){
+	string MergeString(const vector<string> &strings, const string &mergerKey){
 		string strTmp;
 		for(vector<string>::const_iterator citer = strings.begin(); citer != strings.end();){
 			strTmp += *citer;
@@ -296,7 +264,7 @@ namespace Universal{
 	}
 
 
-	string trimRight(const string &str){
+	string TrimRight(const string &str){
 		string trimStr = str.substr(0, str.find_last_not_of(" ")+1);
 		trimStr = trimStr.substr(0, trimStr.find_last_not_of("\t")+1);
 		trimStr = trimStr.substr(0, trimStr.find_last_not_of("\r\n")+1);
@@ -305,7 +273,7 @@ namespace Universal{
 	}
 
 
-	string trimLeft(const string &str){
+	string TrimLeft(const string &str){
 		string trimStr = str.substr(str.find_first_not_of(" ") == string::npos ? str.size()-1 : str.find_first_not_of(" "));
 		trimStr = trimStr.substr(trimStr.find_first_not_of("\t") == string::npos ? str.size()-1 : trimStr.find_first_not_of("\t"));
 		trimStr = trimStr.substr(trimStr.find_first_not_of("\r\n") == string::npos ? str.size()-1 : trimStr.find_first_not_of("\r\n"));
@@ -313,11 +281,11 @@ namespace Universal{
 		return trimStr;
 	}
 
-	string trim(const string &str){
-		return str.empty() ? str : trimRight(trimLeft(str));
+	string Trim(const string &str){
+		return str.empty() ? str : TrimRight(TrimLeft(str));
 	}
 
-}  // namepsace : Universal
+}  // namepsace : universal
 
 
 

@@ -11,11 +11,10 @@
 #ifndef _SingleMode_H
 #define _SingleMode_H
 
-#include <thread>
 #include <mutex>
-#include "boost/shared_ptr.hpp"
+#include <thread>
 
-namespace DesignMode{
+namespace universal{
 	//! \brief	单例模式的模板类。
 	//! \note	使用前置：
 	//!			1	被单例的对象，需要有公有的无参数的构造器。
@@ -26,64 +25,69 @@ namespace DesignMode{
 	template < typename T >
 	class SingleMode{
 		public:
-			static boost::shared_ptr<T> getInstance();
+			static std::shared_ptr<T> GetInstance();
 			//! \brief	允许外界传入一个指针初始化：为保证意外的delete，故使用智能指针。
-			static boost::shared_ptr<T> getInstance(boost::shared_ptr<T> ptrT);
+			static std::shared_ptr<T> GetInstance( std::shared_ptr<T> ptrT );
 			//!	\brief	在希望删除单例时调用。但需要注意，如果删除后再调用getInstance依然会重新创建单例.
-			static void destoryInstance();
+			static void DestoryInstance();
 		private:
 			SingleMode(){
-				m_p_Object = boost::shared_ptr<T>(new T());
+				object_ = std::shared_ptr<T>(new T());
 			}
-			SingleMode( boost::shared_ptr<T> _ptrT )
-				:m_p_Object( _ptrT )
+			SingleMode( std::shared_ptr<T> _ptrT )
+				:object_( _ptrT )
 			{ ; }
 			virtual ~SingleMode(){ ; }
 		private:
 			class Deleter{
 				public:
 					~Deleter(){
-						if( SingleMode::m_s_p_Instance != NULL )
-							delete SingleMode::m_s_p_Instance;
+						if( SingleMode::static_instance_ != NULL )
+							static_mutex_.release();
+							delete SingleMode::static_instance_;
 					}
 			};
-			static Deleter						m_s_Deleter;
+			static Deleter						static_delete_;
 		private:
-			static SingleMode<T>*				m_s_p_Instance;  // 
-			static std::mutex					m_s_Mutex;
+			static SingleMode<T>*				static_instance_;  // 
+			static std::unique_ptr<std::mutex>	static_mutex_;
 	
-			boost::shared_ptr<T>					m_p_Object;
+			std::shared_ptr<T>					object_;
 	};
 
-	template < typename T > SingleMode<T>*		SingleMode<T>::m_s_p_Instance = NULL;
+	template < typename T > SingleMode<T>*					SingleMode<T>::static_instance_ = NULL;
+	template < typename T > std::unique_ptr<std::mutex>		SingleMode<T>::static_mutex_ = std::unique_ptr<std::mutex>(new std::mutex());
 	
 	template < typename T >
-	boost::shared_ptr<T> SingleMode<T>::getInstance(){
-		if( m_s_p_Instance == NULL ){
-			std::lock_guard<std::mutex> localLock(m_s_Mutex);
-			if( m_s_p_Instance == NULL ){
-				m_s_p_Instance = new SingleMode();
-				return m_s_p_Instance->m_p_Object;
+	std::shared_ptr<T> SingleMode<T>::GetInstance(){
+		if(static_instance_ == NULL){
+			std::lock_guard<std::mutex> local_lock(*static_mutex_);
+			if(static_instance_ == NULL){
+				static_instance_ = new SingleMode();
+				return static_instance_->object_;
 			}
 		}
-		return m_s_p_Instance->m_p_Object;
+		return static_instance_->object_;
 	}
 	template < typename T >
-	boost::shared_ptr<T> SingleMode<T>::getInstance( boost::shared_ptr<T> ptrT ){
-		if( m_s_p_Instance == NULL ){
-			std::lock_guard<std::mutex> localLock(m_s_Mutex);
-			if( m_s_p_Instance == NULL ){
-				m_s_p_Instance = new SingleMode(ptrT);
-				return m_s_p_Instance->m_p_Object;
+	std::shared_ptr<T> SingleMode<T>::GetInstance( std::shared_ptr<T> ptrT ){
+		if(static_instance_ == NULL){
+			std::lock_guard<std::mutex> local_lock(*static_mutex_);
+			if(static_instance_ == NULL){
+				static_instance_ = new SingleMode(ptrT);
+				return static_instance_->object_;
 			}
 		}
-		return m_s_p_Instance->m_p_Object;
+		return static_instance_->object_;
 	}
 	template < typename T >
-	void SingleMode<T>::destoryInstance(){ 
-		if( SingleMode::m_s_p_Instance != NULL ){ 
-			delete SingleMode::m_s_p_Instance; 
-			SingleMode::m_s_p_Instance = NULL;
+	void SingleMode<T>::DestoryInstance(){
+		if(SingleMode::static_instance_ != NULL){ 
+			std::lock_guard<std::mutex> local_lock(*static_mutex_);
+			if(SingleMode::static_instance_ != NULL){ 
+				delete SingleMode::static_instance_; 
+				SingleMode::static_instance_ = NULL;
+			}
 		} 
 	}
 } // namespace DesignMode

@@ -13,9 +13,8 @@
 #define _LockStack_H
 
 #include <stack>
-#include "fr_public/pub_thread.h"
 
-namespace Universal{
+namespace universal{
 	//! \brief	自实现的栈操作。
 	//! \note	拥有自己的互斥锁。互斥锁仅对单对象做出限制：多个不同的对象没有影响。
 	//! \note	存在瑕疵：empty之后再进行pop 再多线程并发时有极小的一段时间处于解锁状态。
@@ -25,7 +24,7 @@ namespace Universal{
 			LockStack();
 			~LockStack();
 		private:
-			FrMutex					m_Mutex;
+			std::mutex					mutex_;
 			std::stack<T>				m_Stack;
 		public:
 			//! \brief	推送数据进栈
@@ -39,20 +38,20 @@ namespace Universal{
 			//! \brief	
 			long size();
 	};
+
 	template<typename T> LockStack<T>::LockStack()
-		:m_Mutex(),
+		:mutex_(),
 		 m_Stack()
 	{ ; }
 	template<typename T> LockStack<T>::~LockStack(){ ; }
 
 	template<typename T> void LockStack<T>::push( const T &data ){
-		boost::mutex::scoped_lock localLock(m_Mutex);
+		std::lock_guard<std::mutex> localLock(mutex_);
 		m_Stack.push( data );
 	}
 
-
 	template<typename T> T LockStack<T>::pop(){
-		boost::mutex::scoped_lock localLock(m_Mutex);
+		std::lock_guard<std::mutex> localLock(mutex_);
 		T dataTmp;
 		if(!m_Stack.empty()){
 			dateTmp = m_Stack.top();
@@ -62,30 +61,26 @@ namespace Universal{
 		return dateTmp;
 	}
 
-
 	template<typename T> T LockStack<T>::top(){
-		boost::mutex::scoped_lock localLock(m_Mutex);
+		std::lock_guard<std::mutex> localLock(mutex_);
 		T dataTmp = m_Stack.top();
 
 		return dateTmp;
 	}
 
-
 	template<typename T> bool LockStack<T>::empty(){
-		boost::mutex::scoped_lock localLock(m_Mutex);
+		std::lock_guard<std::mutex> localLock(mutex_);
 		bool empty = m_Stack.empty();
 
 		return empty;
 	}
 
-
 	template<typename T> long LockStack<T>::size(){
-		boost::mutex::scoped_lock localLock(m_Mutex);
+		std::lock_guard<std::mutex> localLock(mutex_);
 		long size = m_Stack.size();
 
 		return size;
 	}
-
 
 }
 

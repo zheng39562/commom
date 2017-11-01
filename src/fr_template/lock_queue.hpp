@@ -12,9 +12,10 @@
 #define _LockQueue_H
 
 #include <queue>
-#include "fr_public/pub_thread.h"
+#include <mutex>
+#include <thread>
 
-namespace Universal{
+namespace universal{
 	//! \brief	自实现的队列操作：队列使用先进先出模式（堆）。
 	//! \note	拥有自己的互斥锁。互斥锁仅对单对象做出限制：多个不同的对象没有影响。
 	//! \note	存在瑕疵：empty之后再进行pop 再多线程并发时有极小的一段时间处于解锁状态。
@@ -24,19 +25,17 @@ namespace Universal{
 			LockQueue();
 			~LockQueue();
 		private:
-			FrMutex m_Mutex;
-			std::queue<T> m_Queue;
+			std::mutex mutex_;
+			std::queue<T> queue_;
 		public:
 			void clear();
 			//! \brief	推送数据进栈
 			void push( const T &data );
-			//! \brief	
-			void push(const std::queue<T> &datas);
 			//! \brief	从栈顶获取对象并从栈中移除
 			T pop();
 			//! \param[in] TQueue 从队列中取出N个变量
-			//! \prarm[in] size 取出的量，大于队列中消息量时,取出所有
-			void pop(std::queue<T> &TQueue, int32 size);
+			//! \prarm[in] size 取出的量，大于队列中消息量时,取出所有 
+			void pop(std::queue<T> &TQueue, int size);
 			//! \brief	从栈顶获取对象
 			T top();
 			//! \brief	
@@ -46,75 +45,68 @@ namespace Universal{
 			//! \brief	
 			bool swap(std::queue<T> &TQueue);
 	};
+
 	template < typename T > LockQueue<T>::LockQueue()
-		:m_Mutex(),
-		 m_Queue()
+		:mutex_(),
+		 queue_()
 	{ ; }
 	template < typename T > LockQueue<T>::~LockQueue(){ ; }
 
 	template < typename T > void LockQueue<T>::clear(){
-		boost::mutex::scoped_lock localLock(m_Mutex);
-		while( !m_Queue.empty() ){
-			m_Queue.pop();
+		std::lock_guard<std::mutex> localLock(mutex_);
+		while(!queue_.empty()){
+			queue_.pop();
 		}
 	}
 
 	template < typename T > void LockQueue<T>::push( const T &data ){
-		boost::mutex::scoped_lock localLock(m_Mutex);
-		m_Queue.push( data );
-	}
-
-	template < typename T > void LockQueue<T>::push( const std::queue<T> &datas ){
-		boost::mutex::scoped_lock localLock(m_Mutex);
-		while(!datas.empty()){
-			m_Queue.push(datas.front());
-			datas.pop();
-		}
+		std::lock_guard<std::mutex> localLock(mutex_);
+		queue_.push( data );
 	}
 
 	template < typename T > T LockQueue<T>::pop(){
-		boost::mutex::scoped_lock localLock(m_Mutex);
+		std::lock_guard<std::mutex> localLock(mutex_);
 		T dataTmp;
-		if(!m_Queue.empty()){
-			dataTmp = m_Queue.front();
-			m_Queue.pop();
+		if(!queue_.empty()){
+			dataTmp = queue_.front();
+			queue_.pop();
 		}
 
 		return dataTmp;
 	}
 
-	template < typename T > T LockQueue<T>::pop(std::queue<T> &TQueue, int32 size){
-		boost::mutex::scoped_lock localLock(m_Mutex);
-		while(TQueue.size() < size && !m_Queue.empty()){
-			TQueue.push(m_Queue.front());
-			m_Queue.pop();
+	template < typename T > void LockQueue<T>::pop(std::queue<T> &TQueue, int size){
+		std::lock_guard<std::mutex> localLock(mutex_);
+		while(TQueue.size() < size && !queue_.empty()){
+			TQueue.push(queue_.front());
+			queue_.pop();
 		}
 	}
 
 	template < typename T > T LockQueue<T>::top(){
-		boost::mutex::scoped_lock localLock(m_Mutex);
-		T dataTmp = m_Queue.front();
+		std::lock_guard<std::mutex> localLock(mutex_);
+		T dataTmp = queue_.front();
 
 		return dataTmp;
 	}
 
 	template < typename T > bool LockQueue<T>::empty(){
-		boost::mutex::scoped_lock localLock(m_Mutex);
-		bool empty = m_Queue.empty();
+		std::lock_guard<std::mutex> localLock(mutex_);
+		bool empty = queue_.empty();
 
 		return empty;
 	}
 
 	template < typename T > long LockQueue<T>::size(){
-		boost::mutex::scoped_lock localLock(m_Mutex);
-		long size = m_Queue.size();
+		std::lock_guard<std::mutex> localLock(mutex_);
+		long size = queue_.size();
 
 		return size;
 	}
 
 	template < typename T > bool LockQueue<T>::swap(std::queue<T> &TQueue){
-		boost::mutex::scoped_lock localLock(m_Mutex);
-		m_Queue.swap(TQueue);
+		std::lock_guard<std::mutex> localLock(mutex_);
+		queue_.swap(TQueue);
 		return true;
 	}
 

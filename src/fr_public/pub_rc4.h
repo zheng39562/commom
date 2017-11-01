@@ -17,24 +17,15 @@
 #ifndef _pub_rc4_H
 #define _pub_rc4_H
 
-#include "fr_public/pub_define.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "pub_define.h"
 
 struct RC4_KEY{
 	Byte bySTab[256];   //256字节的S表
 	Byte byIt, byJt;     //t时刻的两个指针
 };
 
-bool RC4Init(const char*, uint32, RC4_KEY *);
-bool RC4Works (Byte* content, uint32 size, RC4_KEY *);
-
-#ifdef __cplusplus
-}
-#endif
-
+bool RC4Init(const char*, int, RC4_KEY *);
+bool RC4Works(Byte* content, int size, RC4_KEY *);
 
 #endif 
 

@@ -4,7 +4,9 @@
  * \version 
  * * \author zheng39562@163.com
 **********************************************************/
-#include "fr_public/pub_rc4.h"
+#include "pub_rc4.h"
+
+#include <string.h>
 
 using namespace std;
 
@@ -12,11 +14,11 @@ static Byte xyzzy_tmpc;
 
 #define SWAP_BYTE(a,b) xyzzy_tmpc=a; a=b; b=xyzzy_tmpc
 
-bool RC4Init(const char *pszKey, uint32 nKeyLen, RC4_KEY *key)
+bool RC4Init(const char *pszKey, int nKeyLen, RC4_KEY *key)
 {
 	Byte by1, by2;
 	Byte* bySTab;
-    uint32  nCount;
+	int  nCount;
 	if((strlen(pszKey)<1)||(nKeyLen<1)){
 		return false;
 	}
@@ -38,10 +40,10 @@ bool RC4Init(const char *pszKey, uint32 nKeyLen, RC4_KEY *key)
  return true;
 }
 
-bool RC4Works (Byte* content, uint32 size, RC4_KEY *key ){
+bool RC4Works(Byte* content, int size, RC4_KEY *key){
 	Byte byIt, byJt;
 	Byte* bySTab;
-	uint32 nCount;
+	int nCount;
 
 	byIt = key->byIt;
 	byJt = key->byJt;
@@ -58,3 +60,4 @@ bool RC4Works (Byte* content, uint32 size, RC4_KEY *key ){
 	key->byJt = byJt;
 	return true;
 }
+

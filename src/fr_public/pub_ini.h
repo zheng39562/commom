@@ -11,10 +11,10 @@
 #ifndef _pub_ini_H
 #define _pub_ini_H
 
-#include "fr_public/pub_define.h"
-#include "fr_template/single_mode.hpp"
+#include "pub_define.h"
+#include "single_mode.hpp"
 
-namespace Universal{
+namespace universal{
 	//! \brief	读取，解析，保存ini的类
 	//! \note	只支持\n换行。任何其他形式的(例如\r\n)都会被转换成\n。并且，在会写程序时也不会转换回\r\n
 	//! \note	ini限制：非标准ini的限制，仅是该ini解析类的限制.违反限制的结果未定义,但尽可能会保持可用.
@@ -32,39 +32,39 @@ namespace Universal{
 			//! \note	自动过滤key/value前后的空格对应的空格,不会对数据中间的空格做处理。
 			//! \note	section没有做任何处理
 			//! \attetion	sction名称不能存在重复。第二个section无法被解析，其中的key=value会被自行增加到前一个section中。
-			bool initFile(const std::string &filePath);
+			bool InitFile(const std::string &filePath);
 			//! \brief	保存ini文件
 			//! \note	在回写ini文件时，能够完整保存对应的注释信息和换行
-			void saveFile(const std::string &filePath);
-			inline void saveFile(){ saveFile(m_FilePath); }
+			void SaveFile(const std::string &filePath);
+			inline void SaveFile(){ SaveFile(file_path_); }
 
 			//! \brief	获取字符串数据。
-			std::string getString(const std::string &section, const std::string &key, std::string defaultValue = "");
+			std::string GetString(const std::string &section, const std::string &key, std::string defaultValue = "");
 			//! \brief	获取int数据：需要自己保证可转换。否则行为未定义
-			int getInt(const std::string &section, const std::string &key, int defaultValue = 0);
+			int GetInt(const std::string &section, const std::string &key, int defaultValue = 0);
 			//! \brief	获取double数据：需要自己保证可转换。否则行为未定义
-			double getDouble(const std::string &section, const std::string &key, double defaultValue = 0.0);
+			double GetDouble(const std::string &section, const std::string &key, double defaultValue = 0.0);
 
 			//! \brief	设置ini文件的值
 			//! \note	如果section or key不存在，则不做任何操作(会有日志信息).
-			bool setString(const std::string &section, const std::string &key, const std::string &value);
+			bool SetString(const std::string &section, const std::string &key, const std::string &value);
 			//! \brief	设置ini文件的值
-			bool setInt(const std::string &section, const std::string &key, int32 value);
+			bool SetInt(const std::string &section, const std::string &key, int value);
 			//! \brief	设置ini文件的值
-			bool setDouble(const std::string &section, const std::string &key, double value);
+			bool SetDouble(const std::string &section, const std::string &key, double value);
 		private:
 			//! \brief	该行是否是一个妞section
-			bool isNewSection(const std::string &section);
+			bool IsNewSection(const std::string &section);
 			//! \brief	是否是注释行。
-			bool isNote(const std::string &str);
+			bool IsNote(const std::string &str);
 			//! \brief	更新文件中的value值
-			bool updateIniContent(const std::string &section, const std::string &key, const std::string &value);
+			bool UpdateIniContent(const std::string &section, const std::string &key, const std::string &value);
 		private:
-			FilePath m_FilePath;
-			std::string m_IniContent;	//! ini文本的内容。用户回写ini文本.
-			std::map<std::string, std::map<std::string, std::string> > m_IniInfo;	//! 
+			Path file_path_;
+			std::string ini_content_;	//! ini文本的内容。用户回写ini文本.
+			std::map<std::string, std::map<std::string, std::string> > ini_info_;	//! 
 	};
-	typedef DesignMode::SingleMode<IniCfg> SingleIniCfg;
+	typedef SingleMode<IniCfg> SingleIniCfg;
 }
 #endif 
 

@@ -8,87 +8,73 @@
  * \!version 
  * * \!author zheng39562@163.com
 **********************************************************/
-#include "fr_public/pub_log.h"
-
-
-#ifdef WIN32
-#ifdef _MFC
-#include "afxwin.h"
-#else
-#include <windows.h>
-#endif
-#endif
-#ifdef Linux
-#include <pthread.h>
-#endif
+#include "pub_log.h"
 
 #include <sstream>
-#include "fr_public/pub_define.h"
-#include "fr_public/pub_file.h"
-#include "fr_public/pub_tool.h"
-#include "fr_public/pub_timer.h"
-#include "fr_public/pub_string.h"
+#include "pub_tool.h"
+#include "pub_timer.h"
+#include "pub_string.h"
 
 using namespace std;
-using namespace Universal;
+using namespace universal;
 
-namespace Universal{
-	Path LogCache::m_s_Path = "";
-	size_t LogCache::m_s_MaxSize = 10 * 1024 * 1024;
+namespace universal{
+	Path LogCache::static_path_ = "";
+	size_t LogCache::static_max_size_ = 10 * 1024 * 1024;
 
 	LogCache::LogCache(const FileName &_fileName, eLogLevel _level)
-		:m_LogLevel(_level),
-		 m_CurSize(0),
-		 m_Outfile(),
-		 m_CurIndex(0),
-		 m_FileDate(getLocalTime("%Y%m%d")),
-		 m_FileName(_fileName)
+		:log_level_(_level),
+		 cur_size_(0),
+		 out_file_(),
+		 cur_index_(0),
+		 file_date_(GetLocalTime("%Y%m%d")),
+		 file_name_(_fileName)
 	{ 
 		vector<string> fileNames;
-		findFileFromDir(m_s_Path, fileNames, ".*" + m_FileName + ".*\.log");
+		FindFileFromDir(static_path_, fileNames, ".*" + file_name_ + ".*.log");
 
 		for(auto iterFileName = fileNames.begin(); iterFileName != fileNames.end(); ++iterFileName){
-			int index = strToInt(iterFileName->substr(iterFileName->find_last_of("_") + 1, iterFileName->find_last_of(".") - iterFileName->find_last_of("_")));
-			m_CurIndex = m_CurIndex > index ? m_CurIndex : index;
+			int index = stoi(iterFileName->substr(iterFileName->find_last_of("_") + 1, iterFileName->find_last_of(".") - iterFileName->find_last_of("_")));
+			cur_index_ = cur_index_ > index ? cur_index_ : index;
 		}
 		
-		m_CurIndex -= 1;
-		reopen(); 
+		cur_index_ -= 1;
+		Reopen(); 
 	}
 
 	LogCache::~LogCache(){
-		m_Outfile.close();
+		out_file_.close();
 	}
 
-	void LogCache::setPath(const Path &path){
-		m_s_Path = completePath(path);
-		createDir(m_s_Path);
+	void LogCache::set_static_path(const Path &path){ 
+		static_path_ = universal::CompletePath(path); 
+		universal::CreateDir(static_path_); 
 	}
 
-	bool LogCache::fileFull(){
-		if(m_s_MaxSize == 0){
+	bool LogCache::IsFileFull(){
+		if(static_max_size_ == 0){
 #ifdef _DEBUG
 			assert(false);
 #endif
 			return false;
 		}
-		return m_CurSize >= m_s_MaxSize;
+		return cur_size_ >= static_max_size_;
 	}
 
-	bool LogCache::isNewDate(){ 
-		return Universal::getLocalTime("%Y%m%d") != m_FileDate; 
+	bool LogCache::IsNewDate(){ 
+		return universal::GetLocalTime("%Y%m%d") != file_date_; 
 	}
 
-	void LogCache::reopen(){
-		if(!m_s_Path.empty() && !m_FileName.empty()){
-			string curDate = getLocalTime("%Y%m%d");
-			if(curDate != m_FileDate){
-				m_CurIndex = 0;
+	void LogCache::Reopen(){
+		if(!static_path_.empty() && !file_name_.empty()){
+			string curDate = GetLocalTime("%Y%m%d");
+			if(curDate != file_date_){
+				cur_index_ = 0;
 			}
-			m_FileDate = curDate;
-			m_Outfile.close();
-			m_Outfile.open(string(m_s_Path + m_FileName + "_" + m_FileDate + "_" + intToStr(++m_CurIndex) + ".log").c_str(), ios::app);
-			m_CurSize = 0;
+			file_date_ = curDate;
+			out_file_.close();
+			out_file_.open(string(static_path_ + file_name_ + "_" + file_date_ + "_" + to_string(++cur_index_) + ".log").c_str(), ios::app);
+			cur_size_ = 0;
 		}
 		else{
 #ifdef _DEBUG
@@ -97,28 +83,23 @@ namespace Universal{
 		}
 	}
 
-	void LogCache::write(const std::string &time, const eLogLevel &level, const std::string &fileName, const std::string &funcName, const long &line, const std::string &msg){
+	void LogCache::Write(const std::string &time, const eLogLevel &level, const std::string &fileName, const std::string &funcName, const long &line, const std::string &msg){
 		lock();
-		if(m_LogLevel <= level){
+		if(log_level_ <= level){
 			std::ostringstream cache;
 			cache << "[" << time << "]"
-#ifdef WIN32
-				<< "[" << GetCurrentThreadId() << "]"
-#endif
-#ifdef Linux
-				<< "[" << pthread_self() << "]"
-#endif
+				<< "[" << std::this_thread::get_id() << "]"
 				<< "[" << getLevelString(level) << "]"
 				<< "[" << fileName << "]"
 				<< "[" << funcName << ":"<< line << "]"
 				<< " : " << msg << "\n";
 
-			if(m_Outfile){
-				m_CurSize += cache.str().size();
-				m_Outfile << cache.str();
-				m_Outfile.flush();
-				if(fileFull()){
-					reopen();
+			if(out_file_){
+				cur_size_ += cache.str().size();
+				out_file_ << cache.str();
+				out_file_.flush();
+				if(IsFileFull()){
+					Reopen();
 				}
 			}
 			else{
@@ -149,92 +130,80 @@ namespace Universal{
 	}
 }
 
-namespace Universal{
+namespace universal{
 	LogServer::LogServer()
-		:m_Caches(),
-		 m_LoopThread(),
-		 m_Running(false)
-	{ 
-		;
-	}
+		:caches_(),
+		 loop_thread_(),
+		 running_(false)
+	{ ; }
 
 	LogServer::~LogServer(){ 
-		if(m_LoopThread.joinable()){
-			m_Running = false;
-			m_LoopThread.join();
+		if(loop_thread_.joinable()){
+			running_ = false;
+			loop_thread_.join();
 		}
-		for(auto iterCache = m_Caches.begin(); iterCache != m_Caches.end(); ++iterCache){
+		for(auto iterCache = caches_.begin(); iterCache != caches_.end(); ++iterCache){
 			if(iterCache->second != NULL){
 				delete iterCache->second; iterCache->second = NULL;
 			}
 		}
 	}
 
-	void LogServer::initLog(const string &path, size_t _maxSize){
-		LogCache::setPath(path);
-		LogCache::setMaxSize(_maxSize);
+	void LogServer::InitLog(const string &path, size_t _maxSize){
+		LogCache::set_static_path(path);
+		LogCache::set_static_max_size(_maxSize);
 
-		m_Running = true;
-		m_LoopThread = std::thread([&](){
-			while(m_Running){
-				for(auto iterCache = m_Caches.begin(); iterCache != m_Caches.end(); ++iterCache){
+		running_ = true;
+		loop_thread_ = std::thread([&](){
+			while(running_){
+				for(auto iterCache = caches_.begin(); iterCache != caches_.end(); ++iterCache){
 					if(!iterCache->first.empty()){
 						LogCache* pCache = iterCache->second;
 						pCache->lock();
-						if(pCache->isNewDate()){
-							pCache->reopen();
+						if(pCache->IsNewDate()){
+							pCache->Reopen();
 						}
 						pCache->unlock();
 					}
 				}
 
-				int curHour(strToInt(getLocalTime("%H")));
-				int curMin(strToInt(getLocalTime("%M")));
-				if(curHour < 23){
-					frSleep(3600 * _TIMECONVERSION_SECTOMS);
-				}
-				else if(curMin < 59){
-					frSleep(60 * _TIMECONVERSION_SECTOMS);
-				}
-				else{
-					frSleep(1 * _TIMECONVERSION_SECTOMS);
-				}
+				FrSleep(1000);
 			}
 		});
 	}
 
-	void LogServer::setLogLevel(const LogKey &key, eLogLevel level){
-		if(m_Caches.find(key) == m_Caches.end()){
-			m_Caches.insert(make_pair(key, new LogCache(key, level)));
+	void LogServer::set_log_level(const LogKey &key, eLogLevel level){
+		if(caches_.find(key) == caches_.end()){
+			caches_.insert(make_pair(key, new LogCache(key, level)));
 		}
 		else{
-			m_Caches.find(key)->second->setLogLevel(level);
+			caches_.find(key)->second->set_log_level(level);
 		}
 	}
 
-	eLogLevel LogServer::getLogLevel(const LogKey &key)const{
-		auto iterCache = m_Caches.find(key);
-		if(iterCache != m_Caches.end()){
-			return iterCache->second->getLogLevel();
+	eLogLevel LogServer::log_level(const LogKey &key)const{
+		auto iterCache = caches_.find(key);
+		if(iterCache != caches_.end()){
+			return iterCache->second->log_level();
 		}
 		return eLogLevel_IgnoreNothing;
 	}
 
-	void LogServer::writeLog(const LogKey &key, const eLogLevel &level, const std::string &fileName, const string &funcName, const long &line, const string &msg){
-		if(m_Caches.find(key) == m_Caches.end()){
-			m_Caches.insert(make_pair(key, new LogCache(key, eLogLevel_IgnoreNothing)));
+	void LogServer::WriteLog(const LogKey &key, const eLogLevel &level, const std::string &fileName, const string &funcName, const long &line, const string &msg){
+		if(caches_.find(key) == caches_.end()){
+			caches_.insert(make_pair(key, new LogCache(key, eLogLevel_IgnoreNothing)));
 		}
-		m_Caches.find(key)->second->write(getLocalTimeU("%m/%d-%H:%M:%S"), level, fileName, funcName, line, msg);
+		caches_.find(key)->second->Write(GetLocalTimeU("%m/%d-%H:%M:%S"), level, fileName, funcName, line, msg);
 	}
 }
 
-Universal::eLogLevel PARSE_LOG_STRING(const std::string &log_level){
-	if("program" == Universal::strToLower(log_level)){ return Universal::eLogLevel_Program; }
-	else if("debug" == Universal::strToLower(log_level)){ return Universal::eLogLevel_Debug; }
-	else if("info" == Universal::strToLower(log_level)){ return Universal::eLogLevel_Info; }
-	else if("warning" == Universal::strToLower(log_level)){ return Universal::eLogLevel_Warning; }
-	else if("error" == Universal::strToLower(log_level)){ return Universal::eLogLevel_Error; }
-	else if("crash" == Universal::strToLower(log_level)){ return Universal::eLogLevel_Crash; }
-	else { return Universal::eLogLevel_IgnoreNothing; }
+universal::eLogLevel PARSE_LOG_STRING(const std::string &log_level){
+	if("program" == universal::StrToLower(log_level)){ return universal::eLogLevel_Program; }
+	else if("debug" == universal::StrToLower(log_level)){ return universal::eLogLevel_Debug; }
+	else if("info" == universal::StrToLower(log_level)){ return universal::eLogLevel_Info; }
+	else if("warning" == universal::StrToLower(log_level)){ return universal::eLogLevel_Warning; }
+	else if("error" == universal::StrToLower(log_level)){ return universal::eLogLevel_Error; }
+	else if("crash" == universal::StrToLower(log_level)){ return universal::eLogLevel_Crash; }
+	else { return universal::eLogLevel_IgnoreNothing; }
 }
 

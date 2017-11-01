@@ -6,12 +6,17 @@
  * \version 
  * \author zheng39562@163.com
 **********************************************************/
-#include "fr_public/pub_tool.h"
+#include "pub_tool.h"
 
-#include "fr_public/pub_string.h"
-#include "boost/regex.hpp"
-#include "fr_public/pub_md5.h"
-#include "fr_public/pub_rc4.h"
+#include <random>
+#include <regex>
+#include "pub_string.h"
+#include "pub_md5.h"
+#include "pub_rc4.h"
+
+#ifdef WIN32
+#include "pub_window.h"
+#endif
 
 #ifdef WIN32
 #ifdef _MFC
@@ -24,14 +29,13 @@
 #endif
 
 using namespace std;
-using namespace boost;
 
 /*
  * other function
  */
-namespace Universal{
+namespace universal{
 #ifdef LINUX
-	bool execShellCmd(const string &cmd){
+	bool ExecShellCmd(const string &cmd){
 		FILE* fp = NULL;
 		if((fp=popen(cmd.c_str(), "r")) != NULL){
 			pclose(fp);  fp = NULL;
@@ -41,7 +45,7 @@ namespace Universal{
 	}
 #endif
 
-	string getMobileType(const string &mobile){
+	string GetMobileType_(const string &mobile){
 		string head1 = mobile.substr(0, 1);
 		string head2 = mobile.substr(0, 2);
 		string head3 = mobile.substr(0, 3);
@@ -65,15 +69,15 @@ namespace Universal{
 		else{
 			return _PTHONETYPE_QT;
 		}
-		return _STRINGFALSE;
+		return "";
 	}
 
 
-	string findDataFromMap(const map<string, string> &mapData, const string &key){
+	string FindDataFromMap(const map<string, string> &mapData, const string &key){
 		if(mapData.find(key) != mapData.end()){
 			return mapData.find(key)->second;
 		}
-		return _STRINGFALSE;
+		return "";
 	}
 
 	string md5(const std::string str){
@@ -85,9 +89,9 @@ namespace Universal{
 	}
 
 	bool rc4_encrypt(string &content, const string &sKey){
-		return rc4_encrypt(const_cast<char*>(content.c_str()), (int32)content.size(), sKey.c_str(), (int32)sKey.size());
+		return rc4_encrypt(const_cast<char*>(content.c_str()), (int)content.size(), sKey.c_str(), (int)sKey.size());
 	}
-	bool rc4_encrypt(Byte* content, uint32 size, const string &sKey){
+	bool rc4_encrypt(Byte* content, int size, const string &sKey){
 		RC4_KEY key;
 		RC4Init(sKey.c_str(), sKey.size(), &key);
 		RC4Works(content, size, &key);
@@ -97,7 +101,7 @@ namespace Universal{
 #ifndef SWAP_VALUE
 	#define SWAP_VALUE(x, y) { t = *x; *x = *y; *y = t; }
 #endif
-	bool rc4_encrypt(char *content, int32 contentLength, const char* sKey, int32 ketLength){
+	bool rc4_encrypt(char *content, int contentLength, const char* sKey, int ketLength){
 		char t;
 		unsigned char box[256];
 		int index = 0;
@@ -134,21 +138,21 @@ namespace Universal{
 		return true;
 	}
 
-	bool myStrEncrypt(std::string &content, const std::string &key){
+	bool MyStrEncrypt(std::string &content, const std::string &key){
 		if(rc4_encrypt(content, key)){
-			return convertBinaryToHexString(content);
+			return ConvertBinaryToHexString(content);
 		}
 		return false;
 	}
 
-	bool myStrDecrypt(std::string &content, const std::string &key){
-		if(convertHexStringToBinary(content)){
+	bool MyStrDecrypt(std::string &content, const std::string &key){
+		if(ConvertHexStringToBinary(content)){
 			return rc4_encrypt(content, key);
 		}
 		return false;
 	}
 
-	bool convertBinaryToHexString(string &content){
+	bool ConvertBinaryToHexString(string &content){
 		auto funcBinaryToStr = [](char c)->char{
 			if(0 <= c && c <= 9){
 				return c + '0';
@@ -168,7 +172,7 @@ namespace Universal{
 		return true;
 	}
 
-	bool convertHexStringToBinary(string &content){
+	bool ConvertHexStringToBinary(string &content){
 		auto funcHexCharToChar = [](char c)->char{
 			switch(c){
 				case '1': return 1; case '2': return 2; case '3': return 3; case '4': return 4; case '5': return 5; case '6': return 6; case '7': return 7; case '8': return 8; case '9': return 9; 
@@ -189,14 +193,14 @@ namespace Universal{
 		content = tmp;
 		return true;
 	}
-}  // namespace : Universal
+}  // namespace : universal
 
 
 //
 // 字符验证。。。
 //
-namespace Universal{
-	bool checkNumber(const string &number){
+namespace universal{
+	bool CheckNumber(const string &number){
 		if(number.empty()){ return false; }
 
 		stringstream sin(number);
@@ -211,13 +215,13 @@ namespace Universal{
 	}
 
 
-	bool checkDate(const string &date){
+	bool CheckDate(const string &date){
 		regex reg("^(?<year>(1[8-9]\\d{2})|([2-9]\\d{3}))(-|/|.|)(((?<month>10|12|0?[13578])(-|/|.|)(?<day> 3[01]|[12][0-9]|0?[1-9]))|((?<month>11|0?[469])(-|/|.|)(?<day>30|[12][0-9]|0?[1-9]))|((?<month>0?[2])(-|/|.|)(?<day>0[1-9]|1[0-9]|2[0-8])))(\\s((?<hour>(0[1-9])|([1-9])|(1[0-2]))\\:(?<min>[0-5][0-9])((\\:)(?<sec>[0-5][0-9]))?(\\s[AM|PM|am|pm]{2,2})?))?$");
 		return regex_match(date, reg);
 	}
 
 
-	bool checkMobile(const string &mobile){
+	bool CheckMobile(const string &mobile){
 		if(mobile.size() != 11){  return false;  }
 
 		string head3 = mobile.substr(0, 3);
@@ -235,10 +239,10 @@ namespace Universal{
 		return false;
 	}
 
-}  // namespace : Universal
+}  // namespace : universal
 
-namespace Universal{
-	void frSleep(unsigned long time){
+namespace universal{
+	void FrSleep(unsigned long time){
 #ifdef WIN32
 		Sleep(time);
 #else
@@ -246,15 +250,26 @@ namespace Universal{
 #endif
 	}
 
-#ifdef LINUX
-	void frUSleep(unsigned long time){
+#ifndef WIN32
+	void FrUSleep(unsigned long time){
 		usleep(time * 1000);
 	}
 #endif
-}  // namespace : Universal
 
-namespace Universal{
-	void getIp(std::string &ip){
+	static ::std::random_device g_rd39562314159268;  // 只用于构造随机值
+	static ::std::mt19937 g_mt = std::mt19937(g_rd39562314159268());
+	int RandInt32(int begin, int end){
+		if(end <= begin){
+#if defined(DEBUG) || defined(_DEBUG) || defined(__DEBUG)
+			assert(false);
+#endif
+		}
+		return (g_mt() % (end - begin + 1)) + begin;
+	}
+}  // namespace : universal
+
+namespace universal{
+	void GetIp(std::string &ip){
 		ip.clear();
 #ifdef WIN32
 		/*
@@ -280,42 +295,7 @@ namespace Universal{
 #endif
 	}
 
-#ifdef WIN32
-	// #include <windows.h>
-	string GBKToUTF8(const string& strGBK){
-		string strOutUTF8 = ""; 
-		WCHAR * str1;
-		int n = MultiByteToWideChar(CP_ACP, 0, strGBK.c_str(), -1, NULL, 0); 
-		str1 = new WCHAR[n]; 
-		MultiByteToWideChar(CP_ACP, 0, strGBK.c_str(), -1, str1, n); 
-		n = WideCharToMultiByte(CP_UTF8, 0, str1, -1, NULL, 0, NULL, NULL);
-		char * str2 = new char[n]; 
-		WideCharToMultiByte(CP_UTF8, 0, str1, -1, str2, n, NULL, NULL); 
-		strOutUTF8 = str2; 
-		delete[]str1; 
-		str1 = NULL; 
-		delete[]str2;
-		str2 = NULL; 
-		return strOutUTF8;
-	}
-
-	string UTF8ToGBK(const string& strUTF8){
-		int len = MultiByteToWideChar(CP_UTF8, 0, strUTF8.c_str(), -1, NULL, 0);
-		unsigned short * wszGBK = new unsigned short[len + 1]; 
-		memset(wszGBK, 0, len * 2 + 2); 
-		MultiByteToWideChar(CP_UTF8, 0, (LPCTSTR)strUTF8.c_str(), -1, (LPWSTR)wszGBK, len);
-
-		len = WideCharToMultiByte(CP_ACP, 0, (LPWSTR)wszGBK, -1, NULL, 0, NULL, NULL);
-		char *szGBK = new char[len + 1];
-		memset(szGBK, 0, len + 1); 
-		WideCharToMultiByte(CP_ACP, 0, (LPWSTR)wszGBK, -1, szGBK, len, NULL, NULL); //strUTF8 = szGBK; 
-		std::string strTemp(szGBK); 
-		delete[]szGBK; 
-		delete[]wszGBK; 
-		return strTemp; 
-	}
-#endif
-}  // namespace : Universal
+}  // namespace : universal
 
 
 
