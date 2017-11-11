@@ -19,10 +19,8 @@ LINK_NONEEDED=-Wl,--no-as-needed
 PROJECT_PATH=../../out
 PROJECT_OBJECTS= \
 	./$(PROJECT_PATH)/./pub_cfg.o \
-	./$(PROJECT_PATH)/./pub_collection.o \
 	./$(PROJECT_PATH)/./pub_file.o \
 	./$(PROJECT_PATH)/./pub_ini.o \
-	./$(PROJECT_PATH)/./pub_json.o \
 	./$(PROJECT_PATH)/./pub_log.o \
 	./$(PROJECT_PATH)/./pub_md5.o \
 	./$(PROJECT_PATH)/./pub_memory.o \

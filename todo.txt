@@ -1,30 +1,3 @@
 # 任务安排：
-## 序列 end time :
-	*	调整vim的功能应用:可直接应用于源码环境。
-		2	查找功能
-		3	tab功能
-		4	查找上一个打开的文件（而不是缓存顺序）
-	*	穿插可以对freedom的一些设计文档做补全。
-	*	collection测试。
-	*	freedom结构和框架。
-		* 需要阅读相关文档
-		* gate gameserver mapserver and so on.
-	*	数据库服务器：维持连接，暂不缓存。
-
-# 不紧急任务
-	*	vim F4 UpdateTags 增加报错提醒。
-	*	(不紧急)tmux
-		1	配置保存（关机后）
-		2	专门的top页
-		3	window命名设置。
-
-
-### 拆分方案
-	* 所有拆分重新写cmake
-	* public : fr_public and fr_template
-	* sql : fr_sql  依赖 mysql connecto++
-	* xls : fr_xls 依赖 libxls xlslib 
-	* network : delete fr_tcp. rename network : 新库，依赖libco
-	* 所有依赖依靠源码，不再有直接的lib依赖。
-	* 删除library
+	* 
 
