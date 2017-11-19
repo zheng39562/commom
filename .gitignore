@@ -6,6 +6,6 @@ wget-log
 tags
 Main_64
 core.*
-build\
-out\
+build/
+out/
 .*server_config\
