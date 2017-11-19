@@ -16,7 +16,7 @@
 
 #include "pub_define.h"
 
-namespace universal{
+namespace fr_public{
 	//! \brief	读取文件
 	std::string ReadFile(const std::string &path);
 	//! \brief	写入文件（覆盖）
@@ -39,7 +39,7 @@ namespace universal{
 	std::string GetFileNameByPath(const std::string &filepath);
 	//! \brief	补全路径：如果路径最后一个不是/ 则增加/
 	std::string CompletePath(const std::string &path);
-}  // namespace : universal
+}  // namespace : fr_public
 
 #endif
 

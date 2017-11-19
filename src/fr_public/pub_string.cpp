@@ -15,12 +15,12 @@
 #include "pub_tool.h"
 
 using namespace std;
-using namespace universal;
+using namespace fr_public;
 
 //
 // 字符和其他格式之间的转换。
 //
-namespace universal{
+namespace fr_public{
 	string StrToXmlStr(string content){
 		// & -> &amp;
 		StrReplaceAll(content, "&", "&amp;");
@@ -157,13 +157,13 @@ namespace universal{
 		}
 		return 0;
 	}
-} // namespace universal{
+} // namespace fr_public{
 
 
 //
 // 字符本身的转换。
 //
-namespace universal{
+namespace fr_public{
 	string StrToUpper(const string &str){
 		string strTmp = str;
 		transform(strTmp.begin(), strTmp.end(), strTmp.begin(), (int (*)(int))toupper);
@@ -178,13 +178,13 @@ namespace universal{
 	}
 
 
-} // namespace universal{
+} // namespace fr_public{
 
 
 //
 // 字符操作：合并，分割，替换。。。
 //
-namespace universal{
+namespace fr_public{
 	bool StrReplaceAll(string &content, const string &replace, const string &dest){
 		string::size_type pos = 0;
 		string::size_type replaceSize = replace.size();
@@ -285,7 +285,7 @@ namespace universal{
 		return str.empty() ? str : TrimRight(TrimLeft(str));
 	}
 
-}  // namepsace : universal
+}  // namepsace : fr_public
 
 
 

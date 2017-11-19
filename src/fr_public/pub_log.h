@@ -25,23 +25,23 @@
 {\
 	std::ostringstream osTmp; osTmp << msg; \
 	MFC_addLog(key, osTmp.str()); \
-	universal::SingleLogServer::GetInstance()->WriteLog(key, level, __FILE__, __FUNCTION__, __LINE__, osTmp.str());\
+	fr_public::SingleLogServer::GetInstance()->WriteLog(key, level, __FILE__, __FUNCTION__, __LINE__, osTmp.str());\
 }
 #else
 #define LOG_PRINT(key, msg, level) \
 {\
 	std::ostringstream osTmp; osTmp << msg; \
 	std::cout << std::dec << "key[" << key << "] " << msg << std::endl;\
-	universal::SingleLogServer::GetInstance()->WriteLog(key, level, __FILE__, __FUNCTION__, __LINE__, osTmp.str());\
+	fr_public::SingleLogServer::GetInstance()->WriteLog(key, level, __FILE__, __FUNCTION__, __LINE__, osTmp.str());\
 }
 #endif
 
-#define K_DEBUG_P(key, msg) if(universal::SingleLogServer::GetInstance()->log_level(key) <= universal::eLogLevel_Program){ LOG_PRINT(key, msg, universal::eLogLevel_Program); }
-#define K_DEBUG_D(key, msg) if(universal::SingleLogServer::GetInstance()->log_level(key) <= universal::eLogLevel_Debug){ LOG_PRINT(key, msg, universal::eLogLevel_Debug); }
-#define K_DEBUG_I(key, msg) if(universal::SingleLogServer::GetInstance()->log_level(key) <= universal::eLogLevel_Info){ LOG_PRINT(key, msg, universal::eLogLevel_Info); }
-#define K_DEBUG_W(key, msg) if(universal::SingleLogServer::GetInstance()->log_level(key) <= universal::eLogLevel_Warning){ LOG_PRINT(key, msg, universal::eLogLevel_Warning); }
-#define K_DEBUG_E(key, msg) if(universal::SingleLogServer::GetInstance()->log_level(key) <= universal::eLogLevel_Error){ LOG_PRINT(key, msg, universal::eLogLevel_Error); }
-#define K_DEBUG_C(key, msg) if(universal::SingleLogServer::GetInstance()->log_level(key) <= universal::eLogLevel_Crash){ LOG_PRINT(key, msg, universal::eLogLevel_Crash); }
+#define K_DEBUG_P(key, msg) if(fr_public::SingleLogServer::GetInstance()->log_level(key) <= fr_public::eLogLevel_Program){ LOG_PRINT(key, msg, fr_public::eLogLevel_Program); }
+#define K_DEBUG_D(key, msg) if(fr_public::SingleLogServer::GetInstance()->log_level(key) <= fr_public::eLogLevel_Debug){ LOG_PRINT(key, msg, fr_public::eLogLevel_Debug); }
+#define K_DEBUG_I(key, msg) if(fr_public::SingleLogServer::GetInstance()->log_level(key) <= fr_public::eLogLevel_Info){ LOG_PRINT(key, msg, fr_public::eLogLevel_Info); }
+#define K_DEBUG_W(key, msg) if(fr_public::SingleLogServer::GetInstance()->log_level(key) <= fr_public::eLogLevel_Warning){ LOG_PRINT(key, msg, fr_public::eLogLevel_Warning); }
+#define K_DEBUG_E(key, msg) if(fr_public::SingleLogServer::GetInstance()->log_level(key) <= fr_public::eLogLevel_Error){ LOG_PRINT(key, msg, fr_public::eLogLevel_Error); }
+#define K_DEBUG_C(key, msg) if(fr_public::SingleLogServer::GetInstance()->log_level(key) <= fr_public::eLogLevel_Crash){ LOG_PRINT(key, msg, fr_public::eLogLevel_Crash); }
 
 #define DEBUG_KEY_DEFAULT "debug_log"
 #define DEBUG_P(msg) K_DEBUG_P(DEBUG_KEY_DEFAULT, msg)
@@ -51,7 +51,7 @@
 #define DEBUG_E(msg) K_DEBUG_E(DEBUG_KEY_DEFAULT, msg)
 #define DEBUG_C(msg) K_DEBUG_C(DEBUG_KEY_DEFAULT, msg)
 
-namespace universal{
+namespace fr_public{
 	typedef std::string LogKey;
 	enum eLogLevel{
 		eLogLevel_IgnoreNothing = 0,
@@ -123,10 +123,10 @@ namespace universal{
 			std::thread loop_thread_;
 			bool running_;
 	};
-	typedef universal::SingleMode<LogServer> SingleLogServer;
+	typedef fr_template::SingleMode<LogServer> SingleLogServer;
 }
 
-universal::eLogLevel PARSE_LOG_STRING(const std::string &log_level);
+fr_public::eLogLevel PARSE_LOG_STRING(const std::string &log_level);
 
 #endif 
 

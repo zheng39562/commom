@@ -11,7 +11,7 @@
 
 using namespace std;
 
-namespace universal{
+namespace fr_public{
 	BinaryMemory::BinaryMemory()
 		:m_Buffer(NULL),
 		 m_MaxLimit(0x7FFFFFFF),

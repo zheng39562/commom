@@ -17,7 +17,7 @@
 //
 // 时间通用函数。
 //
-namespace universal{
+namespace fr_public{
 	//! \brief	将日期转化为秒数
 	//! \note	格式必须正确，否则会产生异常行为。
 	//! \note	已确定的格式支持：%Y 年 %m 月 %d 日 %H 时 %M 分 %S 秒
@@ -38,10 +38,10 @@ namespace universal{
 	//! \param[in] date_format 格式仅对秒之前的有效。
 	//! \retval	一定会包含秒后的数据。所以如果不需要秒后时间，不要使用该函数。
 	std::string GetLocalTimeU(const std::string &date_format);
-}  // namespace : universal
+}  // namespace : fr_public
 
 
-namespace universal{
+namespace fr_public{
 	//! \brief	计时类。
 	//! \note	精度由系统决定。linux下是us window下是ms。单因计时类本身也需要时间，所以会存在一定误差。
 	//! \note	使用方法：
@@ -74,7 +74,7 @@ namespace universal{
 			clock_t				start_;
 			clock_t				stop_;
 	};
-}  // namespace : universal
+}  // namespace : fr_public
 
 #endif
 

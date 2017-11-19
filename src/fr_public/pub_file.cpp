@@ -17,7 +17,7 @@ using namespace std;
 using namespace boost;
 using namespace boost::filesystem;
 
-namespace universal{
+namespace fr_public{
 	string ReadFile(const string &path){
 		std::ifstream infile;
 		infile.open(path.c_str());

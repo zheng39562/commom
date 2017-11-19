@@ -16,7 +16,7 @@
 
 using namespace std;
 
-namespace universal{
+namespace fr_public{
 	IniCfg::IniCfg()
 		:ini_info_(),
 		 ini_content_(),

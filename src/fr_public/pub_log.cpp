@@ -16,9 +16,9 @@
 #include "pub_string.h"
 
 using namespace std;
-using namespace universal;
+using namespace fr_public;
 
-namespace universal{
+namespace fr_public{
 	Path LogCache::static_path_ = "";
 	size_t LogCache::static_max_size_ = 10 * 1024 * 1024;
 
@@ -47,8 +47,8 @@ namespace universal{
 	}
 
 	void LogCache::set_static_path(const Path &path){ 
-		static_path_ = universal::CompletePath(path); 
-		universal::CreateDir(static_path_); 
+		static_path_ = fr_public::CompletePath(path); 
+		fr_public::CreateDir(static_path_); 
 	}
 
 	bool LogCache::IsFileFull(){
@@ -62,7 +62,7 @@ namespace universal{
 	}
 
 	bool LogCache::IsNewDate(){ 
-		return universal::GetLocalTime("%Y%m%d") != file_date_; 
+		return fr_public::GetLocalTime("%Y%m%d") != file_date_; 
 	}
 
 	void LogCache::Reopen(){
@@ -130,7 +130,7 @@ namespace universal{
 	}
 }
 
-namespace universal{
+namespace fr_public{
 	LogServer::LogServer()
 		:caches_(),
 		 loop_thread_(),
@@ -197,13 +197,13 @@ namespace universal{
 	}
 }
 
-universal::eLogLevel PARSE_LOG_STRING(const std::string &log_level){
-	if("program" == universal::StrToLower(log_level)){ return universal::eLogLevel_Program; }
-	else if("debug" == universal::StrToLower(log_level)){ return universal::eLogLevel_Debug; }
-	else if("info" == universal::StrToLower(log_level)){ return universal::eLogLevel_Info; }
-	else if("warning" == universal::StrToLower(log_level)){ return universal::eLogLevel_Warning; }
-	else if("error" == universal::StrToLower(log_level)){ return universal::eLogLevel_Error; }
-	else if("crash" == universal::StrToLower(log_level)){ return universal::eLogLevel_Crash; }
-	else { return universal::eLogLevel_IgnoreNothing; }
+fr_public::eLogLevel PARSE_LOG_STRING(const std::string &log_level){
+	if("program" == fr_public::StrToLower(log_level)){ return fr_public::eLogLevel_Program; }
+	else if("debug" == fr_public::StrToLower(log_level)){ return fr_public::eLogLevel_Debug; }
+	else if("info" == fr_public::StrToLower(log_level)){ return fr_public::eLogLevel_Info; }
+	else if("warning" == fr_public::StrToLower(log_level)){ return fr_public::eLogLevel_Warning; }
+	else if("error" == fr_public::StrToLower(log_level)){ return fr_public::eLogLevel_Error; }
+	else if("crash" == fr_public::StrToLower(log_level)){ return fr_public::eLogLevel_Crash; }
+	else { return fr_public::eLogLevel_IgnoreNothing; }
 }
 

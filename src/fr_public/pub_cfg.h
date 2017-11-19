@@ -14,7 +14,7 @@
 #include "pub_define.h"
 #include "fr_template/single_mode.hpp"
 
-namespace universal{
+namespace fr_public{
 	enum eCfgDataType{
 		eCfgDataType_Unknow,
 		eCfgDataType_Ini,
@@ -70,78 +70,78 @@ namespace universal{
 			eCfgDataType cfg_type_;	//! 
 			std::mutex mutex_;
 	};
-	typedef universal::SingleMode<Configurator> SingleConfigurator;
+	typedef fr_template::SingleMode<Configurator> SingleConfigurator;
 }
 
 inline bool CFG_GET_BOOL(const std::string& section, const std::string& key, const bool &default_value){ 
-	return (bool)universal::SingleConfigurator::GetInstance()->GetInt(section, key, (int)default_value); 
+	return (bool)fr_public::SingleConfigurator::GetInstance()->GetInt(section, key, (int)default_value); 
 }
-inline bool CFG_GET_BOOL(const universal::Configurator::CfgKey& cfg_key, const std::string& section, const std::string& key, const bool &default_value){ 
-	return (bool)universal::SingleConfigurator::GetInstance()->GetInt(cfg_key, section, key, (int)default_value); 
+inline bool CFG_GET_BOOL(const fr_public::Configurator::CfgKey& cfg_key, const std::string& section, const std::string& key, const bool &default_value){ 
+	return (bool)fr_public::SingleConfigurator::GetInstance()->GetInt(cfg_key, section, key, (int)default_value); 
 }
 
 inline int CFG_GET_INT(const std::string& section, const std::string& key, const int &default_value){ 
-	return universal::SingleConfigurator::GetInstance()->GetInt(section, key, default_value); 
+	return fr_public::SingleConfigurator::GetInstance()->GetInt(section, key, default_value); 
 }
-inline int CFG_GET_INT(const universal::Configurator::CfgKey& cfg_key, const std::string& section, const std::string& key, const int &default_value){ 
-	return universal::SingleConfigurator::GetInstance()->GetInt(cfg_key, section, key, default_value); 
+inline int CFG_GET_INT(const fr_public::Configurator::CfgKey& cfg_key, const std::string& section, const std::string& key, const int &default_value){ 
+	return fr_public::SingleConfigurator::GetInstance()->GetInt(cfg_key, section, key, default_value); 
 }
 
 inline double CFG_GET_DOUBLE(const std::string& section, const std::string& key, const double &default_value){ 
-	return universal::SingleConfigurator::GetInstance()->GetDouble(section, key, default_value); 
+	return fr_public::SingleConfigurator::GetInstance()->GetDouble(section, key, default_value); 
 }
-inline double CFG_GET_DOUBLE(const universal::Configurator::CfgKey& cfg_key, const std::string& section, const std::string& key, const double &default_value){ 
-	return universal::SingleConfigurator::GetInstance()->GetDouble(cfg_key, section, key, default_value); 
+inline double CFG_GET_DOUBLE(const fr_public::Configurator::CfgKey& cfg_key, const std::string& section, const std::string& key, const double &default_value){ 
+	return fr_public::SingleConfigurator::GetInstance()->GetDouble(cfg_key, section, key, default_value); 
 }
 
 inline std::string CFG_GET_STRING(const std::string& section, const std::string& key, const std::string &default_value){ 
-	return universal::SingleConfigurator::GetInstance()->GetString(section, key, default_value); 
+	return fr_public::SingleConfigurator::GetInstance()->GetString(section, key, default_value); 
 }
-inline std::string CFG_GET_STRING(const universal::Configurator::CfgKey& cfg_key, const std::string& section, const std::string& key, const std::string &default_value){ 
-	return universal::SingleConfigurator::GetInstance()->GetString(cfg_key, section, key, default_value); 
+inline std::string CFG_GET_STRING(const fr_public::Configurator::CfgKey& cfg_key, const std::string& section, const std::string& key, const std::string &default_value){ 
+	return fr_public::SingleConfigurator::GetInstance()->GetString(cfg_key, section, key, default_value); 
 }
 
 
 inline bool CFG_SET_BOOL(const std::string& section, const std::string& key, bool value){ 
-	if(universal::SingleConfigurator::GetInstance()->SetInt(section, key, (int)value)){
-		universal::SingleConfigurator::GetInstance()->SaveCfg();
+	if(fr_public::SingleConfigurator::GetInstance()->SetInt(section, key, (int)value)){
+		fr_public::SingleConfigurator::GetInstance()->SaveCfg();
 		return true;
 	}
 	return false; 
 }
-inline bool CFG_SET_BOOL(const universal::Configurator::CfgKey& cfg_key, const std::string& section, const std::string& key, bool value){ 
-	if(universal::SingleConfigurator::GetInstance()->SetInt(cfg_key, section, key, (int)value)){
-		universal::SingleConfigurator::GetInstance()->SaveCfg(cfg_key);
+inline bool CFG_SET_BOOL(const fr_public::Configurator::CfgKey& cfg_key, const std::string& section, const std::string& key, bool value){ 
+	if(fr_public::SingleConfigurator::GetInstance()->SetInt(cfg_key, section, key, (int)value)){
+		fr_public::SingleConfigurator::GetInstance()->SaveCfg(cfg_key);
 		return true;
 	}
 	return false; 
 }
 
 inline bool CFG_SET_INT(const std::string& section, const std::string& key, int value){ 
-	if(universal::SingleConfigurator::GetInstance()->SetInt(section, key, value)){
-		universal::SingleConfigurator::GetInstance()->SaveCfg();
+	if(fr_public::SingleConfigurator::GetInstance()->SetInt(section, key, value)){
+		fr_public::SingleConfigurator::GetInstance()->SaveCfg();
 		return true;
 	}
 	return false; 
 }
-inline bool CFG_SET_INT(const universal::Configurator::CfgKey& cfg_key, const std::string& section, const std::string& key, int value){ 
-	if(universal::SingleConfigurator::GetInstance()->SetInt(cfg_key, section, key, value)){
-		universal::SingleConfigurator::GetInstance()->SaveCfg(cfg_key);
+inline bool CFG_SET_INT(const fr_public::Configurator::CfgKey& cfg_key, const std::string& section, const std::string& key, int value){ 
+	if(fr_public::SingleConfigurator::GetInstance()->SetInt(cfg_key, section, key, value)){
+		fr_public::SingleConfigurator::GetInstance()->SaveCfg(cfg_key);
 		return true;
 	}
 	return false; 
 }
 
 inline bool CFG_SET_DOUBLE(const std::string& section, const std::string& key, double value){ 
-	if(universal::SingleConfigurator::GetInstance()->SetDouble(section, key, value)){
-		universal::SingleConfigurator::GetInstance()->SaveCfg();
+	if(fr_public::SingleConfigurator::GetInstance()->SetDouble(section, key, value)){
+		fr_public::SingleConfigurator::GetInstance()->SaveCfg();
 		return true;
 	}
 	return false; 
 }
-inline bool CFG_SET_DOUBLE(const universal::Configurator::CfgKey& cfg_key, const std::string& section, const std::string& key, double value){ 
-	if(universal::SingleConfigurator::GetInstance()->SetDouble(cfg_key, section, key, value)){
-		universal::SingleConfigurator::GetInstance()->SaveCfg(cfg_key);
+inline bool CFG_SET_DOUBLE(const fr_public::Configurator::CfgKey& cfg_key, const std::string& section, const std::string& key, double value){ 
+	if(fr_public::SingleConfigurator::GetInstance()->SetDouble(cfg_key, section, key, value)){
+		fr_public::SingleConfigurator::GetInstance()->SaveCfg(cfg_key);
 		return true;
 	}
 	return false; 
@@ -149,14 +149,14 @@ inline bool CFG_SET_DOUBLE(const universal::Configurator::CfgKey& cfg_key, const
 
 inline bool CFG_SET_STRING(const std::string& section, const std::string& key, const std::string &value){ 
 	if(CFG_SET_STRING(section, key, value)){
-		universal::SingleConfigurator::GetInstance()->SaveCfg();
+		fr_public::SingleConfigurator::GetInstance()->SaveCfg();
 		return true;
 	}
 	return false; 
 }
-inline bool CFG_SET_STRING(const universal::Configurator::CfgKey& cfg_key, const std::string& section, const std::string& key, const std::string &value){ 
+inline bool CFG_SET_STRING(const fr_public::Configurator::CfgKey& cfg_key, const std::string& section, const std::string& key, const std::string &value){ 
 	if(CFG_SET_STRING(cfg_key, section, key, value)){
-		universal::SingleConfigurator::GetInstance()->SaveCfg(cfg_key);
+		fr_public::SingleConfigurator::GetInstance()->SaveCfg(cfg_key);
 		return true;
 	}
 	return false; 

@@ -33,7 +33,7 @@ using namespace std;
 /*
  * other function
  */
-namespace universal{
+namespace fr_public{
 #ifdef LINUX
 	bool ExecShellCmd(const string &cmd){
 		FILE* fp = NULL;
@@ -193,13 +193,13 @@ namespace universal{
 		content = tmp;
 		return true;
 	}
-}  // namespace : universal
+}  // namespace : fr_public
 
 
 //
 // 字符验证。。。
 //
-namespace universal{
+namespace fr_public{
 	bool CheckNumber(const string &number){
 		if(number.empty()){ return false; }
 
@@ -239,9 +239,9 @@ namespace universal{
 		return false;
 	}
 
-}  // namespace : universal
+}  // namespace : fr_public
 
-namespace universal{
+namespace fr_public{
 	void FrSleep(unsigned long time){
 #ifdef WIN32
 		Sleep(time);
@@ -266,9 +266,9 @@ namespace universal{
 		}
 		return (g_mt() % (end - begin + 1)) + begin;
 	}
-}  // namespace : universal
+}  // namespace : fr_public
 
-namespace universal{
+namespace fr_public{
 	void GetIp(std::string &ip){
 		ip.clear();
 #ifdef WIN32
@@ -295,7 +295,7 @@ namespace universal{
 #endif
 	}
 
-}  // namespace : universal
+}  // namespace : fr_public
 
 
 

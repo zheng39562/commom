@@ -14,7 +14,7 @@
 #include "pub_define.h"
 #include "fr_template/single_mode.hpp"
 
-namespace universal{
+namespace fr_public{
 	//! \brief	读取，解析，保存ini的类
 	//! \note	只支持\n换行。任何其他形式的(例如\r\n)都会被转换成\n。并且，在会写程序时也不会转换回\r\n
 	//! \note	ini限制：非标准ini的限制，仅是该ini解析类的限制.违反限制的结果未定义,但尽可能会保持可用.
@@ -64,7 +64,7 @@ namespace universal{
 			std::string ini_content_;	//! ini文本的内容。用户回写ini文本.
 			std::map<std::string, std::map<std::string, std::string> > ini_info_;	//! 
 	};
-	typedef SingleMode<IniCfg> SingleIniCfg;
+	typedef fr_template::SingleMode<IniCfg> SingleIniCfg;
 }
 #endif 
 

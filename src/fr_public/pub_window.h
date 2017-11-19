@@ -12,7 +12,7 @@
 #include "pub_define.h"
 #if defined(_WIN32) || defined(WIN32)
 
-namespace universal{
+namespace fr_public{
 	std::string getGUIDStr(const GUID &guid);
 	GUID parseGUIDStr(const std::string &strGuid);
 	//! \brief	

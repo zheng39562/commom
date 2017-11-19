@@ -49,7 +49,7 @@ bool doEpollTest(std::string arg0 = "", std::string arg1 = "", std::string arg2 
 int main( int agrc, char **argv ){
 	DEBUG_INIT("./log", "test");
 
-	doTcpTest();
+//	doTcpTest();
 //	doEpollTest();
 
 	return 0;

@@ -17,7 +17,7 @@
 /*
  * template function
  */
-namespace Universal{
+namespace fr_template{
 } // namespace Universal{
 
 

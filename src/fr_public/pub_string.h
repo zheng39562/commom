@@ -15,7 +15,7 @@
 //
 // 字符和其他格式之间的转换。
 //
-namespace universal{
+namespace fr_public{
 	//! \brief	给str增加单引号(主要用于SQL)
 	inline std::string QuotedStr(const std::string &str){ return "'" + str + "'"; }
 	inline std::string DoubleQuotedStr(const std::string &str){ return "\"" + str + "\""; }
@@ -56,13 +56,13 @@ namespace universal{
 	//! \note	暂时仅支持UFT8。
 	//! \todo	下一步建议扩展GBK。
 	size_t GetStrSize(const std::string &str, eCharacterEncoding encoding = eEncoding_UTF8);
-} // namespace universal{
+} // namespace fr_public{
 
 
 //
 // 字符本身的转换。
 //
-namespace universal{
+namespace fr_public{
 	//! \brief	将字符串中的小写转换为大写。
 	//! \param[in]	str	转换字符串。本身不改变。
 	//! \retval	转换后的字符串。
@@ -70,13 +70,13 @@ namespace universal{
 	//! \brief	将字符串中的大写转换为小写。
 	//! \retval	转换后的字符串。
 	std::string StrToLower(const std::string &str);
-} // namespace universal{
+} // namespace fr_public{
 
 
 //
 // 字符操作：合并，分割，替换。。。
 //
-namespace universal{
+namespace fr_public{
 	//! \brief	替换字符串中对应的子字符串。
 	//! \param[out]	content	替换的字符串。
 	//! \param[in]	replace	被替换的子字符串。
@@ -98,7 +98,7 @@ namespace universal{
 	std::string TrimRight(const std::string &str);
 	std::string TrimLeft(const std::string &str);
 	std::string Trim(const std::string &str);
-}  // namespace : universal
+}  // namespace : fr_public
 
 
 #endif

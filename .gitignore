@@ -8,4 +8,5 @@ Main_64
 core.*
 build/
 out/
-.*server_config\
+.*server_config/
+

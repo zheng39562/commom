@@ -14,7 +14,7 @@
 #include <mutex>
 #include <thread>
 
-namespace universal{
+namespace fr_template{
 	//! \brief	单例模式的模板类。
 	//! \note	使用前置：
 	//!			1	被单例的对象，需要有公有的无参数的构造器。

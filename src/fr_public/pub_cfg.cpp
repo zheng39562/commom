@@ -11,7 +11,7 @@
 
 using namespace std;
 
-namespace universal{
+namespace fr_public{
 	Configurator::Configurator()
 		:cfg_map_(),
 		 default_cfg_key_(""),

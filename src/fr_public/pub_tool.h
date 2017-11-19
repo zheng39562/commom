@@ -22,7 +22,7 @@
 /*
  * other function
  */
-namespace universal{
+namespace fr_public{
 #define _PTHONETYPE_MOBILE					"YD"
 #define _PTHONETYPE_UNICOM					"LT"
 #define _PTHONETYPE_CDMA					"DX"
@@ -55,13 +55,13 @@ namespace universal{
 	bool MyStrDecrypt(std::string &content, const std::string &key);
 	bool ConvertBinaryToHexString(std::string &content);
 	bool ConvertHexStringToBinary(std::string &content);
-}  // namespace : universal
+}  // namespace : fr_public
 
 
 //
 // 字符验证。。。
 //
-namespace universal{
+namespace fr_public{
 	//! \brief	验证字符串是否是一个数字。
 	//!	\note	可验证：正负，整数，小数。
 	bool CheckNumber(const std::string &number);
@@ -72,9 +72,9 @@ namespace universal{
 	//! \brief	验证手机格式。
 	bool CheckMobile(const std::string &mobile);
 
-}  // namespace : universal
+}  // namespace : fr_public
 
-namespace universal{
+namespace fr_public{
 	//! \brief	线程休眠，单位ms
 	void FrSleep(unsigned long time);
 	//! \brief	线程休眠，单位us
@@ -89,7 +89,7 @@ namespace universal{
 	int RandInt32(int begin = 0x0, int end = 0xFFFFFFFF);
 }
 
-namespace universal{
+namespace fr_public{
 	//! \brief	获取本机IP： 支持IPV4 支持window and linux 
 	//! \note	window版本需要定义宏 WIN32
 	void GetIp(std::string &ip);

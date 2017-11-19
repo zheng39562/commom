@@ -14,7 +14,7 @@
 
 #include <stack>
 
-namespace universal{
+namespace fr_template{
 	//! \brief	自实现的栈操作。
 	//! \note	拥有自己的互斥锁。互斥锁仅对单对象做出限制：多个不同的对象没有影响。
 	//! \note	存在瑕疵：empty之后再进行pop 再多线程并发时有极小的一段时间处于解锁状态。

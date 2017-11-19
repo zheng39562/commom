@@ -16,7 +16,7 @@
 
 using namespace std;
 
-namespace universal{
+namespace fr_public{
 	time_t DateToTime(const string &date, string date_format){
 		struct tm tm_tmp;
 #if defined(_WIN32) || defined(WIN32)
@@ -59,13 +59,13 @@ namespace universal{
 		GetLocalTimeUs(second_part, us_part);
 		return FormatDateTime(second_part, date_format) + "." + to_string(us_part);
 	}
-}  // namepsace : universal
+}  // namepsace : fr_public
 
 
 /*
  * TimeCounter
  */
-namespace universal{
+namespace fr_public{
 	TimeCounter::TimeCounter()
 		:start_(0),
 		 stop_(0)
@@ -85,5 +85,5 @@ namespace universal{
 		stop_ = std::clock();
 		return (stop_ - start_) * (1000000 / CLOCKS_PER_SEC);
 	}
-}  // namespace : universal
+}  // namespace : fr_public
 

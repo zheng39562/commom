@@ -21,7 +21,7 @@
 
 using namespace std;
 
-namespace universal{
+namespace fr_public{
 	std::string getGUIDStr(const GUID &guid){
 		char buf[70] = {0};
 #ifdef __GNUC__

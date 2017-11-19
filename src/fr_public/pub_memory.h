@@ -10,7 +10,7 @@
 
 #include "pub_define.h"
 
-namespace universal{
+namespace fr_public{
 	//! \brief	
 	//! \note	请勿在外界直接操作内存。这会导致行为未定义。
 	//! \note	创建和使用：

@@ -1,9 +1,9 @@
 /**********************************************************
  * \file SqlOperator.h
  * \brief 
- * \note	æ³¨æ„äº‹é¡¹ï¼š
- *			1,ç±»ä¸­çš„æˆå‘˜å‡½æ•°ä¸­çš„åŒåå‚æ•°çš„å«ä¹‰å®Œå…¨ç›¸åŒã€‚ä»…ä¼šæ³¨é‡Šå…¶ä¸­ä¸€ä¸ªå‡½æ•°ï¼Œå…¶ä»–å‡½æ•°åˆ™ä¸å†é‡å¤æ³¨é‡Šã€‚é‡åçš„å‚æ•°æ„ä¹‰ä¸åŒæ—¶ï¼Œä¼šç‹¬ç«‹æ³¨è§£ã€‚
- *			2,ç¬¬1æ¡çš„è§„åˆ™åŒæ ·é€‚ç”¨äºè¿”å›å€¼çš„å«ä¹‰ã€‚
+ * \note	×¢ÒâÊÂÏî£º
+ *			1,ÀàÖĞµÄ³ÉÔ±º¯ÊıÖĞµÄÍ¬Ãû²ÎÊıµÄº¬ÒåÍêÈ«ÏàÍ¬¡£½ö»á×¢ÊÍÆäÖĞÒ»¸öº¯Êı£¬ÆäËûº¯ÊıÔò²»ÔÙÖØ¸´×¢ÊÍ¡£ÖØÃûµÄ²ÎÊıÒâÒå²»Í¬Ê±£¬»á¶ÀÁ¢×¢½â¡£
+ *			2,µÚ1ÌõµÄ¹æÔòÍ¬ÑùÊÊÓÃÓÚ·µ»ØÖµµÄº¬Òå¡£
  * 
  * \version 
  * \author zheng39562@163.com
@@ -11,59 +11,68 @@
 #ifndef _SqlOperator_H
 #define _SqlOperator_H
 
+#include <memory>
+#include <thread>
+#include <mutex>
+
 #include "mysql_driver.h"
 #include "mysql_connection.h"
-#include "boost/shared_ptr.hpp"
 
-#include "fr_public/pub_define.h"
+namespace fr_sql{
+	//! \brief	sqlÌõ¼ş×ª»»º¯Êı¡£
+	std::string convertCond(const std::map<std::string, std::string> &sqlWhere);
+	std::string BuildQueryCmd(const std::string& table_name, const std::map<std::string, std::string>& condition);
+	std::string BuildCreateCmd(const std::string& table_name, const std::map<std::string, std::string>& fields);
+	std::string BuildUpdateCmd(const std::string& table_name, const std::map<std::string, std::string>& condition, const std::map<std::string, std::string>& fields);
+	std::string BuildDeleteCmd(const std::string& table_name, const std::map<std::string, std::string>& condition);
 
-namespace SqlSpace{
-
-	/*
-	//! \brief	æ•°æ®åº“çš„ç®¡ç†å™¨ï¼šè·å–æ•°æ®åº“æ“ä½œæŒ‡é’ˆã€‚
-	//! \note	é‡‡ç”¨çº¿ç¨‹æ± æ–¹æ¡ˆã€‚
-	class SqlOprtManager{
-		public:
-			SqlOprtManager()=default;
-			~SqlOprtManager()=default;
-	};
-	*/
-
-	typedef std::pair<std::string, std::string>	TableFieldData;
-	typedef std::map<std::string, std::string> TableData;
-	typedef std::vector<TableData> TableDatas;
-	typedef std::string	SQLWhere;
-	//! \brief	æ•°æ®åº“æ“ä½œç±»ï¼Œå¹¶ä¸”ä¸ºéçº¿ç¨‹å®‰å…¨ç±»ã€‚
-	//! \note	æä¾›ä¸¤ç§è®¾ç½®è¿æ¥çš„æ–¹å¼ï¼šæ„é€ å‡½æ•° å’Œ è®¾å®šå‡½æ•°ã€‚
-	//!			æ³¨æ„ï¼šæœªæˆåŠŸè¿æ¥æ•°æ®åº“æ—¶ï¼Œä»»ä½•sqlæ“ä½œéƒ½ä¼šè¿”å›å¼‚å¸¸ã€‚
-	//! \note	è®¾è®¡ç†å¿µä¸æ”¯æŒè·¨åº“æŸ¥è¯¢ã€‚ä½†ä¿ç•™éƒ¨åˆ†è·¨åº“æ¥å£: execSQL
-	//! \todo	é™†ç»­æ”¯æŒæ‰€æœ‰mysqlç›¸å…³æ“ä½œé›†ã€‚
-	//! \todo	ä¼˜å…ˆmysqlã€‚åç»­ä¼šå¢åŠ å…¶ä»–æ•°æ®åº“æ ‡å‡†æ“ä½œã€‚
+	//! \brief	Êı¾İ¿â²Ù×÷Àà£¬²¢ÇÒÎª·ÇÏß³Ì°²È«Àà¡£
+	//! \note	Ìá¹©Á½ÖÖÉèÖÃÁ¬½ÓµÄ·½Ê½£º¹¹Ôìº¯Êı ºÍ Éè¶¨º¯Êı¡£
+	//!			×¢Òâ£ºÎ´³É¹¦Á¬½ÓÊı¾İ¿âÊ±£¬ÈÎºÎsql²Ù×÷¶¼»á·µ»ØÒì³£¡£
+	//! \note	Éè¼ÆÀíÄî²»Ö§³Ö¿ç¿â²éÑ¯¡£µ«±£Áô²¿·Ö¿ç¿â½Ó¿Ú: execSQL
+	//! \todo	Â½ĞøÖ§³ÖËùÓĞmysqlÏà¹Ø²Ù×÷¼¯¡£
+	//! \todo	ÓÅÏÈmysql¡£ºóĞø»áÔö¼ÓÆäËûÊı¾İ¿â±ê×¼²Ù×÷¡£
 	class SqlOperator{
 		public:
-			SqlOperator( const std::string &_host, const int &_port, const std::string &_user, const std::string &_pwd, const std::string &_dbName );
-			SqlOperator( const std::string &_host, const int &_port, const std::string &_user, const std::string &_pwd, const std::string &_dbName, const int &_timeout );
-			SqlOperator( const std::string &_host, const int &_port, const std::string &_user, const std::string &_pwd, const std::string &_dbName, 
-					const int &_readTimeout, const int &_writeTimeout );
+			//! \param[in] _readTimeout  unit is ms
+			//! \param[in] _writeTimeout  unit is ms
+			SqlOperator(const std::string &_host, const int &_port, const std::string &_user, const std::string &_pwd, const std::string &_dbName, 
+					const int _readTimeout, const int _writeTimeout);
 			~SqlOperator();
-		private:
-			boost::shared_ptr<sql::Connection>			m_p_Connection;		//! 
-			boost::shared_ptr<sql::Statement>			m_p_Statement;		//! 
 		public:
-			//! \brief	è®¾ç½®æ•°æ®åº“é“¾æ¥ã€‚
-			bool setConnection( const std::string &host, const int &port, const std::string &user, const std::string &pwd, const std::string &dbName, 
-				const int &_readTimeout, const int &_writeTimeout  );
+			//! \param[in] datas ½ö¶ÔÓµÓĞ·µ»ØÖµµÄselectÓï¾äÓĞĞ§¡£ÆäËû¸´ºÏÓï¾ä·µ»Ø¿Õ¡£
+			bool ExecQuery(const std::string &sqlCmd, std::map<std::string, std::string> &datas);
+			//! \param[in] datas ½ö¶ÔÓµÓĞ·µ»ØÖµµÄselectÓï¾äÓĞĞ§¡£ÆäËû¸´ºÏÓï¾ä·µ»Ø¿Õ¡£
+			bool ExecQuery(const std::string &sqlCmd, std::vector<std::map<std::string, std::string> > &datas);
+			//! \brief	·µ»ØÓ°ÏìÌõÊı
+			bool ExecUpdate(const std::string &sqlCmd, int &updateCount);
 
-			//! \brief	sqlæ¡ä»¶è½¬æ¢å‡½æ•°ã€‚
-			SQLWhere convertCond( const std::map<std::string, std::string> &sqlWhere );
-
-			//! \brief	æ‰§è¡ŒSQLè¯­å¥ï¼šå¯è·¨åº“æŸ¥è¯¢ã€‚
-			//! \note	ä¸é™åˆ¶è·¨åº“è¯­å¥ã€‚ä½†éœ€è¦å½“å‰ç”¨æˆ·æ‹¥æœ‰å¯¹åº”æƒé™ã€‚
-			bool execSQL( const std::string &sqlCmd );
-			//! \param[in] datas ä»…å¯¹æ‹¥æœ‰è¿”å›å€¼çš„selectè¯­å¥æœ‰æ•ˆã€‚å…¶ä»–å¤åˆè¯­å¥è¿”å›ç©ºã€‚
-			bool execQuery( const std::string &sqlCmd, TableDatas &datas );
+			//! \brief	
+			bool IsExist(const std::string& table_name, const std::map<std::string, std::string>& condition);
+			//! \brief	
+			//! \retval true ±íÊ¾²éÑ¯µ½Êı¾İ¡£ false ¿ÉÄÜÊÇ²éÑ¯Ê§°Ü£¬Ò²¿ÉÄÜÊÇ²éÑ¯²»µ½Êı¾İ.
+			bool QueryItem(const std::string& table_name, const std::map<std::string, std::string>& condition, std::map<std::string, std::string>& fields);
+			bool QueryItems(const std::string& table_name, const std::map<std::string, std::string>& condition, std::vector<std::map<std::string, std::string> >& fields);
+			//! \brief	
+			//! \retval true create success¡£ false create falied.
+			bool CreateItem(const std::string& table_name, const std::map<std::string, std::string>& fields);
+			//! \brief	
+			bool UpdateItem(const std::string& table_name, const std::map<std::string, std::string>& condition, const std::map<std::string, std::string>& fields);
+			//! \brief	
+			bool DeleteItem(const std::string& table_name, const std::map<std::string, std::string>& condition);
+		private:
+			//! \brief	ÉèÖÃÊı¾İ¿âÁ´½Ó¡£
+			void SetConnection(const std::string &host, const int &port, const std::string &user, const std::string &pwd, const std::string &dbName, 
+				const int &_readTimeout, const int &_writeTimeout);
+			//! \brief	¼ì²éÁ¬½Ó×´Ì¬¡£µ±Á¬½Ó¶Ï¿ªÊ±£¬³¢ÊÔ×Ô¶¯ÖØÁ¬
+			bool CheckConnectAndReconnect();
+		private:
+			boost::shared_ptr<sql::Connection>			connection_;		//! 
+			boost::shared_ptr<sql::Statement>			statement_;			//! 
+			sql::ConnectOptionsMap						sql_options_;
+			std::mutex									mutex_connect_;
 	};
-} //  namespace Universal{
+} //  namespace universal{
 
 
 #endif 
