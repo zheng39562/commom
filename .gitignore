@@ -1,4 +1,3 @@
-_64
 cscope\.*
 *\.log
 *\.vim
@@ -7,4 +6,6 @@ wget-log
 tags
 Main_64
 core.*
-core
+build\
+out\
+.*server_config\

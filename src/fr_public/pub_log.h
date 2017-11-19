@@ -17,7 +17,7 @@
 #include <thread>
 #include "pub_define.h"
 #include "pub_file.h"
-#include "single_mode.hpp"
+#include "fr_template/single_mode.hpp"
 
 #ifdef _MFC
 #include "other/mfc_interface.h"

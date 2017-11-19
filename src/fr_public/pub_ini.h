@@ -12,7 +12,7 @@
 #define _pub_ini_H
 
 #include "pub_define.h"
-#include "single_mode.hpp"
+#include "fr_template/single_mode.hpp"
 
 namespace universal{
 	//! \brief	读取，解析，保存ini的类

@@ -12,7 +12,7 @@
 #include <mutex>
 #include <thread>
 #include "pub_define.h"
-#include "single_mode.hpp"
+#include "fr_template/single_mode.hpp"
 
 namespace universal{
 	enum eCfgDataType{
