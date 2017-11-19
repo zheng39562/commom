@@ -1,98 +1,53 @@
 # 编译参数
 
-SRC_PATH=./src
-# public
-PUB_MOD=fr_public
-SQL_MOD=fr_sql
-TEMPLATE_MOD=fr_template
-XLS_MOD=fr_xls
-TCP_MOD=fr_tcp
+# phony
+.PHONY: fr_public fr_sql help install
 
 # 编译函数定义
-define make_pub
-	@for sub in $(PUB_MOD); do \
-		(cd ${SRC_PATH}/$$sub && make $1) \
-	done;
+# $(1) : src path
+# $(2) : make command
+define make_func
+	(cd $(1) && make $(2))
 endef
 
-define make_sql
-	@for sub in $(SQL_MOD); do \
-		(cd ${SRC_PATH}/$$sub && make $1) \
-	done;
-endef
+ALL_PROJECT_NAME=fr_public fr_sql fr_template
 
-define make_template
-	@for sub in $(TEMPLATE_MOD); do \
-		(cd ${SRC_PATH}/$$sub && make $1) \
-	done;
-endef
+all: 
+	$(call make_func, ./src/fr_public, all)
+	$(call make_func, ./src/fr_sql, all)
 
-define make_xls
-	@for sub in $(XLS_MOD); do \
-		(cd ${SRC_PATH}/$$sub && make $1) \
-	done;
-endef
+install: 
+	$(call make_func, ./src/fr_public, install)
+	$(call make_func, ./src/fr_sql, install)
+	$(call make_func, ./src/fr_template, install)
 
-define make_tcp
-	@for sub in $(TCP_MOD); do \
-		(cd ${SRC_PATH}/$$sub && make $1) \
-	done;
-endef
-
-all: fr_public fr_sql fr_template fr_xls
-# all: fr_public fr_sql fr_template fr_xls fr_tcp
-
-# 测试使用main 链接库根据测试调整。
-test:
-	g++ -DDEBUG -D__LINUX -g -std=c++11 ./src/main.cpp -I./library/include/ -L./library/lib64/ -lfr_xls -lfr_sql -lfr_tcp -lfr_public -lboost_regex -lboost_system -lboost_filesystem -lboost_thread -lboost_date_time -luuid -pthread -lrt -ldl -o Main_64 
+clean: 
+	$(call make_func, ./src/fr_public, clean)
+	$(call make_func, ./src/fr_sql, clean)
 		
-.PHONY: fr_public fr_sql fr_template fr_xls help
-
 fr_public:
-#$(shell cp ./lib/* .)
-	$(call make_pub, all)
+	$(call make_func, ./src/fr_public, all)
 
 fr_sql:
-	$(call make_sql, all)
-
-fr_template:
-	$(call make_template, all)
-
-fr_xls:
-	$(call make_xls, all)
-
-fr_tcp:
-	$(call make_tcp, all)
+	$(call make_func, ./src/fr_sql, all)
 
 fr_pub_clean:
-	$(call make_pub, clean)
+	$(call make_func, ./src/fr_public, clean)
 
 fr_sql_clean:
-	$(call make_sql, clean)
+	$(call make_func, ./src/fr_sql, clean)
 
 fr_template_clean:
-	$(call make_template, clean)
-
-fr_xls_clean:
-	$(call make_xls, clean)
-
-fr_tcp_clean:
-	$(call make_tcp, clean)
-
-clean: fr_pub_clean fr_sql_clean fr_template_clean fr_xls_clean fr_tcp_clean 
+	$(call make_func, ./src/fr_template, clean)
 
 help:
-	echo "makefile parameter : fr_public fr_sql fr_template fr_xls fr_tcp"
-	echo "clear parameter : fr_pub_clean fr_sql_clean fr_template_clean fr_xls_clean"
-	echo "if you want clean all. you can input make clean"
-
-tags:
-	rm -rf tags
-	touch tags
-	find . -iname '*.cpp' -or -iname '*.c' -or -iname '*.h'-or -iname '*.hpp' | xargs ctags --c++-kinds=+p --fields=+iaS --extra=+q --langmap=c++:+.inl -a tags
-
-# 一些历史遗留。部分可能还会用到
-#CFLAGS=-g -std=c++11 -fPIC
-#LDFLAGS=-shared
-#$(CXX) $(LDFLAGS) -o ${THIRDPART_LIB_PATH}/${TARGET} ${PROJECT_OBJECTS} ${MAIN_OBJECT} ${LIB_LIB} ${LINK_NONEEDED}
+	echo "command help"
+	echo " --| all : "
+	echo " --| install : "
+	echo " --| clean : "
+	echo " --| fr_public : "
+	echo " --| fr_sql : "
+	echo " --| fr_pub_clean : "
+	echo " --| fr_sql_clean : "
+	echo " --| fr_template_clean : "
 
