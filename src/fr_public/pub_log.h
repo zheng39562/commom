@@ -19,22 +19,16 @@
 #include "pub_file.h"
 #include "fr_template/single_mode.hpp"
 
-#ifdef _MFC
-#include "other/mfc_interface.h"
 #define LOG_PRINT(key, msg, level) \
 {\
 	std::ostringstream osTmp; osTmp << msg; \
-	MFC_addLog(key, osTmp.str()); \
 	fr_public::SingleLogServer::GetInstance()->WriteLog(key, level, __FILE__, __FUNCTION__, __LINE__, osTmp.str());\
 }
-#else
-#define LOG_PRINT(key, msg, level) \
+#define LOG_PRINT_DEFAULT(msg, level) \
 {\
 	std::ostringstream osTmp; osTmp << msg; \
-	std::cout << std::dec << "key[" << key << "] " << msg << std::endl;\
-	fr_public::SingleLogServer::GetInstance()->WriteLog(key, level, __FILE__, __FUNCTION__, __LINE__, osTmp.str());\
+	fr_public::SingleLogServer::GetInstance()->WriteLog(level, __FILE__, __FUNCTION__, __LINE__, osTmp.str());\
 }
-#endif
 
 #define K_DEBUG_P(key, msg) if(fr_public::SingleLogServer::GetInstance()->log_level(key) <= fr_public::eLogLevel_Program){ LOG_PRINT(key, msg, fr_public::eLogLevel_Program); }
 #define K_DEBUG_D(key, msg) if(fr_public::SingleLogServer::GetInstance()->log_level(key) <= fr_public::eLogLevel_Debug){ LOG_PRINT(key, msg, fr_public::eLogLevel_Debug); }
@@ -44,12 +38,12 @@
 #define K_DEBUG_C(key, msg) if(fr_public::SingleLogServer::GetInstance()->log_level(key) <= fr_public::eLogLevel_Crash){ LOG_PRINT(key, msg, fr_public::eLogLevel_Crash); }
 
 #define DEBUG_KEY_DEFAULT "debug_log"
-#define DEBUG_P(msg) K_DEBUG_P(DEBUG_KEY_DEFAULT, msg)
-#define DEBUG_D(msg) K_DEBUG_D(DEBUG_KEY_DEFAULT, msg)
-#define DEBUG_I(msg) K_DEBUG_I(DEBUG_KEY_DEFAULT, msg)
-#define DEBUG_W(msg) K_DEBUG_W(DEBUG_KEY_DEFAULT, msg)
-#define DEBUG_E(msg) K_DEBUG_E(DEBUG_KEY_DEFAULT, msg)
-#define DEBUG_C(msg) K_DEBUG_C(DEBUG_KEY_DEFAULT, msg)
+#define DEBUG_P(msg) if(fr_public::SingleLogServer::GetInstance()->default_log_level() <= fr_public::eLogLevel_Program){ LOG_PRINT_DEFAULT(msg, fr_public::eLogLevel_Program); }
+#define DEBUG_D(msg) if(fr_public::SingleLogServer::GetInstance()->default_log_level() <= fr_public::eLogLevel_Debug){ LOG_PRINT_DEFAULT(msg, fr_public::eLogLevel_Debug); }
+#define DEBUG_I(msg) if(fr_public::SingleLogServer::GetInstance()->default_log_level() <= fr_public::eLogLevel_Info){ LOG_PRINT_DEFAULT(msg, fr_public::eLogLevel_Info); }
+#define DEBUG_W(msg) if(fr_public::SingleLogServer::GetInstance()->default_log_level() <= fr_public::eLogLevel_Warning){ LOG_PRINT_DEFAULT(msg, fr_public::eLogLevel_Warning); }
+#define DEBUG_E(msg) if(fr_public::SingleLogServer::GetInstance()->default_log_level() <= fr_public::eLogLevel_Error){ LOG_PRINT_DEFAULT(msg, fr_public::eLogLevel_Error); }
+#define DEBUG_C(msg) if(fr_public::SingleLogServer::GetInstance()->default_log_level() <= fr_public::eLogLevel_Crash){ LOG_PRINT_DEFAULT(msg, fr_public::eLogLevel_Crash); }
 
 namespace fr_public{
 	typedef std::string LogKey;
@@ -88,7 +82,7 @@ namespace fr_public{
 			//! \note	如果是当天，则标志+1.否则对应增加新日期的文件。
 			void Reopen();
 			//! \brief	将日志从缓存写入文件。
-			void Write(const std::string &time, const eLogLevel &level, const std::string &fileName, const std::string &funcName, const long &line, const std::string &msg);
+			void Write(const std::string &time, const eLogLevel &level, const std::string &file_name, const std::string &func_name, const long &line, const std::string &msg);
 		private:
 			std::string getLevelString(const eLogLevel &level);
 		private:
@@ -115,13 +109,18 @@ namespace fr_public{
 		public:
 			//! \brief	日志初始化。必须进行初始化。因为单例原因。在构造时不能进行初始化。
 			void InitLog(const std::string &path, size_t _maxSize);
+			void set_default_log_key(const LogKey& log_key){ default_log_key_ = log_key; };
+			const LogKey& default_log_key()const{ return default_log_key_; }
 			void set_log_level(const LogKey &key, eLogLevel level);
 			eLogLevel log_level(const LogKey &key)const;
-			void WriteLog(const LogKey &key, const eLogLevel &level, const std::string &fileName, const std::string &funcName, const long &line, const std::string &msg);
+			eLogLevel default_log_level()const{ return log_level(default_log_key_); };
+			void WriteLog(const eLogLevel &level, const std::string &file_name, const std::string &func_name, const long &line, const std::string &msg);
+			void WriteLog(const LogKey &key, const eLogLevel &level, const std::string &file_name, const std::string &func_name, const long &line, const std::string &msg);
 		private:
 			std::map<LogKey, LogCache*> caches_;
 			std::thread loop_thread_;
 			bool running_;
+			LogKey default_log_key_;
 	};
 	typedef fr_template::SingleMode<LogServer> SingleLogServer;
 }

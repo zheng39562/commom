@@ -83,15 +83,15 @@ namespace fr_public{
 		}
 	}
 
-	void LogCache::Write(const std::string &time, const eLogLevel &level, const std::string &fileName, const std::string &funcName, const long &line, const std::string &msg){
+	void LogCache::Write(const std::string &time, const eLogLevel &level, const std::string &file_name, const std::string &func_name, const long &line, const std::string &msg){
 		lock();
 		if(log_level_ <= level){
 			std::ostringstream cache;
 			cache << "[" << time << "]"
 				<< "[" << std::this_thread::get_id() << "]"
 				<< "[" << getLevelString(level) << "]"
-				<< "[" << fileName << "]"
-				<< "[" << funcName << ":"<< line << "]"
+				<< "[" << file_name << "]"
+				<< "[" << func_name << ":"<< line << "]"
 				<< " : " << msg << "\n";
 
 			if(out_file_){
@@ -134,7 +134,8 @@ namespace fr_public{
 	LogServer::LogServer()
 		:caches_(),
 		 loop_thread_(),
-		 running_(false)
+		 running_(false),
+		 default_log_key_(DEBUG_KEY_DEFAULT)
 	{ ; }
 
 	LogServer::~LogServer(){ 
@@ -189,11 +190,14 @@ namespace fr_public{
 		return eLogLevel_IgnoreNothing;
 	}
 
-	void LogServer::WriteLog(const LogKey &key, const eLogLevel &level, const std::string &fileName, const string &funcName, const long &line, const string &msg){
+	void LogServer::WriteLog(const eLogLevel &level, const std::string &file_name, const std::string &func_name, const long &line, const std::string &msg){
+		WriteLog(default_log_key_, level, file_name, func_name, line, msg);
+	}
+	void LogServer::WriteLog(const LogKey &key, const eLogLevel &level, const std::string &file_name, const string &func_name, const long &line, const string &msg){
 		if(caches_.find(key) == caches_.end()){
 			caches_.insert(make_pair(key, new LogCache(key, eLogLevel_IgnoreNothing)));
 		}
-		caches_.find(key)->second->Write(GetLocalTimeU("%m/%d-%H:%M:%S"), level, fileName, funcName, line, msg);
+		caches_.find(key)->second->Write(GetLocalTimeU("%m/%d-%H:%M:%S"), level, file_name, func_name, line, msg);
 	}
 }
 
