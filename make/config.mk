@@ -7,7 +7,6 @@ COMMON_CXX=g++
 
 PUBLIC_COMMON_LIBRARY=-lboost_filesystem -lboost_regex
 
-
 BUILD_LIBRARY_PATH=../../build/lib
 BUILD_INCLUDE_PATH=../../build/include
 OUTPUT_LIB_PATH=/usr/lib64
