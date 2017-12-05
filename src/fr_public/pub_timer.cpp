@@ -33,9 +33,9 @@ namespace fr_public{
 	}
 
 	string FormatDateTime(const time_t &second, string date_format){
-		char date_tmp[35] = {};
+		char date_tmp[35] = {0};
 		strftime(date_tmp, sizeof(date_tmp), date_format.c_str(), localtime(&second)); 
-		return string(date_tmp, 35);
+		return string(date_tmp);
 	}
 
 	time_t GetLocalTime(){
