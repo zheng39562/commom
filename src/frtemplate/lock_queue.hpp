@@ -79,8 +79,14 @@ namespace frtemplate{
 	}
 
 	template < typename T > bool LockQueue<T>::pop(T& item){
-		item = pop();
-		return true;
+		std::lock_guard<std::mutex> localLock(mutex_);
+		if(!queue_.empty()){
+			item = queue_.front();
+			queue_.pop();
+			return true;
+		}
+
+		return false;
 	}
 
 	template < typename T > bool LockQueue<T>::pop(std::queue<T> &TQueue, size_t size){

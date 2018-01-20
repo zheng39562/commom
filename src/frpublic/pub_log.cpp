@@ -114,17 +114,17 @@ namespace frpublic{
 	string LogCache::getLevelString(const eLogLevel &level){
 		switch(level){
 			case eLogLevel_Program:
-				return "程序";
+				return "Program";
 			case eLogLevel_Debug:
-				return "调试";
+				return "Debug";
 			case eLogLevel_Info:
-				return "消息";
+				return "Info";
 			case eLogLevel_Warning:
-				return "警告";
+				return "Warn";
 			case eLogLevel_Error:
-				return "错误";
+				return "Error";
 			case eLogLevel_Crash:
-				return "异常";
+				return "Crash";
 		}
 		return "未知";
 	}
