@@ -12,7 +12,7 @@
 #define _pub_ini_H
 
 #include "pub_define.h"
-#include "fr_template/single_mode.hpp"
+#include "frtemplate/single_mode.hpp"
 
 namespace frpublic{
 	//! \brief	读取，解析，保存ini的类
@@ -64,7 +64,7 @@ namespace frpublic{
 			std::string ini_content_;	//! ini文本的内容。用户回写ini文本.
 			std::map<std::string, std::map<std::string, std::string> > ini_info_;	//! 
 	};
-	typedef fr_template::SingleMode<IniCfg> SingleIniCfg;
+	typedef frtemplate::SingleMode<IniCfg> SingleIniCfg;
 }
 #endif 
 

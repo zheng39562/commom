@@ -12,7 +12,7 @@
 #include <mutex>
 #include <thread>
 #include "pub_define.h"
-#include "fr_template/single_mode.hpp"
+#include "frtemplate/single_mode.hpp"
 
 namespace frpublic{
 	enum eCfgDataType{
@@ -70,7 +70,7 @@ namespace frpublic{
 			eCfgDataType cfg_type_;	//! 
 			std::mutex mutex_;
 	};
-	typedef fr_template::SingleMode<Configurator> SingleConfigurator;
+	typedef frtemplate::SingleMode<Configurator> SingleConfigurator;
 }
 
 inline bool CFG_GET_BOOL(const std::string& section, const std::string& key, const bool &default_value){ 
