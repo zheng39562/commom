@@ -1,3 +1,8 @@
 # 任务安排：
 	* 
 
+## frpublic
+	* log DEBUG_ 
+		* 增加cout or print 的打印，当前已增加，但没有开关的选项.
+		* 多key 但单文件输出。
+

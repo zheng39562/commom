@@ -94,6 +94,7 @@ namespace frpublic{
 				<< "[" << func_name << ":"<< line << "]"
 				<< " : " << msg << "\n";
 
+			cout << cache.str();
 			if(out_file_){
 				cur_size_ += cache.str().size();
 				out_file_ << cache.str();

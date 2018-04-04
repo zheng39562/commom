@@ -214,7 +214,7 @@ namespace frpublic{
 		memset(buffer_, 0, max_buffer_size_);
 	}
 
-	string BinaryMemory::print(string expand)const{
+	string BinaryMemory::to_hex()const{
 		if(buffer_ == NULL){
 			return "buffer is null.";
 		}
@@ -222,12 +222,10 @@ namespace frpublic{
 		Byte* msg = (Byte*)buffer_;
 		int index(0);
 		ostringstream ostr;
-		ostr << expand << " buffer is [";
 		while(index < cur_buffer_size_){
 			ostr << (short)(unsigned char)msg[index] << "|";
 			++index;
 		}
-		ostr << "]";
 		return ostr.str();
 	}
 
