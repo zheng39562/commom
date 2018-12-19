@@ -56,6 +56,9 @@ namespace frpublic{
 	//! \note	暂时仅支持UFT8。
 	//! \todo	下一步建议扩展GBK。
 	size_t GetStrSize(const std::string &str, eCharacterEncoding encoding = eEncoding_UTF8);
+
+	//! \brief	格式化输出.类似 sprintf.
+	std::string Format(const char* format, ...);
 } // namespace frpublic{
 
 

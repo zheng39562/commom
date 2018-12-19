@@ -127,7 +127,7 @@ namespace frpublic{
 			case eLogLevel_Crash:
 				return "Crash";
 		}
-		return "未知";
+		return "unknow." + to_string(level);
 	}
 }
 
@@ -191,14 +191,19 @@ namespace frpublic{
 		return eLogLevel_IgnoreNothing;
 	}
 
-	void LogServer::WriteLog(const eLogLevel &level, const std::string &file_name, const std::string &func_name, const long &line, const std::string &msg){
-		WriteLog(default_log_key_, level, file_name, func_name, line, msg);
-	}
 	void LogServer::WriteLog(const LogKey &key, const eLogLevel &level, const std::string &file_name, const string &func_name, const long &line, const string &msg){
-		if(caches_.find(key) == caches_.end()){
-			caches_.insert(make_pair(key, new LogCache(key, eLogLevel_IgnoreNothing)));
+		if(!key.empty()){
+			if(caches_.find(key) == caches_.end()){
+				caches_.insert(make_pair(key, new LogCache(key, eLogLevel_IgnoreNothing)));
+			}
+			caches_.find(key)->second->Write(GetLocalTimeU("%m/%d-%H:%M:%S"), level, file_name, func_name, line, msg);
 		}
-		caches_.find(key)->second->Write(GetLocalTimeU("%m/%d-%H:%M:%S"), level, file_name, func_name, line, msg);
+		else{
+			if(caches_.find(default_log_key()) == caches_.end()){
+				caches_.insert(make_pair(default_log_key(), new LogCache(default_log_key(), eLogLevel_IgnoreNothing)));
+			}
+			caches_.find(default_log_key())->second->Write(GetLocalTimeU("%m/%d-%H:%M:%S"), level, file_name, func_name, line, msg);
+		}
 	}
 }
 

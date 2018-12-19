@@ -11,6 +11,7 @@
 #include <sstream>
 #include <cctype>
 #include <algorithm>
+#include <stdarg.h>
 
 #include "pub_tool.h"
 
@@ -156,6 +157,33 @@ namespace frpublic{
 			return size;
 		}
 		return 0;
+	}
+
+	std::string Format(const char* format, ...){
+		va_list args;
+		va_start(args, format);
+#ifndef _MSC_VER
+		char buffer[1024] = {0};
+		size_t size = std::vsnprintf(buffer, 1024, format, args);
+		if(size >= 1024){
+			va_start(args, format);
+			size += 1;
+			std::unique_ptr<char[]> buf(new char[size]); 
+			std::vsnprintf(buf.get(), size, format, args);
+			va_end(args);
+			return std::string(buf.get(), size - 1); // We don't want the '\0' inside
+		}
+		else{
+			va_end(args);
+			return std::string(buffer);
+		}
+#else
+		int size = _vscprintf(format, args);
+		std::string result(++size, 0);
+		vsnprintf_s((char*)result.data(), size, _TRUNCATE, format, args);
+		va_end(args);
+		return result;
+#endif
 	}
 } // namespace frpublic{
 

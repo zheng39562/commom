@@ -58,7 +58,8 @@ namespace frpublic{
 			//! \note	resize 和 reserve的区别主要在于，resize会或者内存尺寸。
 			void resize(size_t size);
 			void set_max_limit(size_t max_limit){ max_limit_ = max_limit; }
-			inline std::string to_hex()const;
+			std::string to_hex()const;
+			std::string to_hex(int32_t pos, size_t length)const;
 
 			inline bool empty()const{ return cur_buffer_size_ == 0; }
 			//! \note	直接操作内存.仅用于内容修改。：如有需要可以使用，但请慎重使用。

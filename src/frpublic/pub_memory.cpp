@@ -215,16 +215,30 @@ namespace frpublic{
 	}
 
 	string BinaryMemory::to_hex()const{
-		if(buffer_ == NULL){
-			return "buffer is null.";
-		}
+		if(buffer_ == NULL){ return "buffer is null."; }
 
 		Byte* msg = (Byte*)buffer_;
 		int index(0);
 		ostringstream ostr;
 		while(index < cur_buffer_size_){
-			ostr << (short)(unsigned char)msg[index] << "|";
+			ostr << hex << (short)(unsigned char)msg[index] << dec << "|";
 			++index;
+			if(index % 10 == 0){ ostr << "|"; }
+		}
+		return ostr.str();
+	}
+	std::string BinaryMemory::to_hex(int32_t pos, size_t length)const{
+		if(buffer_ == NULL){ return "buffer is null."; }
+		if(pos < 0){ return "pos is a negative integer."; }
+		if(length + pos > cur_buffer_size_){ return "operator want to fetch unkonw address.(length is bigger.)"; }
+
+		Byte* msg = (Byte*)buffer_ + pos;
+		int index(0);
+		ostringstream ostr;
+		while(index < length){
+			ostr << hex << (short)(unsigned char)msg[index] << dec << "|";
+			++index;
+			if(index % 10 == 0){ ostr << "|"; }
 		}
 		return ostr.str();
 	}

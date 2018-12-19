@@ -13,11 +13,11 @@
 #include "frpublic/pub_timer.h"
 #include "frpublic/pub_string.h"
 
-#define SQL_DEBUG_D(msg) DEBUG_D(msg)
-#define SQL_DEBUG_I(msg) DEBUG_I(msg)
-#define SQL_DEBUG_W(msg) DEBUG_W(msg)
-#define SQL_DEBUG_E(msg) DEBUG_E(msg)
-#define SQL_DEBUG_C(msg) DEBUG_C(msg)
+#define SQL_DEBUG_D(msg, arg...) DEBUG_D(msg, ##arg)
+#define SQL_DEBUG_I(msg, arg...) DEBUG_I(msg, ##arg)
+#define SQL_DEBUG_W(msg, arg...) DEBUG_W(msg, ##arg)
+#define SQL_DEBUG_E(msg, arg...) DEBUG_E(msg, ##arg)
+#define SQL_DEBUG_C(msg, arg...) DEBUG_C(msg, ##arg)
 
 #endif 
 

@@ -108,7 +108,7 @@ namespace frsql{
 			return true;
 		}
 		catch(sql::SQLException &e){
-			SQL_DEBUG_E("query operator error. state [" << e.getSQLState() << "] errno [" << e.getErrorCode() << "] what[" << e.what() << "]");
+			SQL_DEBUG_E("query operator error. state [%d] errno [%d] what [%s] ", e.getSQLState().c_str(), e.getErrorCode(), e.what());
 			return false;
 		}
 	}
@@ -131,7 +131,7 @@ namespace frsql{
 			return true;
 		}
 		catch(sql::SQLException &e){
-			SQL_DEBUG_E("query operator error. state [" << e.getSQLState() << "] errno [" << e.getErrorCode() << "] what[" << e.what() << "]");
+			SQL_DEBUG_E("query operator error. state [%d] errno [%d] what [%s] ", e.getSQLState().c_str(), e.getErrorCode(), e.what());
 			return false;
 		}
 	}
@@ -145,8 +145,7 @@ namespace frsql{
 		}
 		catch(sql::SQLException &e){
 			updateCount = 0;
-
-			SQL_DEBUG_E("update operator error. state [" << e.getSQLState() << "] errno [" << e.getErrorCode() << "] what[" << e.what() << "]");
+			SQL_DEBUG_E("query operator error. state [%d] errno [%d] what [%s] ", e.getSQLState().c_str(), e.getErrorCode(), e.what());
 			return false;
 		}
 	}
@@ -176,7 +175,7 @@ namespace frsql{
 	bool SqlOperator::CreateItem(const std::string& table_name, const std::map<std::string, std::string>& fields){
 		int update_count(0);
 		if(!ExecUpdate(BuildCreateCmd(table_name, fields), update_count)){
-			SQL_DEBUG_E("创建item 失败 table[" << table_name << "].");
+			SQL_DEBUG_E("创建item 失败 table[%s]", table_name.c_str());
 			return false;
 		}
 		return update_count >= 1;
@@ -185,7 +184,7 @@ namespace frsql{
 	bool SqlOperator::UpdateItem(const std::string& table_name, const std::map<std::string, std::string>& condition, const std::map<std::string, std::string>& fields){
 		int update_count(0);
 		if(!ExecUpdate(BuildUpdateCmd(table_name, condition, fields), update_count)){
-			SQL_DEBUG_E("update item failed. table name [" << table_name << "].");
+			SQL_DEBUG_E("update item failed. table name [%s]", table_name.c_str());
 			return false;
 		}
 		return update_count >= 1;
@@ -194,7 +193,7 @@ namespace frsql{
 	bool SqlOperator::DeleteItem(const std::string& table_name, const std::map<std::string, std::string>& condition){
 		int update_count(0);
 		if(!ExecUpdate(BuildDeleteCmd(table_name, condition), update_count)){
-			SQL_DEBUG_E("update item failed. table name [" << table_name << "].");
+			SQL_DEBUG_E("update item failed. table name [%s]", table_name.c_str());
 			return false;
 		}
 		return update_count >= 1;

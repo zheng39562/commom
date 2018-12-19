@@ -18,32 +18,46 @@
 #include "pub_define.h"
 #include "pub_file.h"
 #include "frtemplate/single_mode.hpp"
-
-#define LOG_PRINT(key, msg, level) \
-{\
-	std::ostringstream osTmp; osTmp << msg; \
-	frpublic::SingleLogServer::GetInstance()->WriteLog(key, level, __FILE__, __FUNCTION__, __LINE__, osTmp.str());\
-}
-#define LOG_PRINT_DEFAULT(msg, level) \
-{\
-	std::ostringstream osTmp; osTmp << msg; \
-	frpublic::SingleLogServer::GetInstance()->WriteLog(level, __FILE__, __FUNCTION__, __LINE__, osTmp.str());\
-}
-
-#define K_DEBUG_P(key, msg) if(frpublic::SingleLogServer::GetInstance()->log_level(key) <= frpublic::eLogLevel_Program){ LOG_PRINT(key, msg, frpublic::eLogLevel_Program); }
-#define K_DEBUG_D(key, msg) if(frpublic::SingleLogServer::GetInstance()->log_level(key) <= frpublic::eLogLevel_Debug){ LOG_PRINT(key, msg, frpublic::eLogLevel_Debug); }
-#define K_DEBUG_I(key, msg) if(frpublic::SingleLogServer::GetInstance()->log_level(key) <= frpublic::eLogLevel_Info){ LOG_PRINT(key, msg, frpublic::eLogLevel_Info); }
-#define K_DEBUG_W(key, msg) if(frpublic::SingleLogServer::GetInstance()->log_level(key) <= frpublic::eLogLevel_Warning){ LOG_PRINT(key, msg, frpublic::eLogLevel_Warning); }
-#define K_DEBUG_E(key, msg) if(frpublic::SingleLogServer::GetInstance()->log_level(key) <= frpublic::eLogLevel_Error){ LOG_PRINT(key, msg, frpublic::eLogLevel_Error); }
-#define K_DEBUG_C(key, msg) if(frpublic::SingleLogServer::GetInstance()->log_level(key) <= frpublic::eLogLevel_Crash){ LOG_PRINT(key, msg, frpublic::eLogLevel_Crash); }
+#include "pub_string.h"
 
 #define DEBUG_KEY_DEFAULT "debug_log"
-#define DEBUG_P(msg) if(frpublic::SingleLogServer::GetInstance()->default_log_level() <= frpublic::eLogLevel_Program){ LOG_PRINT_DEFAULT(msg, frpublic::eLogLevel_Program); }
-#define DEBUG_D(msg) if(frpublic::SingleLogServer::GetInstance()->default_log_level() <= frpublic::eLogLevel_Debug){ LOG_PRINT_DEFAULT(msg, frpublic::eLogLevel_Debug); }
-#define DEBUG_I(msg) if(frpublic::SingleLogServer::GetInstance()->default_log_level() <= frpublic::eLogLevel_Info){ LOG_PRINT_DEFAULT(msg, frpublic::eLogLevel_Info); }
-#define DEBUG_W(msg) if(frpublic::SingleLogServer::GetInstance()->default_log_level() <= frpublic::eLogLevel_Warning){ LOG_PRINT_DEFAULT(msg, frpublic::eLogLevel_Warning); }
-#define DEBUG_E(msg) if(frpublic::SingleLogServer::GetInstance()->default_log_level() <= frpublic::eLogLevel_Error){ LOG_PRINT_DEFAULT(msg, frpublic::eLogLevel_Error); }
-#define DEBUG_C(msg) if(frpublic::SingleLogServer::GetInstance()->default_log_level() <= frpublic::eLogLevel_Crash){ LOG_PRINT_DEFAULT(msg, frpublic::eLogLevel_Crash); }
+
+#define __USE_FORMAT
+#define LOG_INSTANCE frpublic::SingleLogServer::GetInstance()
+#ifdef __USE_FORMAT
+#define LOG_PRINT(key, msg, level, arg...) LOG_INSTANCE->WriteLog(key, level, __FILE__, __FUNCTION__, __LINE__, frpublic::Format(msg, ##arg));
+
+#define K_DEBUG_P(key, msg, arg...) { if(LOG_INSTANCE->log_level(key) <= frpublic::eLogLevel_Program){ LOG_PRINT(key, msg, frpublic::eLogLevel_Program, ##arg); } }
+#define K_DEBUG_D(key, msg, arg...) { if(LOG_INSTANCE->log_level(key) <= frpublic::eLogLevel_Debug){ LOG_PRINT(key, msg, frpublic::eLogLevel_Debug, ##arg); } }
+#define K_DEBUG_I(key, msg, arg...) { if(LOG_INSTANCE->log_level(key) <= frpublic::eLogLevel_Info){ LOG_PRINT(key, msg, frpublic::eLogLevel_Info, ##arg); } }
+#define K_DEBUG_W(key, msg, arg...) { if(LOG_INSTANCE->log_level(key) <= frpublic::eLogLevel_Warning){ LOG_PRINT(key, msg, frpublic::eLogLevel_Warning, ##arg); } }
+#define K_DEBUG_E(key, msg, arg...) { if(LOG_INSTANCE->log_level(key) <= frpublic::eLogLevel_Error){ LOG_PRINT(key, msg, frpublic::eLogLevel_Error, ##arg); } }
+#define K_DEBUG_C(key, msg, arg...) { if(LOG_INSTANCE->log_level(key) <= frpublic::eLogLevel_Crash){ LOG_PRINT(key, msg, frpublic::eLogLevel_Crash, ##arg); } }
+
+#define DEBUG_P(msg, arg...) K_DEBUG_P(LOG_INSTANCE->default_log_key(), msg, ##arg)
+#define DEBUG_D(msg, arg...) K_DEBUG_D(LOG_INSTANCE->default_log_key(), msg, ##arg)
+#define DEBUG_I(msg, arg...) K_DEBUG_I(LOG_INSTANCE->default_log_key(), msg, ##arg)
+#define DEBUG_W(msg, arg...) K_DEBUG_W(LOG_INSTANCE->default_log_key(), msg, ##arg)
+#define DEBUG_E(msg, arg...) K_DEBUG_E(LOG_INSTANCE->default_log_key(), msg, ##arg)
+#define DEBUG_C(msg, arg...) K_DEBUG_C(LOG_INSTANCE->default_log_key(), msg, ##arg)
+#else
+#define LOG_PRINT(key, msg, level) { std::ostringstream osTmp; osTmp << msg; LOG_INSTANCE->WriteLog(key, level, __FILE__, __FUNCTION__, __LINE__, osTmp.str()); }
+#define LOG_PRINT_DEFAULT(msg, level) { std::ostringstream osTmp; osTmp << msg; LOG_INSTANCE->WriteLog(level, __FILE__, __FUNCTION__, __LINE__, osTmp.str()); }
+
+#define K_DEBUG_P(key, msg) if(LOG_INSTANCE->log_level(key) <= frpublic::eLogLevel_Program){ LOG_PRINT(key, msg, frpublic::eLogLevel_Program); }
+#define K_DEBUG_D(key, msg) if(LOG_INSTANCE->log_level(key) <= frpublic::eLogLevel_Debug){ LOG_PRINT(key, msg, frpublic::eLogLevel_Debug); }
+#define K_DEBUG_I(key, msg) if(LOG_INSTANCE->log_level(key) <= frpublic::eLogLevel_Info){ LOG_PRINT(key, msg, frpublic::eLogLevel_Info); }
+#define K_DEBUG_W(key, msg) if(LOG_INSTANCE->log_level(key) <= frpublic::eLogLevel_Warning){ LOG_PRINT(key, msg, frpublic::eLogLevel_Warning); }
+#define K_DEBUG_E(key, msg) if(LOG_INSTANCE->log_level(key) <= frpublic::eLogLevel_Error){ LOG_PRINT(key, msg, frpublic::eLogLevel_Error); }
+#define K_DEBUG_C(key, msg) if(LOG_INSTANCE->log_level(key) <= frpublic::eLogLevel_Crash){ LOG_PRINT(key, msg, frpublic::eLogLevel_Crash); }
+
+#define DEBUG_P(msg) if(LOG_INSTANCE->default_log_level() <= frpublic::eLogLevel_Program){ LOG_PRINT_DEFAULT(msg, frpublic::eLogLevel_Program); }
+#define DEBUG_D(msg) if(LOG_INSTANCE->default_log_level() <= frpublic::eLogLevel_Debug){ LOG_PRINT_DEFAULT(msg, frpublic::eLogLevel_Debug); }
+#define DEBUG_I(msg) if(LOG_INSTANCE->default_log_level() <= frpublic::eLogLevel_Info){ LOG_PRINT_DEFAULT(msg, frpublic::eLogLevel_Info); }
+#define DEBUG_W(msg) if(LOG_INSTANCE->default_log_level() <= frpublic::eLogLevel_Warning){ LOG_PRINT_DEFAULT(msg, frpublic::eLogLevel_Warning); }
+#define DEBUG_E(msg) if(LOG_INSTANCE->default_log_level() <= frpublic::eLogLevel_Error){ LOG_PRINT_DEFAULT(msg, frpublic::eLogLevel_Error); }
+#define DEBUG_C(msg) if(LOG_INSTANCE->default_log_level() <= frpublic::eLogLevel_Crash){ LOG_PRINT_DEFAULT(msg, frpublic::eLogLevel_Crash); }
+#endif
 
 namespace frpublic{
 	typedef std::string LogKey;
@@ -115,7 +129,6 @@ namespace frpublic{
 			void set_log_level(const LogKey &key, eLogLevel level);
 			eLogLevel log_level(const LogKey &key)const;
 			eLogLevel default_log_level()const{ return log_level(default_log_key_); };
-			void WriteLog(const eLogLevel &level, const std::string &file_name, const std::string &func_name, const long &line, const std::string &msg);
 			void WriteLog(const LogKey &key, const eLogLevel &level, const std::string &file_name, const std::string &func_name, const long &line, const std::string &msg);
 		private:
 			std::map<LogKey, LogCache*> caches_;
