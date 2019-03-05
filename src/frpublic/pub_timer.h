@@ -28,16 +28,20 @@ namespace frpublic{
 	//				* 格式排列数据不是按照 ：年月日时分秒排列（但可以缺少某个格式，例如没有月份直接 %Y%d是可以的）
 	//				* 分隔符使用中文或'%'，或超过一个字符（可以无分隔符）。
 	std::string FormatDateTime(const time_t &second, std::string date_format = "%Y/%m/%d %H:%M:%S");
-	time_t GetLocalTime();
-	void GetLocalTimeUs(time_t& second_part, time_t& us_part);
+
     //! \param[in] date_format 要处理的格式.
-	std::string GetLocalTime(const std::string &date_format);
+	time_t GetLocalTime();
+	std::string GetLocalDate(const std::string &date_format);
+
 	//! \brief	在格式后增加纳秒数，使用[]包含，暂不支持更多格式。
 	//! \note	建议格式中包含到秒。
 	//! \note	window下仅支持毫秒级计时，使用TimeU纳秒级数据将默认使用0填充（所以window下纳秒级数据没有实际含义）
 	//! \param[in] date_format 格式仅对秒之前的有效。
 	//! \retval	一定会包含秒后的数据。所以如果不需要秒后时间，不要使用该函数。
-	std::string GetLocalTimeU(const std::string &date_format);
+	time_t GetLocalTimeMs();
+	std::string GetLocalDateMs(const std::string &date_format);
+
+	time_t GetLocalTimeUs();
 }  // namespace : frpublic
 
 

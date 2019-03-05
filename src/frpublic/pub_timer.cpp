@@ -41,23 +41,21 @@ namespace frpublic{
 	time_t GetLocalTime(){
 		return chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 	}
-	
-	void GetLocalTimeUs(time_t& second_part, time_t& us_part){
-		auto time_now = chrono::system_clock::now();
-		auto duration_in_us = chrono::duration_cast<chrono::microseconds>(time_now.time_since_epoch());
-		auto us_part_ref = duration_in_us - chrono::duration_cast<chrono::seconds>(duration_in_us);
-		second_part = chrono::system_clock::to_time_t(time_now);
-		us_part = us_part_ref.count(); 
-	}
-
-	string GetLocalTime(const string &date_format){
+	string GetLocalDate(const string &date_format){
 		return FormatDateTime(GetLocalTime(), date_format);
 	}
+	
+	time_t GetLocalTimeMs(){
+		return chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now().time_since_epoch()).count();
+	}
 
-	string GetLocalTimeU(const string &date_format){
-		time_t second_part(0), us_part(0);
-		GetLocalTimeUs(second_part, us_part);
-		return FormatDateTime(second_part, date_format) + "." + to_string(us_part);
+	string GetLocalDateMs(const string &date_format){
+		time_t now_ms = GetLocalTimeMs();
+		return FormatDateTime(now_ms / 1000, date_format) + "." + to_string(now_ms % 1000);
+	}
+
+	time_t GetLocalTimeUs(time_t& second_part, time_t& us_part){
+		return chrono::duration_cast<chrono::microseconds>(chrono::system_clock::now().time_since_epoch()).count();
 	}
 }  // namepsace : frpublic
 

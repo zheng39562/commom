@@ -27,7 +27,7 @@ namespace frpublic{
 		 cur_size_(0),
 		 out_file_(),
 		 cur_index_(0),
-		 file_date_(GetLocalTime("%Y%m%d")),
+		 file_date_(GetLocalDate("%Y%m%d")),
 		 file_name_(_fileName)
 	{ 
 		vector<string> fileNames;
@@ -62,12 +62,12 @@ namespace frpublic{
 	}
 
 	bool LogCache::IsNewDate(){ 
-		return frpublic::GetLocalTime("%Y%m%d") != file_date_; 
+		return frpublic::GetLocalDate("%Y%m%d") != file_date_; 
 	}
 
 	void LogCache::Reopen(){
 		if(!static_path_.empty() && !file_name_.empty()){
-			string curDate = GetLocalTime("%Y%m%d");
+			string curDate = GetLocalDate("%Y%m%d");
 			if(curDate != file_date_){
 				cur_index_ = 0;
 			}
@@ -77,6 +77,7 @@ namespace frpublic{
 			cur_size_ = 0;
 		}
 		else{
+			cout << "static_path is empty.[" << static_path_ << "] or file name is empty[" << file_name_ << "]." << endl;
 #ifdef _DEBUG
 			assert(false);
 #endif
@@ -104,6 +105,7 @@ namespace frpublic{
 				}
 			}
 			else{
+				cout << "file is not open." << endl;
 #ifdef _DEBUG
 				assert(false);
 #endif
@@ -196,13 +198,13 @@ namespace frpublic{
 			if(caches_.find(key) == caches_.end()){
 				caches_.insert(make_pair(key, new LogCache(key, eLogLevel_IgnoreNothing)));
 			}
-			caches_.find(key)->second->Write(GetLocalTimeU("%m/%d-%H:%M:%S"), level, file_name, func_name, line, msg);
+			caches_.find(key)->second->Write(GetLocalDateMs("%m/%d-%H:%M:%S"), level, file_name, func_name, line, msg);
 		}
 		else{
 			if(caches_.find(default_log_key()) == caches_.end()){
 				caches_.insert(make_pair(default_log_key(), new LogCache(default_log_key(), eLogLevel_IgnoreNothing)));
 			}
-			caches_.find(default_log_key())->second->Write(GetLocalTimeU("%m/%d-%H:%M:%S"), level, file_name, func_name, line, msg);
+			caches_.find(default_log_key())->second->Write(GetLocalDateMs("%m/%d-%H:%M:%S"), level, file_name, func_name, line, msg);
 		}
 	}
 }
