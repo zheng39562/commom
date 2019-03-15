@@ -5,8 +5,8 @@ PROJECT_OBJECTS= \
 	./$(OUTPUT_TEMPORARY_PATH)/./sql_operator.o \
 	./$(OUTPUT_TEMPORARY_PATH)/./sql_operator_pool.o
 
-# 此路径需要自定义
-SQL_INCLUDE=-I/usr/include/mysqlcppconn/
+# 此路径需要自定义(根据mysqlcppconn情况进行调整.)
+SQL_INCLUDE=-I/usr/local/include/mysqlcppconn
 # need library -lmysqlcppconn
 SQL_LIBRARY=-lmysqlcppconn
 
