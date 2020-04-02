@@ -12,6 +12,7 @@
 #include <map>
 #include <list>
 #include <exception>
+#include <functional>
 
 namespace frtemplate{
 
@@ -50,11 +51,12 @@ namespace frtemplate{
 			 * 默认模式:最大值的1/4会开始回收，回收系数为0.2
 			 * TODO: 随便写的默认值,后续根据经验再进行微调.
 			 */
-			ObjectPool(int _max_object_size);
-			ObjectPool(int _min_free_object_size_, int _max_object_size, int _recover_percent, int _active_recover_fator);
+			ObjectPool(int _max_object_size, std::function<TObject*()> _create_func);
+			ObjectPool(int _min_free_object_size_, int _max_object_size, int _recover_percent, int _active_recover_fator, std::function<TObject*()> _create_func);
 			~ObjectPool();
 
 		public:
+
 			TObject* Fetch();
 			void Recovery(TObject* obj);
 
@@ -81,8 +83,9 @@ namespace frtemplate{
 
 			int CalCreateObjectSize();
 			int CalRecoverObjectSize();
-
 		private:
+			std::function<TObject*()> create_func_;
+
 			int active_recover_fator_;
 			int recover_percent_;
 			int recover_times_;
@@ -98,7 +101,7 @@ namespace frtemplate{
 	};
 
 	template < typename TObject >
-	ObjectPool<TObject>::ObjectPool(int _max_object_size)
+	ObjectPool<TObject>::ObjectPool(int _max_object_size, std::function<TObject*()> _create_func)
 		:active_recover_fator_(20), 
 		 recover_percent_(20),
 		 recover_times_(0), 
@@ -107,11 +110,12 @@ namespace frtemplate{
 		 max_object_size_(_max_object_size), 
 		 free_objects_(),
 		 addr_2used_objects_(),
-		 error_(Err_Default)
+		 error_(Err_Default),
+		 create_func_(_create_func)
 	{ ; }
 
 	template < typename TObject >
-	ObjectPool<TObject>::ObjectPool(int _min_free_object_size_, int _max_object_size, int _recover_percent, int _active_recover_fator)
+	ObjectPool<TObject>::ObjectPool(int _min_free_object_size_, int _max_object_size, int _recover_percent, int _active_recover_fator, std::function<TObject*()> _create_func)
 		:active_recover_fator_((0 <= _active_recover_fator && _active_recover_fator <= 100) ? _active_recover_fator : 20),
 		 recover_percent_((0 <= _recover_percent && _recover_percent <= 100) ? _recover_percent : 20),
 		 recover_times_(0), 
@@ -120,7 +124,8 @@ namespace frtemplate{
 		 max_object_size_(_max_object_size), 
 		 free_objects_(),
 		 addr_2used_objects_(),
-		 error_(Err_Default)
+		 error_(Err_Default),
+		 create_func_(_create_func)
 	{ 
 	}
 
@@ -144,7 +149,7 @@ namespace frtemplate{
 			}
 
 			for(int index = 0; index < create_num; ++index){
-				free_objects_.push_back(new TObject());
+				free_objects_.push_back(create_func_());
 			}
 			resetOprtCount();
 		}

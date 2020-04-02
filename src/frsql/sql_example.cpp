@@ -5,23 +5,22 @@
 #include "sql_operator_pool.h"
 
 using namespace std;
+using namespace frsql;
 
 int main(){
-	string host("47.52.69.59");
-	int port(3306);
-	string user("zjm");
-	string pwd("123456aaa");
-	string db_name("test");
-	int read_timeout(5000);
-	int write_timeout(5000);
-	int pool_size(10);
-	ConnectSql(host, port, user, pwd, db_name, read_timeout, write_timeout, pool_size);
-
-	std::shared_ptr<fr_sql::SqlOprtPool> oprt_pool = GetSqlOprtPool();
+	SqlConnectOption sql_option;
+	sql_option.host = "47.110.229.226";
+	sql_option.port = 3306;
+	sql_option.user = "zjm";
+	sql_option.pwd = "123456aaa";
+	sql_option.db_name = "user_manager";
+	sql_option.read_timeout = 5000;
+	sql_option.write_timeout = 5000;
+	SqlOprtPool oprt_pool("sql_name1", sql_option, 10);
 	
 	map<string, string> condition;
 	vector<map<string, string>> fields;
-	if(oprt_pool->QueryItems("test_table", condition, fields)){
+	if(oprt_pool.QueryItems("user_info", condition, fields)){
 		for(auto& field : fields){
 			for(auto& field_item : field){
 				cout << "key : [" << field_item.first << "] vlaue : [" << field_item.second << "]" << endl;

@@ -33,5 +33,5 @@ clean :
 	rm -f ${OUTPUT_EXAMPLE_PATH}/sql_example
 
 example : sql_example.cpp
-	${COMMON_CXX} ${COMMON_CFLAGS} ${SQL_INCLUDE} ${COMMON_INCLUDE} ${SQL_LIBRARY} ${COMMON_LIBRARY} ${PUBLIC_COMMON_LIBRARY} -l${PROJECT_NAME} -lfr_public sql_example.cpp -o ${OUTPUT_EXAMPLE_PATH}/sql_example
+	${COMMON_CXX} ${COMMON_CFLAGS} ${SQL_INCLUDE} ${COMMON_INCLUDE} ${SQL_LIBRARY} ${COMMON_LIBRARY} ${PUBLIC_COMMON_LIBRARY} -l${PROJECT_NAME} -lfrpublic sql_example.cpp -o ${OUTPUT_EXAMPLE_PATH}/sql_example
 

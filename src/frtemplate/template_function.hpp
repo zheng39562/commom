@@ -18,6 +18,32 @@
  * template function
  */
 namespace frtemplate{
+
+	template < typename T >
+	class FuncResult{
+		public:
+			FuncResult(T _info);
+			FuncResult(std::string _err, T _info);
+		public:
+			inline bool success()const{ return err_.empty(); }
+			inline const std::string& err()const{ return err_; }
+			inline const T& info()const{ return info_; }
+		private:
+			std::string err_;
+			T info_;
+	};
+
+	template < typename T >
+	FuncResult<T>::FuncResult(T _info):
+		err_(),
+		info_()
+	{ }
+	template < typename T >
+	FuncResult<T>::FuncResult(std::string _err, T _info):
+		err_(_err),
+		info_(_info)
+	{ }
+
 } // namespace Universal{
 
 

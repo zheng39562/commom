@@ -72,25 +72,23 @@ namespace frsql{
 	}
 
 
-	SqlOperator::SqlOperator(const string &_host, const int &_port, const string &_user, const string &_pwd, const string &_dbName, 
-			const int _readTimeout, const int _writeTimeout)
+	SqlOperator::SqlOperator(const SqlConnectOption& option)
 		:connection_(NULL),
 		 statement_(NULL)
 	{
-		SetConnection(_host, _port, _user, _pwd, _dbName, _readTimeout, _writeTimeout);
+		SetConnection(option);
 	}
 	SqlOperator::~SqlOperator(){ ; }
 
-	void SqlOperator::SetConnection(const string &host, const int &port, const string &user, const string &pwd, const string &dbName, 
-			const int &_readTimeout, const int &_writeTimeout ){
+	void SqlOperator::SetConnection(const SqlConnectOption& option){
 		sql_options_.clear();
-		sql_options_.insert(pair< sql::SQLString, ConnectPropertyVal >("hostName", host));
-		sql_options_.insert(pair< sql::SQLString, ConnectPropertyVal >("password", pwd));
-		sql_options_.insert(pair< sql::SQLString, ConnectPropertyVal >("userName", user));
-		sql_options_.insert(pair< sql::SQLString, ConnectPropertyVal >("port", port));
-		sql_options_.insert(pair< sql::SQLString, ConnectPropertyVal >("schema", dbName));
-		sql_options_.insert(pair< sql::SQLString, ConnectPropertyVal >("OPT_READ_TIMEOUT", _readTimeout));
-		sql_options_.insert(pair< sql::SQLString, ConnectPropertyVal >("OPT_WRITE_TIMEOUT", _writeTimeout));
+		sql_options_.insert(pair< sql::SQLString, ConnectPropertyVal >("hostName", option.host));
+		sql_options_.insert(pair< sql::SQLString, ConnectPropertyVal >("password", option.pwd));
+		sql_options_.insert(pair< sql::SQLString, ConnectPropertyVal >("userName", option.user));
+		sql_options_.insert(pair< sql::SQLString, ConnectPropertyVal >("port", option.port));
+		sql_options_.insert(pair< sql::SQLString, ConnectPropertyVal >("schema", option.db_name));
+		sql_options_.insert(pair< sql::SQLString, ConnectPropertyVal >("OPT_READ_TIMEOUT", option.read_timeout));
+		sql_options_.insert(pair< sql::SQLString, ConnectPropertyVal >("OPT_WRITE_TIMEOUT", option.write_timeout));
 	}
 
 	bool SqlOperator::ExecQuery(const string &sqlCmd, std::map<std::string, std::string>& datas){

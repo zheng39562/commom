@@ -19,6 +19,25 @@
 #include "mysql_connection.h"
 
 namespace frsql{
+	class SqlOprtPool;
+
+	struct SqlConnectOption{
+		public:
+			SqlConnectOption(){
+				read_timeout = 60 * 1000;
+				write_timeout = 60 * 1000;
+			}
+			~SqlConnectOption()=default;
+		public:
+			std::string host;
+			int port;
+			std::string user;
+			std::string pwd; 
+			std::string db_name;
+			int read_timeout;
+			int write_timeout; 
+	};
+
 	//! \brief	sql条件转换函数。
 	std::string convertCond(const std::map<std::string, std::string> &sqlWhere);
 	std::string BuildQueryCmd(const std::string& table_name, const std::map<std::string, std::string>& condition);
@@ -34,10 +53,9 @@ namespace frsql{
 	//! \todo	优先mysql。后续会增加其他数据库标准操作。
 	class SqlOperator{
 		public:
-			//! \param[in] _readTimeout  unit is ms
-			//! \param[in] _writeTimeout  unit is ms
-			SqlOperator(const std::string &_host, const int &_port, const std::string &_user, const std::string &_pwd, const std::string &_dbName, 
-					const int _readTimeout, const int _writeTimeout);
+			friend class SqlOprtPool;
+		public:
+			SqlOperator(const SqlConnectOption& option);
 			~SqlOperator();
 		public:
 			//! \param[in] datas 仅对拥有返回值的select语句有效。其他复合语句返回空。
@@ -62,8 +80,7 @@ namespace frsql{
 			bool DeleteItem(const std::string& table_name, const std::map<std::string, std::string>& condition);
 		private:
 			//! \brief	设置数据库链接。
-			void SetConnection(const std::string &host, const int &port, const std::string &user, const std::string &pwd, const std::string &dbName, 
-				const int &_readTimeout, const int &_writeTimeout);
+			void SetConnection(const SqlConnectOption& option);
 			//! \brief	检查连接状态。当连接断开时，尝试自动重连
 			bool CheckConnectAndReconnect();
 		private:

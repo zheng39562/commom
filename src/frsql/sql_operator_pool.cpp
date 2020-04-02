@@ -16,29 +16,9 @@ using namespace std;
 using namespace frsql;
 using namespace frpublic;
 
-SqlOprtPool::SqlOprtPool()
-	:sql_operator_pool_(),
-	 read_timeout_(1),
-	 write_timeout_(1),
-	 mutex_sql_operator_()
-{
-}
-
-SqlOprtPool::~SqlOprtPool(){
-	;
-}
-
-void SqlOprtPool::Initialize(const string &host, const int &port, const string &user, const string &pwd, const string &db_name, 
-	const int read_timeout, const int write_timeout, int pool_size){
-	 read_timeout_ = read_timeout;
-	 write_timeout_ = write_timeout;
-	for(int index = 0; index < pool_size; ++index){
-		sql_operator_pool_.push_back(SqlOperatorPtr(new SqlOperator(host, port, user, pwd, db_name, read_timeout, write_timeout)));
-	}
-}
 
 bool SqlOprtPool::ExecQuery(const string &sql_cmd, map<string, string> &datas){
-	SqlOperatorPtr pSqlOperator = popSqlOprtPtr(read_timeout_);
+	SqlOperator* pSqlOperator = popSqlOprtPtr();
 	bool bRet(false);
 	if(pSqlOperator != NULL){
 		bRet = pSqlOperator->ExecQuery(sql_cmd, datas);
@@ -48,7 +28,7 @@ bool SqlOprtPool::ExecQuery(const string &sql_cmd, map<string, string> &datas){
 }
 
 bool SqlOprtPool::ExecQuery(const string &sql_cmd, vector<map<string, string> > &datas){
-	SqlOperatorPtr pSqlOperator = popSqlOprtPtr(read_timeout_);
+	SqlOperator* pSqlOperator = popSqlOprtPtr();
 	bool bRet(false);
 	if(pSqlOperator != NULL){
 		bRet = pSqlOperator->ExecQuery(sql_cmd, datas);
@@ -58,7 +38,7 @@ bool SqlOprtPool::ExecQuery(const string &sql_cmd, vector<map<string, string> > 
 }
 
 bool SqlOprtPool::ExecUpdate(const string &sql_cmd, int &updateCount){
-	SqlOperatorPtr pSqlOperator = popSqlOprtPtr(write_timeout_);
+	SqlOperator* pSqlOperator = popSqlOprtPtr();
 	bool bRet(false);
 	if(pSqlOperator != NULL){
 		bRet = pSqlOperator->ExecUpdate(sql_cmd, updateCount);
@@ -68,7 +48,7 @@ bool SqlOprtPool::ExecUpdate(const string &sql_cmd, int &updateCount){
 }
 
 bool SqlOprtPool::IsExist(const string& table_name, const map<string, string>& condition){
-	SqlOperatorPtr pSqlOperator = popSqlOprtPtr(write_timeout_);
+	SqlOperator* pSqlOperator = popSqlOprtPtr();
 	bool bRet(false);
 	if(pSqlOperator != NULL){
 		bRet = pSqlOperator->IsExist(table_name, condition);
@@ -78,7 +58,7 @@ bool SqlOprtPool::IsExist(const string& table_name, const map<string, string>& c
 }
 
 bool SqlOprtPool::QueryItem(const string& table_name, const map<string, string>& condition, map<string, string>& fields){
-	SqlOperatorPtr pSqlOperator = popSqlOprtPtr(write_timeout_);
+	SqlOperator* pSqlOperator = popSqlOprtPtr();
 	bool bRet(false);
 	if(pSqlOperator != NULL){
 		bRet = pSqlOperator->QueryItem(table_name, condition, fields);
@@ -88,7 +68,7 @@ bool SqlOprtPool::QueryItem(const string& table_name, const map<string, string>&
 }
 
 bool SqlOprtPool::QueryItems(const string& table_name, const map<string, string>& condition, vector<map<string, string> >& fields){
-	SqlOperatorPtr pSqlOperator = popSqlOprtPtr(write_timeout_);
+	SqlOperator* pSqlOperator = popSqlOprtPtr();
 	bool bRet(false);
 	if(pSqlOperator != NULL){
 		bRet = pSqlOperator->QueryItems(table_name, condition, fields);
@@ -98,7 +78,7 @@ bool SqlOprtPool::QueryItems(const string& table_name, const map<string, string>
 }
 
 bool SqlOprtPool::CreateItem(const string& table_name, const map<string, string>& fields){
-	SqlOperatorPtr pSqlOperator = popSqlOprtPtr(write_timeout_);
+	SqlOperator* pSqlOperator = popSqlOprtPtr();
 	bool bRet(false);
 	if(pSqlOperator != NULL){
 		bRet = pSqlOperator->CreateItem(table_name, fields);
@@ -108,7 +88,7 @@ bool SqlOprtPool::CreateItem(const string& table_name, const map<string, string>
 }
 
 bool SqlOprtPool::UpdateItem(const string& table_name, const map<string, string>& condition, const map<string, string>& fields){
-	SqlOperatorPtr pSqlOperator = popSqlOprtPtr(write_timeout_);
+	SqlOperator* pSqlOperator = popSqlOprtPtr();
 	bool bRet(false);
 	if(pSqlOperator != NULL){
 		bRet = pSqlOperator->UpdateItem(table_name, condition, fields);
@@ -118,7 +98,7 @@ bool SqlOprtPool::UpdateItem(const string& table_name, const map<string, string>
 }
 
 bool SqlOprtPool::DeleteItem(const string& table_name, const map<string, string>& condition){
-	SqlOperatorPtr pSqlOperator = popSqlOprtPtr(write_timeout_);
+	SqlOperator* pSqlOperator = popSqlOprtPtr();
 	bool bRet(false);
 	if(pSqlOperator != NULL){
 		bRet = pSqlOperator->DeleteItem(table_name, condition);
@@ -127,31 +107,38 @@ bool SqlOprtPool::DeleteItem(const string& table_name, const map<string, string>
 	return bRet;
 }
 
-SqlOperatorPtr SqlOprtPool::popSqlOprtPtr(int timeout){
-	while(--timeout >= 0){
-		{
-			lock_guard<mutex> lock(mutex_sql_operator_);
-			if(!sql_operator_pool_.empty()){
-				SqlOperatorPtr pSqlOperator = *sql_operator_pool_.begin();
-				sql_operator_pool_.erase(sql_operator_pool_.begin());
-				return pSqlOperator;
-			}
+SqlOprtPool::SqlOprtPool(const std::string& name, const SqlConnectOption& option, int pool_size)
+	:name_(name),
+	 sql_operator_pool_(),
+	 mutex_sql_operator_()
+{
+	for(int index = 0; index < pool_size; ++index){
+		SqlOperator* sql_oprt = new SqlOperator(option);
+		if(!sql_oprt->CheckConnectAndReconnect()){
+			sql_operator_pool_.clear();
+			return ;
 		}
-		FrSleep(1);
+		sql_operator_pool_.push_back(sql_oprt);
 	}
-	return SqlOperatorPtr();
 }
 
-void SqlOprtPool::pushSqlOprtPtr(SqlOperatorPtr pSqlOperator){
+SqlOprtPool::~SqlOprtPool(){
+	;
+}
+
+SqlOperator* SqlOprtPool::popSqlOprtPtr(){
+	lock_guard<mutex> lock(mutex_sql_operator_);
+	if(!sql_operator_pool_.empty()){
+		SqlOperator* pSqlOperator = *sql_operator_pool_.begin();
+		sql_operator_pool_.erase(sql_operator_pool_.begin());
+		return pSqlOperator;
+	}
+	return nullptr;
+}
+
+void SqlOprtPool::pushSqlOprtPtr(SqlOperator* pSqlOperator){
 	lock_guard<mutex> lock(mutex_sql_operator_);
 	sql_operator_pool_.push_back(pSqlOperator);
 }
 
-void ConnectSql(const string &host, const int &port, const string &user, const string &pwd, const string &db_name, const int read_timeout, const int write_timeout, int pool_size){
-	SingleSqlOprtPool::GetInstance()->Initialize(host, port, user, pwd, db_name, read_timeout, write_timeout, pool_size);
-}
-
-shared_ptr<SqlOprtPool> GetSqlOprtPool(){
-	return SingleSqlOprtPool::GetInstance();
-}
 
